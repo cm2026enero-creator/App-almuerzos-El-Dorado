@@ -1,0 +1,1617 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-slate-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Almuerzos del Barrio - Reserva Previa y Pago</title>
+
+  <!-- Tailwind CSS por CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts: Outfit para un look moderno y amigable -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Iconos Lucide -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Configuración personalizada de colores de Tailwind -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Outfit', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#fff7ed',
+              100: '#ffedd5',
+              500: '#f97316',
+              600: '#ea580c',
+              700: '#c2410c',
+            },
+            whatsapp: {
+              500: '#25D366',
+              600: '#128C7E',
+              700: '#075E54',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Estilos personalizados para animaciones y scroll */
+    body {
+      font-family: 'Outfit', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(8px);
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+
+    /* Animación de Éxito y Confetti para la Confirmación de Reserva */
+    @keyframes confetti-burst {
+      0% {
+        opacity: 1;
+        transform: translate(0, 0) scale(1) rotate(0deg);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(var(--tx), var(--ty)) scale(0.2) rotate(var(--tr));
+      }
+    }
+
+    .confetti-piece {
+      position: fixed;
+      border-radius: 3px;
+      pointer-events: none;
+      z-index: 9999;
+      animation: confetti-burst 0.85s cubic-bezier(0.12, 0.8, 0.3, 1) forwards;
+    }
+
+    @keyframes success-pulse {
+      0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.8);
+      }
+      40% {
+        transform: scale(1.04);
+        box-shadow: 0 0 0 18px rgba(34, 197, 94, 0);
+      }
+      100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+      }
+    }
+
+    .btn-success-active {
+      animation: success-pulse 0.65s ease-out;
+      background-color: #15803d !important; /* emerald-700 */
+    }
+  </style>
+</head>
+<body class="h-full text-slate-800 antialiased selection:bg-brand-500 selection:text-white">
+
+  <!-- CONTENEDOR PRINCIPAL MOBILE-FIRST -->
+  <div class="max-w-md mx-auto min-h-screen bg-slate-50 shadow-2xl relative flex flex-col pb-32">
+
+    <!-- ========================================== -->
+    <!-- 1. ENCABEZADO Y BARRA DE ESTADO DE RESERVAS -->
+    <!-- ========================================== -->
+    <header class="bg-gradient-to-r from-brand-600 via-brand-500 to-amber-500 text-white p-5 rounded-b-3xl shadow-lg relative overflow-hidden">
+      <!-- Decoración de fondo -->
+      <div class="absolute -right-6 -top-6 w-28 h-28 bg-white/10 rounded-full blur-xl"></div>
+      <div class="absolute right-12 -bottom-8 w-20 h-20 bg-amber-300/20 rounded-full blur-lg"></div>
+
+      <div class="relative z-10 flex justify-between items-start">
+        <div>
+          <div class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-semibold tracking-wide uppercase text-amber-100 mb-2">
+            <i data-lucide="utensils" class="w-3.5 h-3.5"></i>
+            <span>Sabor de Barrio</span>
+          </div>
+          <h1 class="text-2xl font-extrabold tracking-tight">Almuerzos del Fin de Semana</h1>
+          <p class="text-xs text-orange-100 mt-0.5">Reservas previas y entregas coordinadas</p>
+        </div>
+
+        <div class="flex items-center gap-1.5">
+          <!-- Botón Compartir App (Web Share API) -->
+          <button onclick="shareApp()" 
+                  class="p-2.5 bg-white/20 hover:bg-white/30 active:scale-95 backdrop-blur-md rounded-2xl transition duration-200 text-white shadow-sm flex items-center justify-center gap-1.5 text-xs font-bold"
+                  title="Compartir con vecinos">
+            <i data-lucide="share-2" class="w-4 h-4"></i>
+            <span class="hidden sm:inline">Compartir</span>
+          </button>
+
+          <!-- Botón para abrir el Panel de Administración -->
+          <button onclick="toggleAdminModal(true)" 
+                  class="p-2.5 bg-white/20 hover:bg-white/30 active:scale-95 backdrop-blur-md rounded-2xl transition duration-200 text-white shadow-sm flex items-center justify-center"
+                  title="Panel de Administración">
+            <i data-lucide="settings" class="w-5 h-5"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- BANNER DE ESTADO DEL PEDIDO (Días límite y disponibilidad) -->
+      <div id="status-banner" class="mt-4 p-3.5 rounded-2xl bg-white/15 backdrop-blur-md border border-white/20 flex items-center gap-3">
+        <div id="status-icon-container" class="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center shrink-0 shadow-sm">
+          <i data-lucide="calendar-check" class="w-5 h-5"></i>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-1.5">
+            <span id="status-indicator-dot" class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span id="status-title" class="font-bold text-sm text-white">Reservas Abiertas</span>
+          </div>
+          <p id="status-subtitle" class="text-xs text-orange-100 truncate mt-0.5">Plazo para reservar: Lunes a Viernes hasta las 8 PM</p>
+        </div>
+      </div>
+    </header>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="flex-1 px-4 pt-5 space-y-5">
+
+      <!-- ========================================== -->
+      <!-- 2. PRESENTACIÓN DEL PLATO DEL FIN DE SEMANA -->
+      <!-- ========================================== -->
+      <section class="bg-white rounded-3xl p-4 shadow-sm border border-slate-100 relative overflow-hidden">
+        <div class="relative rounded-2xl overflow-hidden aspect-video mb-3.5 bg-slate-100 shadow-inner group">
+          <!-- Imagen del plato principal -->
+          <img id="dish-image" 
+               src="https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80" 
+               alt="Plato del Fin de Semana" 
+               class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+          
+          <div class="absolute top-3 left-3 bg-slate-900/80 backdrop-blur-md text-white text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1 shadow-md">
+            <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-400"></i>
+            <span>Especial de la Semana</span>
+          </div>
+
+          <div class="absolute bottom-3 right-3 bg-brand-600 text-white font-extrabold text-lg px-3.5 py-1 rounded-2xl shadow-lg border border-white/20">
+            $<span id="dish-price-display">25.000</span>
+          </div>
+        </div>
+
+        <div>
+          <h2 id="dish-name-display" class="text-xl font-bold text-slate-900 leading-snug">Arroz con Pato Criollo</h2>
+          <p id="dish-desc-display" class="text-xs text-slate-600 mt-1 leading-relaxed">
+            Delicioso plato preparado con pato tierno macerado en chicha de jora, arroz verde al cilantro, yuca frita y salsa criolla de la casa.
+          </p>
+        </div>
+
+        <!-- Selector de Cantidad -->
+        <div class="mt-4 pt-3.5 border-t border-slate-100 flex items-center justify-between">
+          <span class="text-sm font-semibold text-slate-700">Cantidad de almuerzos:</span>
+          <div class="flex items-center gap-3 bg-slate-100 p-1.5 rounded-2xl border border-slate-200">
+            <button onclick="updateQuantity(-1)" class="w-8 h-8 rounded-xl bg-white text-slate-700 font-bold flex items-center justify-center shadow-sm active:scale-90 transition">
+              <i data-lucide="minus" class="w-4 h-4"></i>
+            </button>
+            <span id="quantity-display" class="font-extrabold text-lg w-6 text-center text-slate-900">1</span>
+            <button onclick="updateQuantity(1)" class="w-8 h-8 rounded-xl bg-brand-600 text-white font-bold flex items-center justify-center shadow-sm active:scale-90 transition">
+              <i data-lucide="plus" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- 3. OPCIONES DE ENTREGA (Recoger o Domicilio) -->
+      <!-- ========================================== -->
+      <section class="bg-white rounded-3xl p-4 shadow-sm border border-slate-100">
+        <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider text-xs text-slate-400 mb-3 flex items-center gap-1.5">
+          <i data-lucide="truck" class="w-4 h-4 text-brand-600"></i>
+          <span>Modo de Entrega</span>
+        </h3>
+
+        <!-- Pestañas Selectoras de Entrega -->
+        <div class="grid grid-cols-2 gap-2 p-1 bg-slate-100 rounded-2xl border border-slate-200">
+          <button id="btn-delivery-pickup" onclick="setDeliveryMode('pickup')" 
+                  class="py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition duration-200 bg-white text-brand-600 shadow-sm">
+            <i data-lucide="store" class="w-4 h-4"></i>
+            <span>Recoger en Sitio</span>
+          </button>
+          <button id="btn-delivery-home" onclick="setDeliveryMode('delivery')" 
+                  class="py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition duration-200 text-slate-600 hover:text-slate-900">
+            <i data-lucide="bike" class="w-4 h-4"></i>
+            <span>Domicilio (<span id="delivery-cost-badge">+$3.000</span>)</span>
+          </button>
+        </div>
+
+        <!-- Info para Recoger en Sitio -->
+        <div id="pickup-info-box" class="mt-3 p-3 bg-amber-50 rounded-2xl border border-amber-100 text-xs text-amber-900 flex items-start gap-2.5">
+          <i data-lucide="map-pin" class="w-4 h-4 text-amber-600 shrink-0 mt-0.5"></i>
+          <div>
+            <p class="font-bold">Dirección de recogida:</p>
+            <p id="pickup-address-display" class="mt-0.5 text-amber-800">Calle 10 #15-20, Frente al parque del barrio</p>
+          </div>
+        </div>
+
+        <!-- Campos para Domicilio -->
+        <div id="delivery-fields-box" class="mt-3 space-y-2.5 hidden">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Dirección exacta *</label>
+            <input type="text" id="cli-direccion" placeholder="Ej: Calle 45 # 12 - 34" 
+                   class="w-full text-xs p-3 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition bg-slate-50">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Barrio *</label>
+            <input type="text" id="input-neighborhood" placeholder="Ej: Barrio El Prado" 
+                   class="w-full text-xs p-3 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition bg-slate-50">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Notas / Referencias (Opcional)</label>
+            <input type="text" id="input-delivery-notes" placeholder="Ej: Casa de dos pisos, reja blanca" 
+                   class="w-full text-xs p-3 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition bg-slate-50">
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- 4. DATOS DEL CLIENTE -->
+      <!-- ========================================== -->
+      <section class="bg-white rounded-3xl p-4 shadow-sm border border-slate-100">
+        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+          <i data-lucide="user" class="w-4 h-4 text-brand-600"></i>
+          <span>Tus Datos de Contacto</span>
+        </h3>
+        <div class="space-y-2.5">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Nombre completo *</label>
+            <input type="text" id="cli-nombre" placeholder="Ej: Don Carlos Pérez" 
+                   class="w-full text-xs p-3 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition bg-slate-50">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Teléfono de contacto (10 dígitos) *</label>
+            <input type="tel" id="cli-telefono" maxlength="10" placeholder="Ej: 3001234567" 
+                   class="w-full text-xs p-3 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition bg-slate-50">
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- 5. SECCIÓN DE PAGO PARA RESERVAS (Obligatorio) -->
+      <!-- ========================================== -->
+      <section class="bg-white rounded-3xl p-4 shadow-sm border border-brand-200 bg-gradient-to-b from-white to-brand-50/30 relative">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+            <i data-lucide="credit-card" class="w-4 h-4 text-brand-600"></i>
+            <span>Métodos de Pago para Reserva</span>
+          </h3>
+          <span class="text-[10px] bg-red-100 text-red-700 font-bold px-2 py-0.5 rounded-full">Obligatorio</span>
+        </div>
+
+        <p class="text-xs text-slate-600 mb-3.5">
+          Para asegurar tu cupo, realiza la transferencia del total exacto a cualquiera de nuestras cuentas y adjunta el comprobante:
+        </p>
+
+        <!-- Cuentas de Pago Disponibles -->
+        <div class="space-y-2 mb-4">
+          <!-- NEQUI -->
+          <div class="p-3 bg-purple-50 rounded-2xl border border-purple-100 flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-xl bg-purple-600 text-white font-black text-xs flex items-center justify-center shrink-0">
+                N
+              </div>
+              <div>
+                <span class="text-xs font-bold text-purple-900 block">Nequi</span>
+                <span id="account-nequi-display" class="text-xs font-mono font-bold text-purple-700">300 123 4567</span>
+              </div>
+            </div>
+            <button onclick="copyToClipboard('account-nequi-display')" class="px-2.5 py-1 bg-white hover:bg-purple-100 text-purple-700 text-[11px] font-bold rounded-lg border border-purple-200 transition flex items-center gap-1">
+              <i data-lucide="copy" class="w-3 h-3"></i>
+              <span>Copiar</span>
+            </button>
+          </div>
+
+          <!-- DAVIPLATA -->
+          <div class="p-3 bg-red-50 rounded-2xl border border-red-100 flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-xl bg-red-600 text-white font-black text-xs flex items-center justify-center shrink-0">
+                D
+              </div>
+              <div>
+                <span class="text-xs font-bold text-red-900 block">Daviplata</span>
+                <span id="account-daviplata-display" class="text-xs font-mono font-bold text-red-700">300 123 4567</span>
+              </div>
+            </div>
+            <button onclick="copyToClipboard('account-daviplata-display')" class="px-2.5 py-1 bg-white hover:bg-red-100 text-red-700 text-[11px] font-bold rounded-lg border border-red-200 transition flex items-center gap-1">
+              <i data-lucide="copy" class="w-3 h-3"></i>
+              <span>Copiar</span>
+            </button>
+          </div>
+
+          <!-- BANCO / TRANSFIYA -->
+          <div class="p-3 bg-blue-50 rounded-2xl border border-blue-100 flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-xl bg-blue-600 text-white font-black text-xs flex items-center justify-center shrink-0">
+                <i data-lucide="building-2" class="w-4 h-4"></i>
+              </div>
+              <div>
+                <span class="text-xs font-bold text-blue-900 block">Banco / Transfiya</span>
+                <span id="account-banco-display" class="text-xs font-mono font-bold text-blue-700 truncate max-w-[180px] block">Ahorros 123-456789-01</span>
+              </div>
+            </div>
+            <button onclick="copyToClipboard('account-banco-display')" class="px-2.5 py-1 bg-white hover:bg-blue-100 text-blue-700 text-[11px] font-bold rounded-lg border border-blue-200 transition flex items-center gap-1">
+              <i data-lucide="copy" class="w-3 h-3"></i>
+              <span>Copiar</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- COMPROBANTE DE PAGO -->
+        <div class="pt-3 border-t border-slate-200/80">
+          <label class="block text-xs font-bold text-slate-800 mb-1.5 flex items-center gap-1">
+            <i data-lucide="upload-cloud" class="w-4 h-4 text-brand-600"></i>
+            <span>Subir comprobante de pago o N° de Referencia *</span>
+          </label>
+
+          <!-- Botón / Zona de Carga de Foto -->
+          <div class="relative mb-2.5">
+            <input type="file" id="file-payment-proof" accept="image/*" onchange="handleImageUpload(event)" class="hidden">
+            <label for="file-payment-proof" class="cursor-pointer border-2 border-dashed border-brand-300 hover:border-brand-500 bg-white p-3.5 rounded-2xl flex items-center justify-center gap-2 text-xs font-bold text-brand-700 transition hover:bg-brand-50">
+              <i data-lucide="image" class="w-4 h-4 text-brand-600"></i>
+              <span id="upload-btn-label">Adjuntar captura o foto del pago</span>
+            </label>
+          </div>
+
+          <!-- Vista previa de la imagen cargada -->
+          <div id="image-preview-container" class="hidden mb-2.5 p-2 bg-slate-100 rounded-2xl relative border border-slate-200">
+            <img id="image-preview" src="" alt="Comprobante" class="w-full h-32 object-cover rounded-xl">
+            <button onclick="removeImageUpload()" class="absolute top-3 right-3 bg-red-600 text-white p-1.5 rounded-full shadow-md active:scale-90 transition">
+              <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+            <p class="text-[10px] text-center text-emerald-600 font-bold mt-1 flex items-center justify-center gap-1">
+              <i data-lucide="check-circle-2" class="w-3 h-3"></i> Imagen adjuntada con éxito
+            </p>
+          </div>
+
+          <!-- Campo de Referencia Escrita -->
+          <div>
+            <span class="text-[11px] text-slate-500 block mb-1">O ingresa el número de transacción/referencia:</span>
+            <input type="text" id="input-payment-ref" placeholder="Ej: Ref Nequi N° 892301" 
+                   class="w-full text-xs p-3 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition bg-white">
+          </div>
+        </div>
+      </section>
+
+      <!-- RESUMEN DE TOTAL Y DESGLOSE -->
+      <section class="bg-slate-900 text-white rounded-3xl p-4 shadow-lg space-y-2">
+        <div class="flex justify-between text-xs text-slate-300">
+          <span>Subtotal (<span id="summary-quantity">1</span> almuerzo):</span>
+          <span class="font-bold">$<span id="summary-subtotal">25.000</span></span>
+        </div>
+        <div class="flex justify-between text-xs text-slate-300">
+          <span>Envío a domicilio:</span>
+          <span class="font-bold">$<span id="summary-delivery">0</span></span>
+        </div>
+        <div class="pt-2 border-t border-slate-800 flex justify-between items-center">
+          <span class="text-sm font-bold text-amber-400">TOTAL A PAGAR:</span>
+          <span class="text-xl font-extrabold text-white">$<span id="summary-total">25.000</span></span>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- 6. RESEÑAS DE VECINOS (Testimonios y Confianza) -->
+      <!-- ========================================== -->
+      <section class="bg-white rounded-3xl p-4 shadow-sm border border-slate-100 space-y-3">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-1.5">
+            <i data-lucide="message-square-heart" class="w-4 h-4 text-brand-600"></i>
+            <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider">Reseñas de Vecinos</h3>
+          </div>
+          <div class="flex items-center gap-1 bg-amber-50 px-2.5 py-1 rounded-full border border-amber-200">
+            <i data-lucide="star" class="w-3.5 h-3.5 text-amber-500 fill-amber-500"></i>
+            <span class="text-xs font-bold text-amber-900">4.9 / 5.0</span>
+            <span id="reviews-count-badge" class="text-[10px] text-amber-700 font-medium">(+45)</span>
+          </div>
+        </div>
+
+        <p class="text-xs text-slate-500">
+          Comentarios reales de familias del barrio que ya han probado nuestros almuerzos:
+        </p>
+
+        <!-- Lista Dinámica de Reseñas -->
+        <div id="reviews-container" class="space-y-2.5 max-h-80 overflow-y-auto custom-scrollbar pr-1">
+          <!-- Se genera dinámicamente desde JS -->
+        </div>
+
+        <!-- Botón para Agregar Reseña -->
+        <button onclick="toggleReviewModal(true)" class="w-full py-2.5 bg-slate-50 hover:bg-slate-100 active:scale-95 text-slate-700 text-xs font-bold rounded-2xl border border-slate-200 transition flex items-center justify-center gap-1.5 shadow-sm">
+          <i data-lucide="pen-tool" class="w-3.5 h-3.5 text-brand-600"></i>
+          <span>Dejar mi opinión como vecino</span>
+        </button>
+      </section>
+
+    </main>
+
+    <!-- ========================================== -->
+    <!-- 6. BARRA FIJA INFERIOR - BOTÓN DE WHATSAPP -->
+    <!-- ========================================== -->
+    <div class="fixed bottom-0 left-0 right-0 max-w-md mx-auto p-4 bg-white/95 backdrop-blur-md border-t border-slate-200 shadow-2xl z-20">
+      <button onclick="confirmOrderWhatsApp()" 
+              id="btn-whatsapp-confirm"
+              class="w-full py-4 px-5 bg-whatsapp-500 hover:bg-whatsapp-600 active:bg-whatsapp-700 text-white rounded-2xl font-bold text-base shadow-lg shadow-whatsapp-500/30 flex items-center justify-center gap-3 active:scale-[0.98] transition duration-200">
+        <i data-lucide="message-circle" class="w-6 h-6 fill-current"></i>
+        <span>Confirmar Reserva por WhatsApp</span>
+      </button>
+      <p class="text-[10px] text-center text-slate-500 mt-1.5">Se abrirá WhatsApp con el detalle de tu pedido y pago</p>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 7. PANEL DE ADMINISTRACIÓN (MODAL PARA EL DUEÑO) -->
+    <!-- ========================================== -->
+    <div id="admin-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+      <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in slide-in-from-bottom duration-300">
+        
+        <!-- Header Admin -->
+        <div class="p-4 bg-slate-900 text-white flex justify-between items-center border-b border-slate-800">
+          <div class="flex items-center gap-2">
+            <i data-lucide="sliders" class="w-5 h-5 text-amber-400"></i>
+            <h2 class="font-bold text-base">Panel de Administración</h2>
+          </div>
+          <button onclick="toggleAdminModal(false)" class="p-1 rounded-xl bg-slate-800 text-slate-300 hover:text-white">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <!-- Formulario de Configuración con Scroll -->
+        <div class="p-4 overflow-y-auto space-y-4 text-xs custom-scrollbar flex-1">
+
+          <!-- ESTADO DE RESERVAS (Activar/Desactivar) -->
+          <div class="p-3 bg-amber-50 rounded-2xl border border-amber-200">
+            <label class="font-bold text-slate-900 block mb-1">Estado de Reservas</label>
+            <div class="flex items-center gap-3 mt-2">
+              <label class="flex items-center gap-2 cursor-pointer font-semibold text-slate-700">
+                <input type="radio" name="admin-status" value="active" id="admin-status-active" class="accent-brand-600">
+                <span>🟢 Reservas Abiertas</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer font-semibold text-slate-700">
+                <input type="radio" name="admin-status" value="closed" id="admin-status-closed" class="accent-red-600">
+                <span>🔴 Cupos Agotados</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- DATOS DEL PLATO -->
+          <div class="space-y-3">
+            <h3 class="font-bold text-slate-900 uppercase text-[11px] text-slate-400">Configuración del Almuerzo</h3>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Nombre del Plato *</label>
+              <input type="text" id="admin-dish-name" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 font-medium">
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Descripción del Plato</label>
+              <textarea id="admin-dish-desc" rows="2" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 font-medium"></textarea>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block font-semibold text-slate-700 mb-1">Precio Almuerzo ($)</label>
+                <input type="number" id="admin-dish-price" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 font-medium">
+              </div>
+              <div>
+                <label class="block font-semibold text-slate-700 mb-1">Costo Domicilio ($)</label>
+                <input type="number" id="admin-delivery-cost" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 font-medium">
+              </div>
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Días/Plazo de Reserva</label>
+              <input type="text" id="admin-booking-deadline" placeholder="Ej: De lunes a viernes hasta las 8 PM" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 font-medium">
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Dirección de Recogida</label>
+              <input type="text" id="admin-pickup-address" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 font-medium">
+            </div>
+          </div>
+
+          <!-- CUENTAS Y WHATSAPP DEL NEGOCIO -->
+          <div class="space-y-3 pt-3 border-t border-slate-200">
+            <h3 class="font-bold text-slate-900 uppercase text-[11px] text-slate-400">Cuentas y WhatsApp</h3>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Número de WhatsApp del Negocio *</label>
+              <input type="text" id="admin-whatsapp" placeholder="Ej: 573001234567 (con código de país)" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 font-medium">
+              <span class="text-[10px] text-slate-400">Incluir prefijo de país sin '+' (Ej: 573001234567 para Colombia)</span>
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Número Nequi</label>
+              <input type="text" id="admin-nequi" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 font-medium">
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Número Daviplata</label>
+              <input type="text" id="admin-daviplata" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 font-medium">
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Cuenta Bancaria / Transfiya</label>
+              <input type="text" id="admin-banco" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 font-medium">
+            </div>
+          </div>
+
+          <!-- GESTIÓN Y REPORTE DE CLIENTES / RESERVAS -->
+          <div class="space-y-3 pt-3 border-t border-slate-200">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="font-bold text-slate-900 uppercase text-[11px] text-slate-400">Clientes y Reservas Registradas</h3>
+                <p class="text-slate-500 text-[11px] mt-0.5">
+                  Envía recordatorios individuales por WhatsApp y descarga reportes.
+                </p>
+              </div>
+              <span id="admin-orders-count-badge" class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full shrink-0">0 registradas</span>
+            </div>
+
+            <!-- Botón para Registrar Cliente Manualmente -->
+            <button onclick="toggleManualOrderModal(true)" class="w-full py-2.5 px-3 bg-brand-50 hover:bg-brand-100 text-brand-700 rounded-xl font-bold transition flex items-center justify-center gap-2 text-xs border border-brand-200">
+              <i data-lucide="user-plus" class="w-4 h-4"></i>
+              <span>+ Registrar Cliente Manualmente</span>
+            </button>
+
+            <!-- Lista de Reservas Registradas -->
+            <div id="admin-orders-list" class="space-y-2 max-h-60 overflow-y-auto pr-1">
+              <!-- Se renderiza con JS -->
+            </div>
+
+            <!-- Botones de Exportar CSV y Limpiar -->
+            <div class="flex gap-2 pt-1">
+              <button onclick="exportOrdersToCSV()" class="flex-1 py-2.5 px-3 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white rounded-xl font-bold transition flex items-center justify-center gap-2 shadow-sm text-xs">
+                <i data-lucide="file-spread-sheet" class="w-4 h-4"></i>
+                <span>Exportar Reporte (CSV)</span>
+              </button>
+              <button onclick="clearOrdersHistory()" class="py-2.5 px-3 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl font-semibold transition text-xs" title="Limpiar historial">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Footer Admin con Guardado -->
+        <div class="p-4 bg-slate-100 border-t border-slate-200 flex gap-2">
+          <button onclick="resetAdminDefaults()" class="py-3 px-4 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl font-bold transition">
+            Restablecer
+          </button>
+          <button onclick="saveAdminConfig()" class="flex-1 py-3 px-4 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-bold shadow-md transition flex items-center justify-center gap-2">
+            <i data-lucide="save" class="w-4 h-4"></i>
+            <span>Guardar Configuración</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- MODAL PARA AGREGAR RESEÑA -->
+    <div id="review-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+      <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-5 shadow-2xl space-y-4 animate-in slide-in-from-bottom duration-300">
+        <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+          <div class="flex items-center gap-2">
+            <i data-lucide="star" class="w-5 h-5 text-amber-500 fill-amber-500"></i>
+            <h3 class="font-bold text-base text-slate-900">Dejar Reseña de Vecino</h3>
+          </div>
+          <button onclick="toggleReviewModal(false)" class="p-1.5 rounded-xl bg-slate-100 text-slate-500 hover:text-slate-800">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <div class="space-y-3 text-xs">
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Tu Nombre o Familia *</label>
+            <input type="text" id="new-review-name" placeholder="Ej: Doña Carmen R. o Familia Pérez" class="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 outline-none focus:border-brand-500">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Barrio / Sector *</label>
+            <input type="text" id="new-review-sector" placeholder="Ej: Barrio San José" class="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 outline-none focus:border-brand-500">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Calificación</label>
+            <div class="flex items-center gap-2 py-1" id="star-rating-selector">
+              <button type="button" onclick="setRating(1)" class="star-btn text-amber-400 p-1 hover:scale-110 transition"><i data-lucide="star" class="w-6 h-6 fill-amber-400"></i></button>
+              <button type="button" onclick="setRating(2)" class="star-btn text-amber-400 p-1 hover:scale-110 transition"><i data-lucide="star" class="w-6 h-6 fill-amber-400"></i></button>
+              <button type="button" onclick="setRating(3)" class="star-btn text-amber-400 p-1 hover:scale-110 transition"><i data-lucide="star" class="w-6 h-6 fill-amber-400"></i></button>
+              <button type="button" onclick="setRating(4)" class="star-btn text-amber-400 p-1 hover:scale-110 transition"><i data-lucide="star" class="w-6 h-6 fill-amber-400"></i></button>
+              <button type="button" onclick="setRating(5)" class="star-btn text-amber-400 p-1 hover:scale-110 transition"><i data-lucide="star" class="w-6 h-6 fill-amber-400"></i></button>
+            </div>
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Tu Opinión sobre el Almuerzo *</label>
+            <textarea id="new-review-comment" rows="3" placeholder="Ej: ¡Excelente sazón casera, porción muy abundante y la entrega súper puntual!" class="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 outline-none focus:border-brand-500"></textarea>
+          </div>
+        </div>
+
+        <button onclick="submitNewReview()" class="w-full py-3.5 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl shadow-md transition flex items-center justify-center gap-2">
+          <i data-lucide="send" class="w-4 h-4"></i>
+          <span>Publicar Opinión</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- MODAL REGISTRAR CLIENTE MANUALMENTE (ADMIN) -->
+    <div id="manual-order-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+      <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-5 shadow-2xl space-y-4 animate-in slide-in-from-bottom duration-300">
+        <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+          <div class="flex items-center gap-2">
+            <i data-lucide="user-check" class="w-5 h-5 text-brand-600"></i>
+            <h3 class="font-bold text-base text-slate-900">Registrar Cliente / Reserva</h3>
+          </div>
+          <button onclick="toggleManualOrderModal(false)" class="p-1.5 rounded-xl bg-slate-100 text-slate-500 hover:text-slate-800">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <div class="space-y-3 text-xs">
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Nombre Completo del Cliente *</label>
+            <input type="text" id="manual-client-name" placeholder="Ej: Carlos Ramírez" class="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 outline-none focus:border-brand-500 font-medium">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Teléfono / WhatsApp *</label>
+            <input type="tel" id="manual-client-phone" placeholder="Ej: 3001234567" class="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 outline-none focus:border-brand-500 font-medium">
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Cantidad de Platos</label>
+              <input type="number" id="manual-client-qty" value="1" min="1" class="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 outline-none focus:border-brand-500 font-bold">
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Tipo de Entrega</label>
+              <select id="manual-client-type" class="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 outline-none focus:border-brand-500 font-medium">
+                <option value="Domicilio">Domicilio</option>
+                <option value="Recoger en sitio">Recoger en sitio</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Dirección / Notas</label>
+            <input type="text" id="manual-client-address" placeholder="Ej: Calle 10 # 5-30 Barrio Centro" class="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 outline-none focus:border-brand-500 font-medium">
+          </div>
+        </div>
+
+        <button onclick="submitManualOrder()" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-md transition flex items-center justify-center gap-2">
+          <i data-lucide="check" class="w-4 h-4"></i>
+          <span>Guardar Cliente en Registro</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="fixed top-5 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-4 py-2.5 rounded-2xl shadow-xl text-xs font-semibold z-50 hidden flex items-center gap-2">
+      <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
+      <span id="toast-message">Guardado exitosamente</span>
+    </div>
+
+  </div>
+
+  <!-- ========================================== -->
+  <!-- LÓGICA JAVASCRIPT PRINCIPAL                -->
+  <!-- ========================================== -->
+  <script>
+    // Configuración por defecto del negocio (Venta de Almuerzos)
+    const defaultConfig = {
+      nombrePlato: "Arroz con Pato Criollo Especial",
+      descripcionPlato: "Jugoso pato tierno macerado en chicha de jora y especias, acompañado de arroz verde con cilantro, yuca dorada y salsa criolla de la casa.",
+      precioPlato: 25000,
+      costoDomicilio: 3000,
+      reservasActivas: true,
+      plazoReserva: "De Lunes a Viernes hasta las 8:00 PM",
+      direccionNegocio: "Calle 10 #15-20, Frente al parque principal",
+      whatsapp: "573001234567",
+      nequi: "300 123 4567 - Don Carlos",
+      daviplata: "300 123 4567 - Don Carlos",
+      banco: "Bancolombia Ahorros # 123-456789-01 - Don Carlos"
+    };
+
+    // Reseñas por defecto de vecinos
+    const defaultReviews = [
+      {
+        nombre: "Doña Martha R.",
+        sector: "Barrio El Prado",
+        estrellas: 5,
+        comentario: "¡El pato estaba súper tierno y jugoso! Llegó a tiempo y calentito para el almuerzo familiar. Muy recomendado.",
+        fecha: "Hace 3 días",
+        verificado: true
+      },
+      {
+        nombre: "Don Gonzalo P.",
+        sector: "Sector Centro",
+        estrellas: 5,
+        comentario: "Excelente sazón casera. El arroz verde con salsa criolla queda perfecto. Ya reservé mi cupo para este fin de semana.",
+        fecha: "Hace 5 días",
+        verificado: true
+      },
+      {
+        nombre: "Familia Gómez",
+        sector: "Barrio San José",
+        estrellas: 5,
+        comentario: "Hicimos la reserva por Nequi sin complicaciones. Súper abundante la porción y la atención de Don Carlos de primera.",
+        fecha: "Hace 1 semana",
+        verificado: true
+      },
+      {
+        nombre: "Clara M.",
+        sector: "Calle 10",
+        estrellas: 5,
+        comentario: "La comodidad de reservar desde la semana nos asegura el almuerzo del domingo sin cocinar. 10/10.",
+        fecha: "Hace 2 semanas",
+        verificado: true
+      }
+    ];
+
+    // Reservas por defecto para el reporte
+    const defaultOrders = [
+      {
+        id: "RES-1001",
+        fecha: "08/08/2026 10:30 AM",
+        cliente: "Doña Martha R.",
+        telefono: "3001112233",
+        plato: "Arroz con Pato Criollo",
+        cantidad: 3,
+        tipoEntrega: "Domicilio",
+        direccion: "Calle 15 # 4-20, Barrio El Prado",
+        estado: "Pendiente",
+        total: 80000
+      },
+      {
+        id: "RES-1002",
+        fecha: "08/08/2026 11:15 AM",
+        cliente: "Don Gonzalo P.",
+        telefono: "3104445566",
+        plato: "Arroz con Pato Criollo",
+        cantidad: 2,
+        tipoEntrega: "Recoger en sitio",
+        direccion: "En punto de recogida",
+        estado: "Confirmado",
+        total: 50000
+      },
+      {
+        id: "RES-1003",
+        fecha: "08/08/2026 11:45 AM",
+        cliente: "Familia Gómez",
+        telefono: "3207778899",
+        plato: "Arroz con Pato Criollo",
+        cantidad: 4,
+        tipoEntrega: "Domicilio",
+        direccion: "Carrera 8 # 12-45, Barrio San José",
+        estado: "Entregado",
+        total: 105000
+      }
+    ];
+
+    // Estado runtime de la aplicación
+    let config = { ...defaultConfig };
+    let reviews = [ ...defaultReviews ];
+    let orders = [ ...defaultOrders ];
+    let selectedRating = 5;
+    let currentQuantity = 1;
+    let deliveryMode = 'pickup'; // 'pickup' o 'delivery'
+    let uploadedImageBase64 = null;
+
+    // Inicializar aplicación al cargar la página
+    document.addEventListener("DOMContentLoaded", () => {
+      lucide.createIcons();
+      loadConfigFromLocalStorage();
+      loadReviewsFromLocalStorage();
+      loadOrdersFromLocalStorage();
+      cargarVista();
+      renderApp();
+      renderReviews();
+      updateAdminOrdersCount();
+    });
+
+    // 2. AUTOCOMPLETADO AUTOMÁTICO (Sin Login)
+    function cargarVista() {
+      const savedData = localStorage.getItem('datos_cliente');
+      if (savedData) {
+        try {
+          const client = JSON.parse(savedData);
+          const nameEl = document.getElementById('cli-nombre') || document.getElementById('input-customer-name');
+          const phoneEl = document.getElementById('cli-telefono') || document.getElementById('input-customer-phone');
+          const addressEl = document.getElementById('cli-direccion') || document.getElementById('input-address');
+
+          if (nameEl && client.nombre) nameEl.value = client.nombre;
+          if (phoneEl && client.telefono) phoneEl.value = client.telefono;
+          if (addressEl && client.direccion) addressEl.value = client.direccion;
+        } catch (e) {
+          console.error("Error al autocompletar datos_cliente desde localStorage:", e);
+        }
+      }
+    }
+
+    // Cargar datos desde LocalStorage
+    function loadConfigFromLocalStorage() {
+      const saved = localStorage.getItem('almuerzos_barrio_config');
+      if (saved) {
+        try {
+          config = { ...defaultConfig, ...JSON.parse(saved) };
+        } catch (e) {
+          console.error("Error leyendo LocalStorage:", e);
+        }
+      }
+    }
+
+    function loadReviewsFromLocalStorage() {
+      const savedReviews = localStorage.getItem('almuerzos_barrio_reviews');
+      if (savedReviews) {
+        try {
+          reviews = JSON.parse(savedReviews);
+        } catch (e) {
+          console.error("Error leyendo reseñas:", e);
+        }
+      }
+    }
+
+    function saveReviewsToLocalStorage() {
+      localStorage.setItem('almuerzos_barrio_reviews', JSON.stringify(reviews));
+    }
+
+    function loadOrdersFromLocalStorage() {
+      const savedOrders = localStorage.getItem('almuerzos_barrio_orders');
+      if (savedOrders) {
+        try {
+          orders = JSON.parse(savedOrders);
+        } catch (e) {
+          console.error("Error leyendo reservas:", e);
+        }
+      }
+    }
+
+    function saveOrdersToLocalStorage() {
+      localStorage.setItem('almuerzos_barrio_orders', JSON.stringify(orders));
+    }
+
+    function updateAdminOrdersCount() {
+      const badge = document.getElementById('admin-orders-count-badge');
+      if (badge) {
+        badge.innerText = `${orders.length} registrada${orders.length === 1 ? '' : 's'}`;
+      }
+    }
+
+    // Web Share API para compartir la aplicación
+    function shareApp() {
+      const title = config.nombrePlato ? `Almuerzos de Barrio - ${config.nombrePlato}` : 'Almuerzos del Fin de Semana';
+      const text = `¡Hola vecino! Mira los deliciosos almuerzos para este fin de semana (${config.nombrePlato || 'Plato especial'}). Reserva tu cupo fácilmente aquí:`;
+      const url = window.location.href;
+
+      if (navigator.share) {
+        navigator.share({
+          title: title,
+          text: text,
+          url: url
+        }).then(() => {
+          showToast("¡Gracias por compartir con tus vecinos!");
+        }).catch(err => {
+          if (err.name !== 'AbortError') {
+            copyShareUrlToClipboard(url);
+          }
+        });
+      } else {
+        copyShareUrlToClipboard(url);
+      }
+    }
+
+    function copyShareUrlToClipboard(url) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(() => {
+          showToast("¡Enlace copiado al portapapeles!");
+        }).catch(() => {
+          showToast("Comparte esta app: " + url);
+        });
+      } else {
+        showToast("Comparte esta app: " + url);
+      }
+    }
+
+    // Exportar Reporte de Reservas a CSV
+    function exportOrdersToCSV() {
+      if (!orders || orders.length === 0) {
+        alert("No hay reservas registradas en el sistema para exportar.");
+        return;
+      }
+
+      let csvContent = "\uFEFF"; // UTF-8 BOM
+      csvContent += "ID Reserva,Fecha,Cliente,Teléfono,Plato,Cantidad,Tipo Entrega,Dirección,Estado,Total ($)\n";
+
+      orders.forEach(o => {
+        const row = [
+          `"${o.id}"`,
+          `"${o.fecha}"`,
+          `"${(o.cliente || '').replace(/"/g, '""')}"`,
+          `"${(o.telefono || '').replace(/"/g, '""')}"`,
+          `"${(o.plato || '').replace(/"/g, '""')}"`,
+          `"${o.cantidad}"`,
+          `"${(o.tipoEntrega || '').replace(/"/g, '""')}"`,
+          `"${(o.direccion || '').replace(/"/g, '""')}"`,
+          `"${o.estado || 'Pendiente'}"`,
+          `"${o.total}"`
+        ];
+        csvContent += row.join(",") + "\n";
+      });
+
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      const fileName = `Reporte_Reservas_Almuerzos_${new Date().toISOString().slice(0,10)}.csv`;
+      link.setAttribute("href", url);
+      link.setAttribute("download", fileName);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      showToast("¡Reporte CSV descargado con éxito!");
+    }
+
+    function clearOrdersHistory() {
+      if (confirm("¿Estás seguro de que deseas limpiar el historial de reservas registrado?")) {
+        orders = [];
+        saveOrdersToLocalStorage();
+        updateAdminOrdersCount();
+        renderAdminOrdersList();
+        showToast("Historial de reservas limpiado.");
+      }
+    }
+
+    // Cambiar estado de la reserva (Pendiente -> Confirmado -> Entregado)
+    function toggleOrderStatus(orderId) {
+      const order = orders.find(o => o.id === orderId);
+      if (!order) return;
+
+      const current = order.estado || 'Pendiente';
+      let nextStatus = 'Confirmado';
+      if (current === 'Pendiente') {
+        nextStatus = 'Confirmado';
+      } else if (current === 'Confirmado') {
+        nextStatus = 'Entregado';
+      } else {
+        nextStatus = 'Pendiente';
+      }
+
+      order.estado = nextStatus;
+      saveOrdersToLocalStorage();
+      renderAdminOrdersList();
+      showToast(`Reserva ${order.id}: ${nextStatus}`);
+    }
+
+    // Renderizar Lista de Reservas en el Panel de Administración
+    function renderAdminOrdersList() {
+      const container = document.getElementById('admin-orders-list');
+      if (!container) return;
+
+      if (!orders || orders.length === 0) {
+        container.innerHTML = `
+          <div class="p-3 bg-slate-50 border border-dashed border-slate-200 rounded-xl text-center text-slate-400 text-xs">
+            No hay clientes ni reservas registradas aún.
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = orders.map(o => {
+        const estado = o.estado || 'Pendiente';
+        let badgeClass = "bg-amber-100 text-amber-800 border-amber-300 hover:bg-amber-200";
+        let badgeIcon = "clock";
+
+        if (estado === 'Confirmado') {
+          badgeClass = "bg-blue-100 text-blue-800 border-blue-300 hover:bg-blue-200";
+          badgeIcon = "check-circle";
+        } else if (estado === 'Entregado') {
+          badgeClass = "bg-emerald-100 text-emerald-800 border-emerald-300 hover:bg-emerald-200";
+          badgeIcon = "check-check";
+        }
+
+        return `
+        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2 text-xs">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <div class="font-bold text-slate-900 text-sm flex items-center gap-1.5 flex-wrap">
+                <span>${o.cliente}</span>
+                <span class="bg-slate-200 text-slate-700 font-semibold text-[10px] px-2 py-0.5 rounded-full">${o.id}</span>
+              </div>
+              <div class="text-[11px] text-slate-500 flex items-center gap-2 mt-0.5">
+                <span class="flex items-center gap-1"><i data-lucide="phone" class="w-3 h-3 text-slate-400"></i>${o.telefono || 'Sin celular'}</span>
+                <span>•</span>
+                <span>${o.fecha}</span>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-1.5 shrink-0">
+              <!-- BADGE INTERACTIVO DE ESTADO -->
+              <button onclick="toggleOrderStatus('${o.id}')" class="px-2.5 py-1 rounded-full text-[10px] font-extrabold border transition flex items-center gap-1 cursor-pointer shadow-2xs ${badgeClass}" title="Haz clic para cambiar estado (Pendiente ➔ Confirmado ➔ Entregado)">
+                <i data-lucide="${badgeIcon}" class="w-3 h-3"></i>
+                <span>${estado}</span>
+              </button>
+
+              <button onclick="deleteOrder('${o.id}')" class="p-1 text-slate-400 hover:text-red-500 rounded transition" title="Eliminar cliente">
+                <i data-lucide="trash" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="bg-white p-2 rounded-lg border border-slate-100 flex items-center justify-between text-[11px]">
+            <div>
+              <span class="font-bold text-slate-800">${o.cantidad}x ${o.plato}</span>
+              <span class="text-slate-500 block text-[10px]">${o.tipoEntrega}: ${o.direccion || 'Recogida'}</span>
+            </div>
+            <span class="font-extrabold text-brand-600 text-xs">$${Number(o.total).toLocaleString('es-CO')}</span>
+          </div>
+
+          <!-- BOTÓN RECORDATORIO WHATSAPP -->
+          <button onclick="sendWhatsAppReminder('${o.id}')" class="w-full py-2 px-3 bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-white font-bold rounded-lg transition flex items-center justify-center gap-1.5 shadow-2xs text-[11px]">
+            <svg class="w-3.5 h-3.5 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.299.38 2.51 1.036 3.531l-.679 2.48 2.541-.666c.983.537 2.11.83 3.308.83 3.18 0 5.767-2.586 5.767-5.766 0-3.18-2.587-5.765-5.767-5.765zm0 10.455c-1.026 0-1.989-.289-2.812-.792l-.201-.122-1.503.394.401-1.464-.132-.21c-.563-.896-.861-1.938-.861-3.023 0-2.859 2.327-5.186 5.187-5.186 2.859 0 5.186 2.327 5.186 5.186 0 2.86-2.327 5.187-5.186 5.187zm-11.861-4.627c0 6.627 5.373 12 12 12s12-5.373 12-12-5.373-12-12-12-12 5.373-12 12z"/></svg>
+            <span>Enviar Recordatorio por WhatsApp</span>
+          </button>
+        </div>
+      `;
+      }).join('');
+
+      lucide.createIcons();
+    }
+
+    // Enviar Recordatorio por WhatsApp
+    function sendWhatsAppReminder(orderId) {
+      const order = orders.find(o => o.id === orderId);
+      if (!order) return;
+
+      let phone = (order.telefono || "").replace(/[^0-9]/g, '');
+      if (!phone || phone.length < 7) {
+        phone = prompt("Por favor ingresa el número de WhatsApp del cliente (con código de país ej: 573001234567):", "57");
+        if (!phone) return;
+        phone = phone.replace(/[^0-9]/g, '');
+      } else if (!phone.startsWith('57') && phone.length === 10) {
+        phone = '57' + phone; // Asumir Colombia si tiene 10 dígitos sin prefijo
+      }
+
+      const msg = `¡Hola ${order.cliente}! 🍲 Te escribimos desde *Almuerzos de Barrio*.\n\nLe recordamos amablemente que su reserva de *${order.cantidad}x ${order.plato}* (${order.tipoEntrega}) está programada para este fin de semana.\n\n💰 *Total a pagar/confirmado:* $${Number(order.total).toLocaleString('es-CO')}\n📍 *Dirección/Punto:* ${order.direccion}\n\n¡Muchas gracias por su confianza y buen provecho!`;
+
+      const whatsappUrl = `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(msg)}`;
+      window.open(whatsappUrl, '_blank');
+      showToast("Abriendo WhatsApp con el recordatorio...");
+    }
+
+    // Eliminar una reserva individual
+    function deleteOrder(orderId) {
+      if (confirm("¿Deseas eliminar este registro de cliente?")) {
+        orders = orders.filter(o => o.id !== orderId);
+        saveOrdersToLocalStorage();
+        updateAdminOrdersCount();
+        renderAdminOrdersList();
+        showToast("Registro de cliente eliminado.");
+      }
+    }
+
+    // Modal para Registrar Cliente Manualmente
+    function toggleManualOrderModal(show) {
+      const modal = document.getElementById('manual-order-modal');
+      if (show) {
+        document.getElementById('manual-client-name').value = '';
+        document.getElementById('manual-client-phone').value = '';
+        document.getElementById('manual-client-qty').value = '1';
+        document.getElementById('manual-client-address').value = '';
+        modal.classList.remove('hidden');
+      } else {
+        modal.classList.add('hidden');
+      }
+    }
+
+    function submitManualOrder() {
+      const name = document.getElementById('manual-client-name').value.trim();
+      const phone = document.getElementById('manual-client-phone').value.trim();
+      const qty = parseInt(document.getElementById('manual-client-qty').value) || 1;
+      const type = document.getElementById('manual-client-type').value;
+      const address = document.getElementById('manual-client-address').value.trim();
+
+      if (!name) {
+        alert("Por favor ingresa el Nombre del cliente.");
+        return;
+      }
+
+      const subtotal = qty * Number(config.precioPlato);
+      const deliveryFee = (type === 'Domicilio') ? Number(config.costoDomicilio) : 0;
+      const total = subtotal + deliveryFee;
+
+      const newOrder = {
+        id: "RES-" + Math.floor(1000 + Math.random() * 9000),
+        fecha: new Date().toLocaleDateString('es-CO') + ' ' + new Date().toLocaleTimeString('es-CO', {hour: '2-digit', minute:'2-digit'}),
+        cliente: name,
+        telefono: phone || 'Sin número',
+        plato: config.nombrePlato,
+        cantidad: qty,
+        tipoEntrega: type,
+        direccion: address || (type === 'Domicilio' ? 'Por definir' : config.direccionNegocio),
+        estado: 'Pendiente',
+        total: total
+      };
+
+      orders.unshift(newOrder);
+      saveOrdersToLocalStorage();
+      updateAdminOrdersCount();
+      renderAdminOrdersList();
+      toggleManualOrderModal(false);
+      showToast("¡Cliente registrado con éxito!");
+    }
+
+    // Renderizar lista de reseñas
+    function renderReviews() {
+      const container = document.getElementById('reviews-container');
+      const badge = document.getElementById('reviews-count-badge');
+      if (!container) return;
+
+      if (badge) badge.innerText = `(+${reviews.length + 42})`;
+
+      container.innerHTML = reviews.map(rev => {
+        const initials = rev.nombre.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+        const starsHtml = Array.from({ length: 5 }, (_, i) => `
+          <svg class="w-3.5 h-3.5 ${i < rev.estrellas ? 'text-amber-400 fill-amber-400' : 'text-slate-200 fill-slate-200'}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        `).join('');
+
+        return `
+          <div class="p-3 bg-slate-50/80 rounded-2xl border border-slate-100 shadow-2xs space-y-1.5">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <div class="w-7 h-7 rounded-full bg-brand-100 text-brand-700 font-extrabold text-[10px] flex items-center justify-center shrink-0">
+                  ${initials}
+                </div>
+                <div>
+                  <div class="flex items-center gap-1.5">
+                    <span class="font-bold text-xs text-slate-800">${rev.nombre}</span>
+                    ${rev.verificado ? `<span class="bg-emerald-100 text-emerald-800 text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5"><i data-lucide="check-circle-2" class="w-2.5 h-2.5"></i>Vecino Comprador</span>` : ''}
+                  </div>
+                  <span class="text-[10px] text-slate-400 block">${rev.sector} • ${rev.fecha}</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-0.5">
+                ${starsHtml}
+              </div>
+            </div>
+            <p class="text-xs text-slate-600 leading-relaxed italic pl-1">
+              "${rev.comentario}"
+            </p>
+          </div>
+        `;
+      }).join('');
+
+      lucide.createIcons();
+    }
+
+    // Modal de Reseñas
+    function toggleReviewModal(show) {
+      const modal = document.getElementById('review-modal');
+      if (show) {
+        modal.classList.remove('hidden');
+      } else {
+        modal.classList.add('hidden');
+      }
+    }
+
+    function setRating(rating) {
+      selectedRating = rating;
+      const buttons = document.querySelectorAll('#star-rating-selector .star-btn svg');
+      buttons.forEach((svg, idx) => {
+        if (idx < rating) {
+          svg.classList.add('fill-amber-400', 'text-amber-400');
+          svg.classList.remove('text-slate-300', 'fill-slate-200');
+        } else {
+          svg.classList.remove('fill-amber-400', 'text-amber-400');
+          svg.classList.add('text-slate-300', 'fill-slate-200');
+        }
+      });
+    }
+
+    function submitNewReview() {
+      const name = document.getElementById('new-review-name').value.trim();
+      const sector = document.getElementById('new-review-sector').value.trim();
+      const comment = document.getElementById('new-review-comment').value.trim();
+
+      if (!name || !sector || !comment) {
+        alert("Por favor completa tu nombre, barrio y comentario.");
+        return;
+      }
+
+      const newRev = {
+        nombre: name,
+        sector: sector,
+        estrellas: selectedRating,
+        comentario: comment,
+        fecha: "Hoy",
+        verificado: true
+      };
+
+      reviews.unshift(newRev);
+      saveReviewsToLocalStorage();
+      renderReviews();
+
+      // Limpiar campos
+      document.getElementById('new-review-name').value = '';
+      document.getElementById('new-review-sector').value = '';
+      document.getElementById('new-review-comment').value = '';
+
+      toggleReviewModal(false);
+      showToast("¡Gracias por tu reseña! Ya está publicada.");
+    }
+
+    // Guardar datos en LocalStorage
+    function saveConfigToLocalStorage() {
+      localStorage.setItem('almuerzos_barrio_config', JSON.stringify(config));
+    }
+
+    // Renderizar la vista según la configuración actual
+    function renderApp() {
+      // 1. Estado de Reservas
+      const statusBanner = document.getElementById('status-banner');
+      const statusTitle = document.getElementById('status-title');
+      const statusSubtitle = document.getElementById('status-subtitle');
+      const statusDot = document.getElementById('status-indicator-dot');
+      const statusIcon = document.getElementById('status-icon-container');
+
+      if (config.reservasActivas) {
+        statusTitle.innerText = "Reservas Abiertas para este fin de semana";
+        statusSubtitle.innerText = "Plazo de reserva: " + (config.plazoReserva || "De Lunes a Viernes");
+        statusDot.className = "w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse";
+        statusIcon.className = "w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center shrink-0 shadow-sm";
+      } else {
+        statusTitle.innerText = "Reservas Cerradas (Cupos Agotados)";
+        statusSubtitle.innerText = "Agradecemos tu preferencia. ¡Te esperamos el próximo fin de semana!";
+        statusDot.className = "w-2.5 h-2.5 rounded-full bg-red-400";
+        statusIcon.className = "w-10 h-10 rounded-xl bg-red-500 text-white flex items-center justify-center shrink-0 shadow-sm";
+      }
+
+      // 2. Plato y Precios
+      document.getElementById('dish-name-display').innerText = config.nombrePlato;
+      document.getElementById('dish-desc-display').innerText = config.descripcionPlato;
+      document.getElementById('dish-price-display').innerText = Number(config.precioPlato).toLocaleString('es-CO');
+      document.getElementById('delivery-cost-badge').innerText = '+$' + Number(config.costoDomicilio).toLocaleString('es-CO');
+      document.getElementById('pickup-address-display').innerText = config.direccionNegocio;
+
+      // 3. Cuentas
+      document.getElementById('account-nequi-display').innerText = config.nequi || "No disponible";
+      document.getElementById('account-daviplata-display').innerText = config.daviplata || "No disponible";
+      document.getElementById('account-banco-display').innerText = config.banco || "No disponible";
+
+      // 4. Actualizar Totales
+      calculateTotals();
+    }
+
+    // Cambiar Cantidad de Almuerzos
+    function updateQuantity(delta) {
+      currentQuantity = Math.max(1, currentQuantity + delta);
+      document.getElementById('quantity-display').innerText = currentQuantity;
+      calculateTotals();
+    }
+
+    // Cambiar Modo de Entrega (Recoger vs Domicilio)
+    function setDeliveryMode(mode) {
+      deliveryMode = mode;
+      const btnPickup = document.getElementById('btn-delivery-pickup');
+      const btnDelivery = document.getElementById('btn-delivery-home');
+      const pickupBox = document.getElementById('pickup-info-box');
+      const deliveryBox = document.getElementById('delivery-fields-box');
+
+      if (mode === 'pickup') {
+        btnPickup.className = "py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition duration-200 bg-white text-brand-600 shadow-sm";
+        btnDelivery.className = "py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition duration-200 text-slate-600 hover:text-slate-900";
+        pickupBox.classList.remove('hidden');
+        deliveryBox.classList.add('hidden');
+      } else {
+        btnDelivery.className = "py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition duration-200 bg-white text-brand-600 shadow-sm";
+        btnPickup.className = "py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition duration-200 text-slate-600 hover:text-slate-900";
+        pickupBox.classList.add('hidden');
+        deliveryBox.classList.remove('hidden');
+      }
+      calculateTotals();
+    }
+
+    // Calcular totales finales
+    function calculateTotals() {
+      const subtotal = currentQuantity * Number(config.precioPlato);
+      const deliveryFee = (deliveryMode === 'delivery') ? Number(config.costoDomicilio) : 0;
+      const total = subtotal + deliveryFee;
+
+      document.getElementById('summary-quantity').innerText = currentQuantity;
+      document.getElementById('summary-subtotal').innerText = subtotal.toLocaleString('es-CO');
+      document.getElementById('summary-delivery').innerText = deliveryFee.toLocaleString('es-CO');
+      document.getElementById('summary-total').innerText = total.toLocaleString('es-CO');
+    }
+
+    // Manejar subida de foto de comprobante
+    function handleImageUpload(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          uploadedImageBase64 = e.target.result;
+          document.getElementById('image-preview').src = uploadedImageBase64;
+          document.getElementById('image-preview-container').classList.remove('hidden');
+          document.getElementById('upload-btn-label').innerText = "Cambiar foto del comprobante";
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    // Eliminar foto adjunta
+    function removeImageUpload() {
+      uploadedImageBase64 = null;
+      document.getElementById('file-payment-proof').value = "";
+      document.getElementById('image-preview-container').classList.add('hidden');
+      document.getElementById('upload-btn-label').innerText = "Adjuntar captura o foto del pago";
+    }
+
+    // Copiar números de cuenta al portapapeles
+    function copyToClipboard(elementId) {
+      const text = document.getElementById(elementId).innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        showToast("¡Número copiado al portapapeles!");
+      });
+    }
+
+    // Mostrar Notificación Toast
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toast-message').innerText = message;
+      toast.classList.remove('hidden');
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 3000);
+    }
+
+    // Abrir/Cerrar Modal de Administración
+    function toggleAdminModal(show) {
+      const modal = document.getElementById('admin-modal');
+      if (show) {
+        // Cargar valores actuales en el formulario admin
+        document.getElementById('admin-dish-name').value = config.nombrePlato;
+        document.getElementById('admin-dish-desc').value = config.descripcionPlato;
+        document.getElementById('admin-dish-price').value = config.precioPlato;
+        document.getElementById('admin-delivery-cost').value = config.costoDomicilio;
+        document.getElementById('admin-booking-deadline').value = config.plazoReserva;
+        document.getElementById('admin-pickup-address').value = config.direccionNegocio;
+        document.getElementById('admin-whatsapp').value = config.whatsapp;
+        document.getElementById('admin-nequi').value = config.nequi;
+        document.getElementById('admin-daviplata').value = config.daviplata;
+        document.getElementById('admin-banco').value = config.banco;
+
+        if (config.reservasActivas) {
+          document.getElementById('admin-status-active').checked = true;
+        } else {
+          document.getElementById('admin-status-closed').checked = true;
+        }
+
+        renderAdminOrdersList();
+        modal.classList.remove('hidden');
+      } else {
+        modal.classList.add('hidden');
+      }
+    }
+
+    // Guardar cambios en el Panel de Administración
+    function saveAdminConfig() {
+      config.nombrePlato = document.getElementById('admin-dish-name').value.trim() || defaultConfig.nombrePlato;
+      config.descripcionPlato = document.getElementById('admin-dish-desc').value.trim() || defaultConfig.descripcionPlato;
+      config.precioPlato = Number(document.getElementById('admin-dish-price').value) || defaultConfig.precioPlato;
+      config.costoDomicilio = Number(document.getElementById('admin-delivery-cost').value) || 0;
+      config.plazoReserva = document.getElementById('admin-booking-deadline').value.trim();
+      config.direccionNegocio = document.getElementById('admin-pickup-address').value.trim();
+      config.whatsapp = document.getElementById('admin-whatsapp').value.trim().replace(/[^0-9]/g, '');
+      config.nequi = document.getElementById('admin-nequi').value.trim();
+      config.daviplata = document.getElementById('admin-daviplata').value.trim();
+      config.banco = document.getElementById('admin-banco').value.trim();
+      config.reservasActivas = document.getElementById('admin-status-active').checked;
+
+      saveConfigToLocalStorage();
+      renderApp();
+      toggleAdminModal(false);
+      showToast("Configuración del negocio actualizada");
+    }
+
+    // Restablecer configuraciones por defecto
+    function resetAdminDefaults() {
+      if (confirm("¿Deseas restablecer todos los valores iniciales?")) {
+        config = { ...defaultConfig };
+        saveConfigToLocalStorage();
+        renderApp();
+        toggleAdminModal(false);
+        showToast("Valores restablecidos por defecto");
+      }
+    }
+
+    // 1. VALIDACIÓN DE CELULAR Y ENVÍO DE RESERVA
+    function enviarReservaWhatsApp() {
+      // Validar disponibilidad de reservas
+      if (!config.reservasActivas) {
+        alert("Las reservas están cerradas temporalmente. Disculpa los inconvenientes.");
+        return;
+      }
+
+      // Obtener campos de entrada del cliente (soporta cli-nombre/cli-telefono/cli-direccion)
+      const inputNombre = document.getElementById('cli-nombre') || document.getElementById('input-customer-name');
+      const inputTelefono = document.getElementById('cli-telefono') || document.getElementById('input-customer-phone');
+
+      const customerName = inputNombre ? inputNombre.value.trim() : "";
+      const rawPhone = inputTelefono ? inputTelefono.value.trim() : "";
+
+      // Validar que el nombre no esté vacío
+      if (!customerName) {
+        alert("Por favor ingresa tu Nombre completo para la reserva.");
+        if (inputNombre) inputNombre.focus();
+        return;
+      }
+
+      // 1. VALIDACIÓN DE CELULAR: Verificar que tenga exactamente 10 dígitos (Formato estándar Colombia, ej. 3001234567)
+      const phoneClean = rawPhone.replace(/[^0-9]/g, '');
+      if (phoneClean.length !== 10) {
+        alert("Por favor ingresa un número de celular válido de 10 dígitos (ejemplo: 3001234567).");
+        if (inputTelefono) inputTelefono.focus();
+        return;
+      }
+
+      // Validar Dirección en caso de Domicilio
+      let address = "";
+      let neighborhood = "";
+      let deliveryNotes = "";
+
+      if (deliveryMode === 'delivery') {
+        const inputDir = document.getElementById('cli-direccion') || document.getElementById('input-address');
+        const inputBarrio = document.getElementById('input-neighborhood');
+        const inputNotas = document.getElementById('input-delivery-notes');
+
+        address = inputDir ? inputDir.value.trim() : "";
+        neighborhood = inputBarrio ? inputBarrio.value.trim() : "";
+        deliveryNotes = inputNotas ? inputNotas.value.trim() : "";
+
+        if (!address || !neighborhood) {
+          alert("Por favor ingresa tu Dirección y Barrio para el domicilio.");
+          if (inputDir && !address) inputDir.focus();
+          return;
+        }
+      }
+
+      // Validar Comprobante o Referencia de Pago
+      const paymentRef = document.getElementById('input-payment-ref').value.trim();
+      if (!uploadedImageBase64 && !paymentRef) {
+        alert("Por favor adjunta la foto del comprobante de pago o escribe el número de referencia para confirmar la reserva.");
+        document.getElementById('input-payment-ref').focus();
+        return;
+      }
+
+      // 2. AUTOCOMPLETADO AUTOMÁTICO (Sin Login): Guardar datos en localStorage con la clave 'datos_cliente'
+      const datosCliente = {
+        nombre: customerName,
+        telefono: phoneClean,
+        direccion: address
+      };
+      localStorage.setItem('datos_cliente', JSON.stringify(datosCliente));
+
+      // Cálculos Finales
+      const subtotal = currentQuantity * Number(config.precioPlato);
+      const deliveryFee = (deliveryMode === 'delivery') ? Number(config.costoDomicilio) : 0;
+      const total = subtotal + deliveryFee;
+
+      // 3. FORMATO DEL MENSAJE DE WHATSAPP: Incluye el número de teléfono del cliente en el registro claro del chat
+      let msg = `*NUEVA RESERVA DE ALMUERZO DE FIN DE SEMANA* 🍽️\n\n`;
+      msg += `👤 *Cliente:* ${customerName}\n`;
+      msg += `📞 *Teléfono:* ${phoneClean}\n\n`;
+
+      msg += `🍲 *PEDIDO:* ${currentQuantity} x ${config.nombrePlato}\n`;
+      msg += `💵 *Subtotal:* $${subtotal.toLocaleString('es-CO')}\n\n`;
+
+      msg += `🛵 *TIPO DE ENTREGA:* ${deliveryMode === 'delivery' ? 'Domicilio' : 'Recoger en Sitio'}\n`;
+      if (deliveryMode === 'delivery') {
+        msg += `📍 *Dirección:* ${address}\n`;
+        msg += `🏙️ *Barrio:* ${neighborhood}\n`;
+        if (deliveryNotes) msg += `📝 *Nota:* ${deliveryNotes}\n`;
+        msg += `🚚 *Costo Domicilio:* $${deliveryFee.toLocaleString('es-CO')}\n`;
+      } else {
+        msg += `🏠 *Punto de recogida:* ${config.direccionNegocio}\n`;
+      }
+
+      msg += `\n💰 *TOTAL A PAGAR:* $${total.toLocaleString('es-CO')}\n\n`;
+
+      msg += `💳 *COMPROBANTE DE PAGO:*\n`;
+      if (paymentRef) {
+        msg += `• *Referencia de Transacción:* ${paymentRef}\n`;
+      }
+      if (uploadedImageBase64) {
+        msg += `• 📸 *Nota:* Te adjunto la foto/captura del comprobante de pago a continuación en este chat.\n`;
+      }
+
+      msg += `\n¡Quedo atento a la confirmación! Gracias.`;
+
+      // Guardar registro de la reserva para el reporte CSV de la administración
+      const newOrder = {
+        id: "RES-" + Math.floor(1000 + Math.random() * 9000),
+        fecha: new Date().toLocaleDateString('es-CO') + ' ' + new Date().toLocaleTimeString('es-CO', {hour: '2-digit', minute:'2-digit'}),
+        cliente: customerName,
+        telefono: phoneClean,
+        plato: config.nombrePlato,
+        cantidad: currentQuantity,
+        tipoEntrega: deliveryMode === 'delivery' ? 'Domicilio' : 'Recoger en sitio',
+        direccion: deliveryMode === 'delivery' ? `${address}, ${neighborhood}` : config.direccionNegocio,
+        estado: 'Pendiente',
+        total: total
+      };
+      orders.unshift(newOrder);
+      saveOrdersToLocalStorage();
+      updateAdminOrdersCount();
+      renderAdminOrdersList();
+
+      // Abrir enlace de WhatsApp con animación de éxito y confetti
+      const cleanAdminPhone = (config.whatsapp || "573001234567").replace(/[^0-9]/g, '');
+      const encodedMsg = encodeURIComponent(msg);
+      const whatsappUrl = `https://api.whatsapp.com/send?phone=${cleanAdminPhone}&text=${encodedMsg}`;
+
+      const btn = document.getElementById('btn-whatsapp-confirm');
+      if (btn) {
+        triggerConfettiAndSuccess(btn, () => {
+          window.open(whatsappUrl, '_blank');
+        });
+      } else {
+        window.open(whatsappUrl, '_blank');
+      }
+    }
+
+    // Alias confirmOrderWhatsApp para compatibilidad con botones existentes
+    function confirmOrderWhatsApp() {
+      enviarReservaWhatsApp();
+    }
+
+    // Efecto de Confetti y Transición de Éxito en el Botón de WhatsApp
+    function triggerConfettiAndSuccess(btn, callback) {
+      if (btn.dataset.animating === "true") return;
+      btn.dataset.animating = "true";
+
+      const rect = btn.getBoundingClientRect();
+      const colors = ['#22c55e', '#eab308', '#f97316', '#3b82f6', '#ec4899', '#10b981', '#f59e0b'];
+
+      // Generar 30 partículas de confetti que explotan hacia arriba y lados
+      for (let i = 0; i < 30; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti-piece';
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        const tx = (Math.random() - 0.5) * 260 + 'px';
+        const ty = (Math.random() * -180 - 50) + 'px';
+        const tr = (Math.random() * 360) + 'deg';
+        const size = Math.floor(Math.random() * 6) + 6 + 'px';
+
+        confetti.style.backgroundColor = color;
+        confetti.style.width = size;
+        confetti.style.height = size;
+        confetti.style.left = (rect.left + rect.width / 2) + 'px';
+        confetti.style.top = (rect.top + rect.height / 2) + 'px';
+        confetti.style.setProperty('--tx', tx);
+        confetti.style.setProperty('--ty', ty);
+        confetti.style.setProperty('--tr', tr);
+
+        document.body.appendChild(confetti);
+
+        setTimeout(() => {
+          confetti.remove();
+        }, 850);
+      }
+
+      // Animación visual del botón
+      const originalHtml = btn.innerHTML;
+      btn.classList.add('btn-success-active');
+      btn.innerHTML = `
+        <svg class="w-6 h-6 animate-bounce text-amber-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        <span class="font-extrabold tracking-wide text-white">¡Reserva Lista! Abriendo WhatsApp...</span>
+      `;
+
+      // Notificación Toast de Éxito
+      showToast("¡Excelente! Abriendo WhatsApp con tu pedido...");
+
+      setTimeout(() => {
+        callback();
+        setTimeout(() => {
+          btn.innerHTML = originalHtml;
+          btn.classList.remove('btn-success-active');
+          btn.dataset.animating = "false";
+          if (window.lucide) lucide.createIcons();
+        }, 1500);
+      }, 600);
+    }
+  </script>
+</body>
+</html>

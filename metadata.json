@@ -1,0 +1,6 @@
+{
+  "name": "Almuerzos Barrio",
+  "description": "Aplicación para reserva previa y pago de almuerzos del fin de semana en el barrio con panel de administración y WhatsApp",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
