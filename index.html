@@ -775,25 +775,29 @@
             </button>
           </div>
 
-          <!-- Fotos Predeterminadas Rápida Selección (Empanadas, Sancocho, etc.) -->
+          <!-- Fotos Predeterminadas Rápida Selección (Pollo con Yuca, Empanadas, Sancocho, etc.) -->
           <div class="mt-2.5 space-y-1.5">
-            <span class="block text-[11px] font-bold text-slate-600">O elige una foto sugerida con 1 clic:</span>
-            <div class="grid grid-cols-4 gap-1.5">
-              <button type="button" onclick="selectPresetDishImage('Empanadas')" class="p-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-brand-50 hover:border-brand-400 text-center transition cursor-pointer group">
-                <img src="https://images.unsplash.com/photo-1626700051175-6818013e1d4f?auto=format&fit=crop&w=300&q=70" class="w-full h-10 object-cover rounded-lg mb-1 group-hover:scale-105 transition duration-200">
-                <span class="block text-[9px] font-bold text-slate-700 truncate">Empanadas</span>
+            <span class="block text-[11px] font-bold text-slate-600">O elige un plato del menú con foto y características sugeridas (1 clic):</span>
+            <div class="grid grid-cols-3 sm:grid-cols-5 gap-1.5">
+              <button type="button" onclick="selectPresetDishImage('PolloYuca')" class="p-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-brand-50 hover:border-brand-400 text-center transition cursor-pointer group">
+                <img src="https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=300&q=70" class="w-full h-12 object-cover rounded-lg mb-1 group-hover:scale-105 transition duration-200">
+                <span class="block text-[10px] font-extrabold text-slate-800 truncate">Pollo con Yuca</span>
               </button>
-              <button type="button" onclick="selectPresetDishImage('BandejaPaisa')" class="p-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-brand-50 hover:border-brand-400 text-center transition cursor-pointer group">
-                <img src="https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=300&q=70" class="w-full h-10 object-cover rounded-lg mb-1 group-hover:scale-105 transition duration-200">
-                <span class="block text-[9px] font-bold text-slate-700 truncate">Frijoles</span>
+              <button type="button" onclick="selectPresetDishImage('Empanadas')" class="p-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-brand-50 hover:border-brand-400 text-center transition cursor-pointer group">
+                <img src="https://images.unsplash.com/photo-1626700051175-6818013e1d4f?auto=format&fit=crop&w=300&q=70" class="w-full h-12 object-cover rounded-lg mb-1 group-hover:scale-105 transition duration-200">
+                <span class="block text-[10px] font-bold text-slate-700 truncate">Empanadas</span>
               </button>
               <button type="button" onclick="selectPresetDishImage('Sancocho')" class="p-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-brand-50 hover:border-brand-400 text-center transition cursor-pointer group">
-                <img src="https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=300&q=70" class="w-full h-10 object-cover rounded-lg mb-1 group-hover:scale-105 transition duration-200">
-                <span class="block text-[9px] font-bold text-slate-700 truncate">Sancocho</span>
+                <img src="https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=300&q=70" class="w-full h-12 object-cover rounded-lg mb-1 group-hover:scale-105 transition duration-200">
+                <span class="block text-[10px] font-bold text-slate-700 truncate">Sancocho</span>
               </button>
-              <button type="button" onclick="selectPresetDishImage('Pollo')" class="p-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-brand-50 hover:border-brand-400 text-center transition cursor-pointer group">
-                <img src="https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=300&q=70" class="w-full h-10 object-cover rounded-lg mb-1 group-hover:scale-105 transition duration-200">
-                <span class="block text-[9px] font-bold text-slate-700 truncate">Pollo Asado</span>
+              <button type="button" onclick="selectPresetDishImage('BandejaPaisa')" class="p-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-brand-50 hover:border-brand-400 text-center transition cursor-pointer group">
+                <img src="https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=300&q=70" class="w-full h-12 object-cover rounded-lg mb-1 group-hover:scale-105 transition duration-200">
+                <span class="block text-[10px] font-bold text-slate-700 truncate">Frijoles</span>
+              </button>
+              <button type="button" onclick="selectPresetDishImage('Pescado')" class="p-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-brand-50 hover:border-brand-400 text-center transition cursor-pointer group">
+                <img src="https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=300&q=70" class="w-full h-12 object-cover rounded-lg mb-1 group-hover:scale-105 transition duration-200">
+                <span class="block text-[10px] font-bold text-slate-700 truncate">Pescado Frito</span>
               </button>
             </div>
           </div>
@@ -1276,6 +1280,7 @@
 
     function getBestDishImage(dishName, currentImage) {
       if (adminUploadedDishImageBase64) return adminUploadedDishImageBase64;
+      if (currentImage) return currentImage;
       
       const urlInput = document.getElementById('adm-plato-imagen');
       if (urlInput && urlInput.value.trim()) {
@@ -1284,6 +1289,9 @@
 
       const lowerName = (dishName || '').toLowerCase();
       
+      if (lowerName.includes('yuca') || lowerName.includes('plátano') || lowerName.includes('platano')) {
+        return PRESET_DISH_IMAGES.PolloYuca;
+      }
       if (lowerName.includes('empanada')) {
         return PRESET_DISH_IMAGES.Empanadas;
       }
@@ -1294,22 +1302,13 @@
         return PRESET_DISH_IMAGES.BandejaPaisa;
       }
       if (lowerName.includes('pollo')) {
-        return PRESET_DISH_IMAGES.Pollo;
+        return PRESET_DISH_IMAGES.PolloYuca;
       }
       if (lowerName.includes('pescado') || lowerName.includes('mojarra') || lowerName.includes('trucha')) {
-        return "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=800&q=80";
-      }
-      if (lowerName.includes('lasagna') || lowerName.includes('pasta') || lowerName.includes('espagueti')) {
-        return "https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=800&q=80";
-      }
-      if (lowerName.includes('hamburguesa') || lowerName.includes('burger')) {
-        return "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=800&q=80";
-      }
-      if (lowerName.includes('carne') || lowerName.includes('asado') || lowerName.includes('churrasco')) {
-        return "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80";
+        return PRESET_DISH_IMAGES.Pescado;
       }
 
-      return currentImage || DEFAULT_CONFIG.imagenPlato;
+      return DEFAULT_CONFIG.imagenPlato;
     }
 
     function saveAdminConfigQuietly() {
@@ -1331,8 +1330,8 @@
         config.imagenPlato = adminUploadedDishImageBase64;
       } else if (imgUrlEl && imgUrlEl.value.trim()) {
         config.imagenPlato = imgUrlEl.value.trim();
-      } else {
-        config.imagenPlato = getBestDishImage(config.nombrePlato, config.imagenPlato);
+      } else if (!config.imagenPlato) {
+        config.imagenPlato = getBestDishImage(config.nombrePlato, null);
       }
 
       if (wspEl) config.numeroWhatsAppAdmin = wspEl.value.trim().replace(/\D/g, '') || DEFAULT_CONFIG.numeroWhatsAppAdmin;
@@ -1404,7 +1403,7 @@
       if (domicilio !== undefined) params.set('domicilio', domicilio);
       if (desc) params.set('desc', desc);
 
-      if (config.imagenPlato) {
+      if (config.imagenPlato && !config.imagenPlato.startsWith('data:image')) {
         params.set('img', config.imagenPlato);
       }
       if (config.numeroWhatsAppAdmin) params.set('wsp', config.numeroWhatsAppAdmin);
@@ -1708,12 +1707,13 @@
       showToast("Comprobante removido");
     }
 
-    // SELECCIÓN DE FOTO DE PLATO PREDETERMINADA (Empanadas, Frijoles, Sancocho, Pollo)
+    // SELECCIÓN DE FOTO DE PLATO PREDETERMINADA (Pollo con Yuca, Empanadas, Frijoles, Sancocho, Pescado)
     const PRESET_DISH_IMAGES = {
+      PolloYuca: "https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=800&q=80",
       Empanadas: "https://images.unsplash.com/photo-1626700051175-6818013e1d4f?auto=format&fit=crop&w=800&q=80",
-      BandejaPaisa: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80",
       Sancocho: "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=800&q=80",
-      Pollo: "https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=800&q=80"
+      BandejaPaisa: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80",
+      Pescado: "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=800&q=80"
     };
 
     function selectPresetDishImage(type) {
@@ -1722,20 +1722,23 @@
         config.imagenPlato = PRESET_DISH_IMAGES[type];
 
         const nombreInput = document.getElementById('adm-plato-nombre');
-        if (nombreInput) {
-          if (type === 'Empanadas') {
-            nombreInput.value = "Empanadas Especiales";
-            config.nombrePlato = "Empanadas Especiales";
-          } else if (type === 'BandejaPaisa') {
-            nombreInput.value = "Bandeja Paisa con Frijoles";
-            config.nombrePlato = "Bandeja Paisa con Frijoles";
-          } else if (type === 'Sancocho') {
-            nombreInput.value = "Sancocho Trifásico";
-            config.nombrePlato = "Sancocho Trifásico";
-          } else if (type === 'Pollo') {
-            nombreInput.value = "Pollo Asado con Papas";
-            config.nombrePlato = "Pollo Asado con Papas";
-          }
+        const descInput = document.getElementById('adm-plato-desc');
+
+        if (type === 'PolloYuca') {
+          if (nombreInput) { nombreInput.value = "Pollo con Yuca y Plátano"; config.nombrePlato = "Pollo con Yuca y Plátano"; }
+          if (descInput) { descInput.value = "Pollo dorado jugoso con yuca sudada, plátano maduro, arroz con coco y ensalada fresca."; config.descripcionPlato = descInput.value; }
+        } else if (type === 'Empanadas') {
+          if (nombreInput) { nombreInput.value = "Empanadas Especiales de la Casa"; config.nombrePlato = "Empanadas Especiales de la Casa"; }
+          if (descInput) { descInput.value = "Porción de 5 empanadas crocantes de carne desmechada y papa criolla con ají casero."; config.descripcionPlato = descInput.value; }
+        } else if (type === 'Sancocho') {
+          if (nombreInput) { nombreInput.value = "Sancocho Trifásico Especial"; config.nombrePlato = "Sancocho Trifásico Especial"; }
+          if (descInput) { descInput.value = "Sancocho criollo con gallina, res y cerdo, acompañado de mazorca, plátano, yuca, arroz y aguacate."; config.descripcionPlato = descInput.value; }
+        } else if (type === 'BandejaPaisa') {
+          if (nombreInput) { nombreInput.value = "Bandeja Paisa con Frijoles"; config.nombrePlato = "Bandeja Paisa con Frijoles"; }
+          if (descInput) { descInput.value = "Frijoles cargamanto, chicharrón crocante, carne molida, huevo frito, tajada de plátano, arepa y aguacate."; config.descripcionPlato = descInput.value; }
+        } else if (type === 'Pescado') {
+          if (nombreInput) { nombreInput.value = "Mojarra Frita con Patacón y Yuca"; config.nombrePlato = "Mojarra Frita con Patacón y Yuca"; }
+          if (descInput) { descInput.value = "Mojarra dorada crocante acompañada de patacones de plátano verde, yuca y ensalada mixta."; config.descripcionPlato = descInput.value; }
         }
 
         const urlInput = document.getElementById('adm-plato-imagen');
@@ -1744,7 +1747,7 @@
         if (imgPreview) imgPreview.src = config.imagenPlato;
 
         saveAdminConfigQuietly();
-        showToast(`Menú y foto de ${type} seleccionados`);
+        showToast(`Plato de ${config.nombrePlato} seleccionado`);
       }
     }
 
