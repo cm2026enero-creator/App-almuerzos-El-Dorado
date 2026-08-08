@@ -769,14 +769,37 @@
             <input type="file" id="adm-plato-file" accept="image/*" class="hidden" onchange="handleAdminDishImageUpload(event)">
             
             <!-- Botón interactivo para elegir imagen desde cel/PC -->
-            <button type="button" onclick="document.getElementById('adm-plato-file').click()" class="w-full py-3 px-4 rounded-xl border-2 border-dashed border-brand-300 bg-brand-50/60 hover:bg-brand-100 text-brand-700 font-extrabold text-xs flex items-center justify-center gap-2 transition shadow-sm">
+            <button type="button" onclick="document.getElementById('adm-plato-file').click()" class="w-full py-3 px-4 rounded-xl border-2 border-dashed border-brand-300 bg-brand-50/60 hover:bg-brand-100 text-brand-700 font-extrabold text-xs flex items-center justify-center gap-2 transition shadow-sm cursor-pointer">
               <i data-lucide="image-plus" class="w-4.5 h-4.5 text-brand-600"></i>
-              <span>Seleccionar Foto desde Galería o Cámara</span>
+              <span>Cargar Foto desde Galería o Cámara</span>
             </button>
           </div>
 
+          <!-- Fotos Predeterminadas Rápida Selección (Empanadas, Sancocho, etc.) -->
+          <div class="mt-2.5 space-y-1.5">
+            <span class="block text-[11px] font-bold text-slate-600">O elige una foto sugerida con 1 clic:</span>
+            <div class="grid grid-cols-4 gap-1.5">
+              <button type="button" onclick="selectPresetDishImage('Empanadas')" class="p-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-brand-50 hover:border-brand-400 text-center transition cursor-pointer group">
+                <img src="https://images.unsplash.com/photo-1626700051175-6818013e1d4f?auto=format&fit=crop&w=300&q=70" class="w-full h-10 object-cover rounded-lg mb-1 group-hover:scale-105 transition duration-200">
+                <span class="block text-[9px] font-bold text-slate-700 truncate">Empanadas</span>
+              </button>
+              <button type="button" onclick="selectPresetDishImage('BandejaPaisa')" class="p-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-brand-50 hover:border-brand-400 text-center transition cursor-pointer group">
+                <img src="https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=300&q=70" class="w-full h-10 object-cover rounded-lg mb-1 group-hover:scale-105 transition duration-200">
+                <span class="block text-[9px] font-bold text-slate-700 truncate">Frijoles</span>
+              </button>
+              <button type="button" onclick="selectPresetDishImage('Sancocho')" class="p-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-brand-50 hover:border-brand-400 text-center transition cursor-pointer group">
+                <img src="https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=300&q=70" class="w-full h-10 object-cover rounded-lg mb-1 group-hover:scale-105 transition duration-200">
+                <span class="block text-[9px] font-bold text-slate-700 truncate">Sancocho</span>
+              </button>
+              <button type="button" onclick="selectPresetDishImage('Pollo')" class="p-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-brand-50 hover:border-brand-400 text-center transition cursor-pointer group">
+                <img src="https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=300&q=70" class="w-full h-10 object-cover rounded-lg mb-1 group-hover:scale-105 transition duration-200">
+                <span class="block text-[9px] font-bold text-slate-700 truncate">Pollo Asado</span>
+              </button>
+            </div>
+          </div>
+
           <!-- Opción Alternativa URL de Internet -->
-          <details class="text-xs text-slate-500 mt-1">
+          <details class="text-xs text-slate-500 mt-2">
             <summary class="cursor-pointer font-semibold text-slate-600 hover:text-brand-600 py-1">O pegar enlace / URL directa de foto de Internet</summary>
             <input type="text" id="adm-plato-imagen" placeholder="https://..." class="w-full text-xs p-3 rounded-xl border border-slate-200 outline-none truncate mt-1">
           </details>
@@ -1251,6 +1274,44 @@
       });
     }
 
+    function getBestDishImage(dishName, currentImage) {
+      if (adminUploadedDishImageBase64) return adminUploadedDishImageBase64;
+      
+      const urlInput = document.getElementById('adm-plato-imagen');
+      if (urlInput && urlInput.value.trim()) {
+        return urlInput.value.trim();
+      }
+
+      const lowerName = (dishName || '').toLowerCase();
+      
+      if (lowerName.includes('empanada')) {
+        return PRESET_DISH_IMAGES.Empanadas;
+      }
+      if (lowerName.includes('sancocho') || lowerName.includes('sopa') || lowerName.includes('caldo')) {
+        return PRESET_DISH_IMAGES.Sancocho;
+      }
+      if (lowerName.includes('frijol') || lowerName.includes('paisa') || lowerName.includes('bandeja')) {
+        return PRESET_DISH_IMAGES.BandejaPaisa;
+      }
+      if (lowerName.includes('pollo')) {
+        return PRESET_DISH_IMAGES.Pollo;
+      }
+      if (lowerName.includes('pescado') || lowerName.includes('mojarra') || lowerName.includes('trucha')) {
+        return "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=800&q=80";
+      }
+      if (lowerName.includes('lasagna') || lowerName.includes('pasta') || lowerName.includes('espagueti')) {
+        return "https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=800&q=80";
+      }
+      if (lowerName.includes('hamburguesa') || lowerName.includes('burger')) {
+        return "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=800&q=80";
+      }
+      if (lowerName.includes('carne') || lowerName.includes('asado') || lowerName.includes('churrasco')) {
+        return "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80";
+      }
+
+      return currentImage || DEFAULT_CONFIG.imagenPlato;
+    }
+
     function saveAdminConfigQuietly() {
       const nombreEl = document.getElementById('adm-plato-nombre');
       const precioEl = document.getElementById('adm-plato-precio');
@@ -1270,6 +1331,8 @@
         config.imagenPlato = adminUploadedDishImageBase64;
       } else if (imgUrlEl && imgUrlEl.value.trim()) {
         config.imagenPlato = imgUrlEl.value.trim();
+      } else {
+        config.imagenPlato = getBestDishImage(config.nombrePlato, config.imagenPlato);
       }
 
       if (wspEl) config.numeroWhatsAppAdmin = wspEl.value.trim().replace(/\D/g, '') || DEFAULT_CONFIG.numeroWhatsAppAdmin;
@@ -1290,6 +1353,9 @@
 
       const imgEl = document.getElementById('dish-image');
       if (imgEl && config.imagenPlato) imgEl.src = config.imagenPlato;
+
+      const previewImg = document.getElementById('adm-dish-preview-img');
+      if (previewImg && config.imagenPlato) previewImg.src = config.imagenPlato;
 
       const deliveryBadge = document.getElementById('delivery-fee-badge');
       if (deliveryBadge) deliveryBadge.innerText = `+ $${Number(config.costoDomicilio).toLocaleString('es-CO')} domicilio`;
@@ -1338,7 +1404,7 @@
       if (domicilio !== undefined) params.set('domicilio', domicilio);
       if (desc) params.set('desc', desc);
 
-      if (config.imagenPlato && !config.imagenPlato.startsWith('data:image')) {
+      if (config.imagenPlato) {
         params.set('img', config.imagenPlato);
       }
       if (config.numeroWhatsAppAdmin) params.set('wsp', config.numeroWhatsAppAdmin);
@@ -1642,24 +1708,102 @@
       showToast("Comprobante removido");
     }
 
-    // PROCESO DE CARGA DE FOTO DE PLATO DESDE EL ADMIN (Galería / Cámara)
+    // SELECCIÓN DE FOTO DE PLATO PREDETERMINADA (Empanadas, Frijoles, Sancocho, Pollo)
+    const PRESET_DISH_IMAGES = {
+      Empanadas: "https://images.unsplash.com/photo-1626700051175-6818013e1d4f?auto=format&fit=crop&w=800&q=80",
+      BandejaPaisa: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80",
+      Sancocho: "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=800&q=80",
+      Pollo: "https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=800&q=80"
+    };
+
+    function selectPresetDishImage(type) {
+      if (PRESET_DISH_IMAGES[type]) {
+        adminUploadedDishImageBase64 = null;
+        config.imagenPlato = PRESET_DISH_IMAGES[type];
+
+        const nombreInput = document.getElementById('adm-plato-nombre');
+        if (nombreInput) {
+          if (type === 'Empanadas') {
+            nombreInput.value = "Empanadas Especiales";
+            config.nombrePlato = "Empanadas Especiales";
+          } else if (type === 'BandejaPaisa') {
+            nombreInput.value = "Bandeja Paisa con Frijoles";
+            config.nombrePlato = "Bandeja Paisa con Frijoles";
+          } else if (type === 'Sancocho') {
+            nombreInput.value = "Sancocho Trifásico";
+            config.nombrePlato = "Sancocho Trifásico";
+          } else if (type === 'Pollo') {
+            nombreInput.value = "Pollo Asado con Papas";
+            config.nombrePlato = "Pollo Asado con Papas";
+          }
+        }
+
+        const urlInput = document.getElementById('adm-plato-imagen');
+        if (urlInput) urlInput.value = config.imagenPlato;
+        const imgPreview = document.getElementById('adm-dish-preview-img');
+        if (imgPreview) imgPreview.src = config.imagenPlato;
+
+        saveAdminConfigQuietly();
+        showToast(`Menú y foto de ${type} seleccionados`);
+      }
+    }
+
+    // PROCESO DE CARGA Y COMPRESIÓN DE FOTO DE PLATO DESDE EL ADMIN (Galería / Cámara)
     function handleAdminDishImageUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
 
-      if (file.size > 5 * 1024 * 1024) {
-        showToast("La foto del plato es muy pesada (Máximo 5MB)");
+      if (file.size > 10 * 1024 * 1024) {
+        showToast("La foto del plato es muy pesada (Máximo 10MB)");
         return;
       }
 
       const reader = new FileReader();
       reader.onload = function(e) {
-        adminUploadedDishImageBase64 = e.target.result;
-        const imgPreview = document.getElementById('adm-dish-preview-img');
-        if (imgPreview) imgPreview.src = adminUploadedDishImageBase64;
-        const urlInput = document.getElementById('adm-plato-imagen');
-        if (urlInput) urlInput.value = '';
-        showToast("Foto cargada. Haz clic en 'Guardar Cambios de Menú'");
+        const rawImg = new Image();
+        rawImg.onload = function() {
+          // Compresor canvas HTML5 para optimizar tamaño para URL y LocalStorage
+          const canvas = document.createElement('canvas');
+          const maxDim = 500; // Ancho/Alto máximo ideal para web móvil
+          let width = rawImg.width;
+          let height = rawImg.height;
+
+          if (width > height) {
+            if (width > maxDim) {
+              height = Math.round((height * maxDim) / width);
+              width = maxDim;
+            }
+          } else {
+            if (height > maxDim) {
+              width = Math.round((width * maxDim) / height);
+              height = maxDim;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(rawImg, 0, 0, width, height);
+
+          // Genera un JPEG super optimizado (~10-18KB base64)
+          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.65);
+
+          adminUploadedDishImageBase64 = compressedBase64;
+          config.imagenPlato = compressedBase64;
+
+          const imgPreview = document.getElementById('adm-dish-preview-img');
+          if (imgPreview) imgPreview.src = compressedBase64;
+          const urlInput = document.getElementById('adm-plato-imagen');
+          if (urlInput) urlInput.value = '';
+
+          // Guardado silencioso y actualización inmediata
+          saveAdminConfigQuietly();
+          showToast("¡Foto cargada, optimizada y guardada en el menú!");
+        };
+        rawImg.onerror = function() {
+          showToast("Error al procesar la foto seleccionada");
+        };
+        rawImg.src = e.target.result;
       };
       reader.readAsDataURL(file);
     }
