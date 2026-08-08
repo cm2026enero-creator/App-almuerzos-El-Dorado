@@ -606,9 +606,9 @@
             </div>
             <h2 class="font-extrabold text-sm">Panel de Administración</h2>
           </div>
-          <button onclick="logoutAdmin()" class="text-[11px] bg-rose-500/20 text-rose-300 hover:bg-rose-500/30 font-bold px-3 py-1 rounded-full border border-rose-500/30 transition flex items-center gap-1">
-            <i data-lucide="lock" class="w-3 h-3"></i>
-            <span>Cerrar Sesión</span>
+          <button onclick="switchTab('client')" class="text-[11px] bg-brand-500/20 text-brand-300 hover:bg-brand-500/30 font-bold px-3 py-1 rounded-full border border-brand-500/30 transition flex items-center gap-1">
+            <i data-lucide="arrow-left" class="w-3 h-3"></i>
+            <span>Volver a Clientes</span>
           </button>
         </div>
 
@@ -698,15 +698,6 @@
           <input type="text" id="adm-banco-detalles" class="w-full text-xs p-3 rounded-xl border border-slate-200 outline-none">
         </div>
 
-        <div class="pt-2 border-t border-slate-100">
-          <label class="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1.5">
-            <i data-lucide="key-round" class="w-3.5 h-3.5 text-brand-600"></i>
-            <span>Código PIN de Seguridad (4 dígitos)</span>
-          </label>
-          <input type="text" id="adm-pin-code" maxlength="10" placeholder="2026" class="w-full text-xs p-3 rounded-xl border border-slate-200 outline-none font-mono font-bold">
-          <p class="text-[11px] text-slate-400 mt-0.5">Clave requerida para ingresar a este panel de administración</p>
-        </div>
-
         <button onclick="saveAdminConfig()" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-extrabold text-xs py-3.5 rounded-xl shadow-md transition flex items-center justify-center gap-2">
           <i data-lucide="check-circle" class="w-4 h-4"></i>
           <span>Guardar Cambios de Menú</span>
@@ -741,35 +732,6 @@
     </div>
 
   </main>
-
-  <!-- MODAL DE SEGURIDAD PARA ACCESO A ADMINISTRACIÓN -->
-  <div id="pin-modal" class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
-    <div class="bg-white rounded-3xl p-6 max-w-xs w-full shadow-2xl border border-slate-100 text-center space-y-4">
-      <div class="w-12 h-12 rounded-2xl bg-brand-100 text-brand-600 mx-auto flex items-center justify-center shadow-inner">
-        <i data-lucide="lock" class="w-6 h-6"></i>
-      </div>
-      <div>
-        <h3 class="font-extrabold text-slate-900 text-base">Acceso Administrador</h3>
-        <p class="text-xs text-slate-500 mt-1">Ingresa el código PIN de 4 dígitos para acceder al Panel de Administración</p>
-      </div>
-
-      <div>
-        <input type="password" id="pin-input" maxlength="10" placeholder="••••" inputmode="numeric" pattern="[0-9]*"
-               class="w-full text-center text-xl font-bold tracking-widest py-3 px-4 rounded-xl border border-slate-300 focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none bg-slate-50"
-               onkeyup="if(event.key === 'Enter') verifyAdminPin()">
-        <p id="pin-error-msg" class="text-xs text-rose-600 font-bold mt-2 hidden">Código PIN incorrecto</p>
-      </div>
-
-      <div class="grid grid-cols-2 gap-2 pt-1">
-        <button type="button" onclick="closePinModal()" class="py-2.5 rounded-xl border border-slate-200 text-slate-600 font-bold text-xs hover:bg-slate-50 transition">
-          Cancelar
-        </button>
-        <button type="button" onclick="verifyAdminPin()" class="py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-extrabold text-xs shadow-md transition">
-          Ingresar
-        </button>
-      </div>
-    </div>
-  </div>
 
   <!-- NOTIFICACIÓN TOAST FLOTANTE -->
   <div id="toast" class="fixed bottom-5 left-1/2 -translate-x-1/2 bg-slate-900/90 backdrop-blur-md text-white text-xs font-semibold px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-2 transition-all duration-300 opacity-0 translate-y-10 pointer-events-none z-50 border border-slate-700">
@@ -854,60 +816,6 @@
     let uploadedImageBase64 = null;
     let adminUploadedDishImageBase64 = null;
     let selectedWeekendDay = 'Sábado';
-
-    // Configuración de Seguridad Administrador
-    const DEFAULT_ADMIN_PIN = "2026";
-    let isAdminAuthenticated = false;
-
-    function getAdminPin() {
-      return localStorage.getItem('almuerzos_admin_pin') || DEFAULT_ADMIN_PIN;
-    }
-
-    function openPinModal() {
-      const modal = document.getElementById('pin-modal');
-      const input = document.getElementById('pin-input');
-      const error = document.getElementById('pin-error-msg');
-      if (modal) {
-        modal.classList.remove('hidden');
-        if (input) {
-          input.value = '';
-          setTimeout(() => input.focus(), 150);
-        }
-        if (error) error.classList.add('hidden');
-      }
-    }
-
-    function closePinModal() {
-      const modal = document.getElementById('pin-modal');
-      if (modal) modal.classList.add('hidden');
-    }
-
-    function verifyAdminPin() {
-      const input = document.getElementById('pin-input');
-      const error = document.getElementById('pin-error-msg');
-      const enteredPin = input ? input.value.trim() : '';
-      const correctPin = getAdminPin();
-
-      if (enteredPin === correctPin) {
-        isAdminAuthenticated = true;
-        closePinModal();
-        switchTab('admin');
-        showToast("Acceso concedido al Panel de Administración");
-      } else {
-        if (error) error.classList.remove('hidden');
-        showToast("Código PIN incorrecto");
-        if (input) {
-          input.value = '';
-          input.focus();
-        }
-      }
-    }
-
-    function logoutAdmin() {
-      isAdminAuthenticated = false;
-      switchTab('client');
-      showToast("Sesión de administración cerrada");
-    }
 
     // Inicializar aplicación al cargar la página
     document.addEventListener("DOMContentLoaded", () => {
@@ -1144,9 +1052,6 @@
       document.getElementById('adm-whatsapp-num').value = config.numeroWhatsAppAdmin;
       document.getElementById('adm-nequi-num').value = config.numeroNequi;
       document.getElementById('adm-banco-detalles').value = config.detallesBanco;
-      
-      const pinField = document.getElementById('adm-pin-code');
-      if (pinField) pinField.value = getAdminPin();
 
       // Vista previa foto plato
       const previewImg = document.getElementById('adm-dish-preview-img');
@@ -1213,10 +1118,6 @@
         btnClient.className = "flex-1 py-2.5 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 bg-white text-slate-900 shadow-sm";
         btnAdmin.className = "flex-1 py-2.5 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 text-slate-600 hover:text-slate-900";
       } else {
-        if (!isAdminAuthenticated) {
-          openPinModal();
-          return;
-        }
         viewClient.classList.add('hidden');
         viewAdmin.classList.remove('hidden');
         btnAdmin.className = "flex-1 py-2.5 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 bg-slate-900 text-white shadow-sm";
@@ -1299,15 +1200,6 @@
       config.numeroWhatsAppAdmin = numWsp || DEFAULT_CONFIG.numeroWhatsAppAdmin;
       config.numeroNequi = document.getElementById('adm-nequi-num').value.trim() || DEFAULT_CONFIG.numeroNequi;
       config.detallesBanco = document.getElementById('adm-banco-detalles').value.trim() || DEFAULT_CONFIG.detallesBanco;
-
-      // Actualizar PIN de seguridad si el admin lo modificó
-      const newPinInput = document.getElementById('adm-pin-code');
-      if (newPinInput) {
-        const newPin = newPinInput.value.trim();
-        if (newPin && newPin.length >= 2) {
-          localStorage.setItem('almuerzos_admin_pin', newPin);
-        }
-      }
 
       saveConfigToLocalStorage();
       renderApp();
