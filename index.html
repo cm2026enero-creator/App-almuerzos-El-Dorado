@@ -2,8 +2,12 @@
 <html lang="es" class="h-full bg-slate-100">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="color-scheme" content="only light">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="color-scheme" content="light">
+  <meta name="supported-color-schemes" content="light">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <title>Almuerzos del Barrio - Reserva Previa y Pago</title>
 
   <!-- Tailwind CSS por CDN -->
@@ -45,19 +49,61 @@
   </script>
 
   <style>
-    /* Forzar siempre modo claro y prevenir deformación en celulares con modo oscuro activado */
-    :root {
-      color-scheme: light;
+    /* Forzar siempre modo claro y prevenir inversión de colores en móviles con modo oscuro forzado */
+    :root, html, body {
+      color-scheme: light !important;
+      supported-color-schemes: light !important;
     }
 
     body {
       font-family: 'Outfit', sans-serif;
       -webkit-tap-highlight-color: transparent;
-      background-color: #f1f5f9;
-      color: #0f172a;
+      background-color: #f1f5f9 !important;
+      color: #0f172a !important;
     }
 
-    /* Estilos explícitos para elementos de formulario en celulares con modo oscuro forzado */
+    /* Reglas para evitar inversión automática en Xiaomi/Chrome/Samsung Force Dark */
+    @media (prefers-color-scheme: dark) {
+      :root, html, body {
+        color-scheme: light !important;
+        background-color: #f1f5f9 !important;
+        color: #0f172a !important;
+      }
+
+      body, header, main, section, div, input, select, textarea, button, p, span, h1, h2, h3, label {
+        color-scheme: light !important;
+      }
+
+      .bg-white {
+        background-color: #ffffff !important;
+        color: #0f172a !important;
+      }
+
+      .bg-slate-50 {
+        background-color: #f8fafc !important;
+        color: #0f172a !important;
+      }
+
+      .bg-slate-100 {
+        background-color: #f1f5f9 !important;
+      }
+
+      .text-slate-900, .text-slate-800, .text-slate-700, .text-slate-600 {
+        color: #0f172a !important;
+      }
+
+      input, select, textarea {
+        background-color: #f8fafc !important;
+        color: #0f172a !important;
+        border-color: #e2e8f0 !important;
+      }
+
+      input::placeholder, textarea::placeholder {
+        color: #94a3b8 !important;
+      }
+    }
+
+    /* Estilos explícitos para elementos de formulario */
     input, select, textarea, button {
       color-scheme: light !important;
       color: #0f172a;
