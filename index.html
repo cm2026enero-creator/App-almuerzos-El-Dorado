@@ -442,9 +442,10 @@
             <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-600"></i>
             Especial del Fin de Semana
           </span>
-          <span id="badge-cupos" class="text-xs font-semibold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-full border border-slate-200">
-            Cupos limitados
-          </span>
+          <button onclick="nativeShareMenu()" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-brand-50 text-brand-700 border border-brand-200 hover:bg-brand-100 transition cursor-pointer shadow-sm">
+            <i data-lucide="share-2" class="w-3.5 h-3.5 text-brand-600"></i>
+            <span>Compartir Menú</span>
+          </button>
         </div>
 
         <div class="relative rounded-2xl overflow-hidden aspect-video mb-3.5 bg-slate-100 shadow-inner group">
@@ -822,29 +823,36 @@
       <section class="bg-gradient-to-br from-brand-900 to-slate-900 rounded-3xl p-5 text-white shadow-md border border-brand-800 space-y-3.5">
         <div class="flex items-center gap-2 pb-2 border-b border-brand-800/80">
           <i data-lucide="share-2" class="w-4 h-4 text-brand-400"></i>
-          <h3 class="font-extrabold text-xs uppercase tracking-wider text-brand-200">Enlace Personalizado y Difusión</h3>
+          <h3 class="font-extrabold text-xs uppercase tracking-wider text-brand-200">Compartir Menú del Fin de Semana</h3>
         </div>
         
         <p class="text-xs text-slate-300 leading-relaxed">
-          Comparte este enlace directo con tus clientes. Al abrirlo en GitHub Pages o cualquier navegador, verán exactamente el menú, precio y datos que guardaste.
+          Los cambios que realices en el nombre del plato, precio o fechas se guardan en tiempo real. Haz clic en <strong>"Compartir Menú"</strong> para enviarlo por WhatsApp o redes; los clientes verán únicamente el almuerzo que configuraste.
         </p>
 
-        <div class="space-y-2">
+        <!-- Botón Principal Prominente para Compartir -->
+        <button onclick="nativeShareMenu()" class="w-full bg-brand-500 hover:bg-brand-600 text-white font-extrabold text-xs py-3.5 px-4 rounded-2xl flex items-center justify-center gap-2 transition shadow-lg border border-brand-400 cursor-pointer">
+          <i data-lucide="share-2" class="w-4.5 h-4.5"></i>
+          <span>Compartir Menú Actualizado (Celular / WhatsApp)</span>
+        </button>
+
+        <div class="space-y-2 pt-1 border-t border-brand-800/60">
+          <span class="block text-[10px] uppercase font-bold text-slate-400">Enlace Dinámico Personalizado:</span>
           <div class="flex items-center gap-2 bg-slate-950/70 p-2.5 rounded-xl border border-slate-800">
             <input type="text" id="share-link-input" readonly class="bg-transparent text-xs text-brand-300 font-mono w-full outline-none truncate" value="">
-            <button onclick="copyShareableLink()" class="shrink-0 bg-brand-600 hover:bg-brand-500 text-white p-2 rounded-lg transition" title="Copiar enlace">
+            <button onclick="copyShareableLink()" class="shrink-0 bg-brand-600 hover:bg-brand-500 text-white p-2 rounded-lg transition cursor-pointer" title="Copiar enlace">
               <i data-lucide="copy" class="w-4 h-4"></i>
             </button>
           </div>
 
           <div class="grid grid-cols-2 gap-2 pt-1">
-            <button onclick="copyShareableLink()" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs py-2.5 px-3 rounded-xl flex items-center justify-center gap-1.5 transition border border-slate-700">
+            <button onclick="copyShareableLink()" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs py-2.5 px-3 rounded-xl flex items-center justify-center gap-1.5 transition border border-slate-700 cursor-pointer">
               <i data-lucide="link" class="w-3.5 h-3.5 text-brand-400"></i>
               <span>Copiar Enlace</span>
             </button>
-            <button onclick="shareMenuOnWhatsApp()" class="w-full bg-whatsapp-500 hover:bg-whatsapp-600 text-white font-bold text-xs py-2.5 px-3 rounded-xl flex items-center justify-center gap-1.5 transition shadow-sm">
+            <button onclick="shareMenuOnWhatsApp()" class="w-full bg-whatsapp-500 hover:bg-whatsapp-600 text-white font-bold text-xs py-2.5 px-3 rounded-xl flex items-center justify-center gap-1.5 transition shadow-sm cursor-pointer">
               <i data-lucide="message-circle" class="w-3.5 h-3.5"></i>
-              <span>Difundir WhatsApp</span>
+              <span>Enviar WhatsApp</span>
             </button>
           </div>
         </div>
@@ -1002,6 +1010,7 @@
       renderApp();
       renderReviews();
       renderOrders();
+      attachAdminListeners();
     });
 
     // LÓGICA DEL SELECTOR Y PICKER DE FECHA DE FIN DE SEMANA
@@ -1210,19 +1219,125 @@
         updatedFromUrl = true;
       }
 
+      // Garantizar que no haya campos vacíos sin valor por defecto
+      if (!config.nombrePlato) config.nombrePlato = DEFAULT_CONFIG.nombrePlato;
+      if (!config.precioPlato || isNaN(config.precioPlato)) config.precioPlato = DEFAULT_CONFIG.precioPlato;
+      if (!config.descripcionPlato) config.descripcionPlato = DEFAULT_CONFIG.descripcionPlato;
+
       if (updatedFromUrl) {
         saveConfigToLocalStorage();
       }
+    }
+
+    // LISTENER EN TIEMPO REAL PARA CAMPOS DEL ADMINISTRADOR
+    function attachAdminListeners() {
+      const adminInputIds = [
+        'adm-plato-nombre',
+        'adm-plato-precio',
+        'adm-domicilio-precio',
+        'adm-plato-desc',
+        'adm-whatsapp-num',
+        'adm-nequi-num',
+        'adm-banco-detalles',
+        'adm-plato-imagen'
+      ];
+
+      adminInputIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.addEventListener('input', () => saveAdminConfigQuietly());
+          el.addEventListener('change', () => saveAdminConfigQuietly());
+        }
+      });
+    }
+
+    function saveAdminConfigQuietly() {
+      const nombreEl = document.getElementById('adm-plato-nombre');
+      const precioEl = document.getElementById('adm-plato-precio');
+      const domiEl = document.getElementById('adm-domicilio-precio');
+      const descEl = document.getElementById('adm-plato-desc');
+      const wspEl = document.getElementById('adm-whatsapp-num');
+      const nequiEl = document.getElementById('adm-nequi-num');
+      const bancoEl = document.getElementById('adm-banco-detalles');
+      const imgUrlEl = document.getElementById('adm-plato-imagen');
+
+      if (nombreEl) config.nombrePlato = nombreEl.value.trim() || DEFAULT_CONFIG.nombrePlato;
+      if (precioEl) config.precioPlato = Number(precioEl.value) || DEFAULT_CONFIG.precioPlato;
+      if (domiEl) config.costoDomicilio = Number(domiEl.value) || DEFAULT_CONFIG.costoDomicilio;
+      if (descEl) config.descripcionPlato = descEl.value.trim() || DEFAULT_CONFIG.descripcionPlato;
+
+      if (adminUploadedDishImageBase64) {
+        config.imagenPlato = adminUploadedDishImageBase64;
+      } else if (imgUrlEl && imgUrlEl.value.trim()) {
+        config.imagenPlato = imgUrlEl.value.trim();
+      }
+
+      if (wspEl) config.numeroWhatsAppAdmin = wspEl.value.trim().replace(/\D/g, '') || DEFAULT_CONFIG.numeroWhatsAppAdmin;
+      if (nequiEl) config.numeroNequi = nequiEl.value.trim() || DEFAULT_CONFIG.numeroNequi;
+      if (bancoEl) config.detallesBanco = bancoEl.value.trim() || DEFAULT_CONFIG.detallesBanco;
+
+      saveConfigToLocalStorage();
+
+      // Actualizar vista cliente
+      const nameEl = document.getElementById('dish-name');
+      if (nameEl) nameEl.innerText = config.nombrePlato;
+
+      const descElClient = document.getElementById('dish-description');
+      if (descElClient) descElClient.innerText = config.descripcionPlato;
+
+      const priceEl = document.getElementById('dish-price-display');
+      if (priceEl) priceEl.innerText = '$' + Number(config.precioPlato).toLocaleString('es-CO');
+
+      const imgEl = document.getElementById('dish-image');
+      if (imgEl && config.imagenPlato) imgEl.src = config.imagenPlato;
+
+      const deliveryBadge = document.getElementById('delivery-fee-badge');
+      if (deliveryBadge) deliveryBadge.innerText = `+ $${Number(config.costoDomicilio).toLocaleString('es-CO')} domicilio`;
+
+      const payNequi = document.getElementById('pay-nequi');
+      if (payNequi) payNequi.innerText = config.numeroNequi;
+
+      const payHolder = document.getElementById('pay-holder');
+      if (payHolder) payHolder.innerText = config.titularCuenta;
+
+      const shareInput = document.getElementById('share-link-input');
+      if (shareInput) shareInput.value = getShareableURL();
+
+      const prevDish = document.getElementById('template-dish-preview');
+      if (prevDish) prevDish.innerText = config.nombrePlato;
+
+      const prevTotal = document.getElementById('template-total-preview');
+      if (prevTotal) prevTotal.innerText = '$' + Number(config.precioPlato).toLocaleString('es-CO');
+
+      const prevNequi = document.getElementById('template-nequi-preview');
+      if (prevNequi) prevNequi.innerText = config.numeroNequi;
+
+      // Actualizar la URL de la barra de direcciones sin recargar
+      try {
+        const shareUrl = getShareableURL();
+        window.history.replaceState(null, '', shareUrl);
+      } catch (e) {
+        console.warn("No se pudo actualizar history state:", e);
+      }
+
+      updateTotals();
     }
 
     // GENERADOR DE ENLACE COMPARTIBLE
     function getShareableURL() {
       const baseUrl = window.location.origin + window.location.pathname;
       const params = new URLSearchParams();
-      if (config.nombrePlato) params.set('plato', config.nombrePlato);
-      if (config.precioPlato) params.set('precio', config.precioPlato);
-      if (config.costoDomicilio !== undefined) params.set('domicilio', config.costoDomicilio);
-      if (config.descripcionPlato) params.set('desc', config.descripcionPlato);
+
+      const plato = config.nombrePlato || DEFAULT_CONFIG.nombrePlato;
+      const precio = config.precioPlato || DEFAULT_CONFIG.precioPlato;
+      const domicilio = config.costoDomicilio !== undefined ? config.costoDomicilio : DEFAULT_CONFIG.costoDomicilio;
+      const desc = config.descripcionPlato || DEFAULT_CONFIG.descripcionPlato;
+
+      if (plato) params.set('plato', plato);
+      if (precio) params.set('precio', precio);
+      if (domicilio !== undefined) params.set('domicilio', domicilio);
+      if (desc) params.set('desc', desc);
+
       if (config.imagenPlato && !config.imagenPlato.startsWith('data:image')) {
         params.set('img', config.imagenPlato);
       }
@@ -1234,20 +1349,50 @@
       return baseUrl + '?' + params.toString();
     }
 
+    function nativeShareMenu() {
+      saveAdminConfigQuietly();
+      const link = getShareableURL();
+      const title = `🍲 Menú Especial: ${config.nombrePlato}`;
+      const text = `🍲 *¡MENÚ ESPECIAL DE ESTE FIN DE SEMANA!* 🍲\n\n` +
+        `*${config.nombrePlato}*\n` +
+        `📝 ${config.descripcionPlato}\n\n` +
+        `💰 *Precio Porción:* $${Number(config.precioPlato).toLocaleString('es-CO')}\n` +
+        `🛵 *Domicilio:* $${Number(config.costoDomicilio).toLocaleString('es-CO')}\n\n` +
+        `👉 *Haz tu pedido en nuestro menú interactivo aquí:*\n${link}`;
+
+      if (navigator.share) {
+        navigator.share({
+          title: title,
+          text: text,
+          url: link
+        }).then(() => {
+          showToast("¡Menú compartido con éxito!");
+        }).catch((err) => {
+          if (err.name !== 'AbortError') {
+            shareMenuOnWhatsApp();
+          }
+        });
+      } else {
+        shareMenuOnWhatsApp();
+      }
+    }
+
     function copyShareableLink() {
+      saveAdminConfigQuietly();
       const link = getShareableURL();
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(link).then(() => {
-          showToast("¡Enlace personalizado copiado al portapapeles!");
-        }).catch(() => fallbackCopyText(link, "¡Enlace personalizado copiado!"));
+          showToast("¡Enlace del menú copiado al portapapeles!");
+        }).catch(() => fallbackCopyText(link, "¡Enlace del menú copiado!"));
       } else {
-        fallbackCopyText(link, "¡Enlace personalizado copiado!");
+        fallbackCopyText(link, "¡Enlace del menú copiado!");
       }
     }
 
     function shareMenuOnWhatsApp() {
+      saveAdminConfigQuietly();
       const link = getShareableURL();
-      const text = `🍲 *¡MENÚ ESPECIAL DISPONIBLE!* 🍲\n\n` +
+      const text = `🍲 *¡MENÚ ESPECIAL DE ESTE FIN DE SEMANA!* 🍲\n\n` +
         `*${config.nombrePlato}*\n` +
         `📝 ${config.descripcionPlato}\n\n` +
         `💰 *Precio Porción:* $${Number(config.precioPlato).toLocaleString('es-CO')}\n` +
@@ -1256,7 +1401,7 @@
 
       const wspUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
       window.open(wspUrl, '_blank');
-      showToast("Abriendo WhatsApp con la oferta del menú...");
+      fallbackCopyText(link, "¡Enlace copiado y abriendo WhatsApp!");
     }
 
     // PLANTILLA Y CONFIRMACIÓN DE PEDIDO POR WHATSAPP
