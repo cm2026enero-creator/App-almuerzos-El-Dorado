@@ -10,7 +10,10 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <title>Almuerzos del Barrio - Reserva Previa y Pago</title>
 
-  <!-- Tailwind CSS por CDN -->
+  <!-- Compiled Tailwind CSS por CDN (Fallback estático sin depender de JS JIT) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <!-- Tailwind CSS JIT Compiler por CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
 
   <!-- Google Fonts: Outfit para un look moderno y amigable -->
@@ -23,24 +26,26 @@
 
   <!-- Configuración personalizada de colores de Tailwind -->
   <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Outfit', 'sans-serif'],
-          },
-          colors: {
-            brand: {
-              50: '#fff7ed',
-              100: '#ffedd5',
-              500: '#f97316',
-              600: '#ea580c',
-              700: '#c2410c',
+    if (typeof tailwind !== 'undefined') {
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Outfit', 'sans-serif'],
             },
-            whatsapp: {
-              500: '#25D366',
-              600: '#128C7E',
-              700: '#075E54',
+            colors: {
+              brand: {
+                50: '#fff7ed',
+                100: '#ffedd5',
+                500: '#f97316',
+                600: '#ea580c',
+                700: '#c2410c',
+              },
+              whatsapp: {
+                500: '#25D366',
+                600: '#128C7E',
+                700: '#075E54',
+              }
             }
           }
         }
@@ -49,78 +54,220 @@
   </script>
 
   <style>
-    /* Forzar siempre modo claro y prevenir inversión de colores en móviles con modo oscuro forzado */
+    /* ==========================================================================
+       ESTILOS BASE Y FALLBACKS CRÍTICOS PARA GARANTIZAR VISUALIZACIÓN EN MÓVILES
+       ========================================================================== */
+    *, ::before, ::after {
+      box-sizing: border-box;
+      border-width: 0;
+      border-style: solid;
+      border-color: #e2e8f0;
+    }
+
     :root, html, body {
       color-scheme: light !important;
       supported-color-schemes: light !important;
+      margin: 0;
+      padding: 0;
     }
 
     body {
-      font-family: 'Outfit', sans-serif;
+      font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       -webkit-tap-highlight-color: transparent;
       background-color: #f1f5f9 !important;
       color: #0f172a !important;
+      min-height: 100vh;
     }
 
-    /* Reglas para evitar inversión automática en Xiaomi/Chrome/Samsung Force Dark */
+    /* Visibilidad y Layout Básico */
+    .hidden { display: none !important; }
+    .block { display: block !important; }
+    .inline-block { display: inline-block !important; }
+    .flex { display: flex !important; }
+    .inline-flex { display: inline-flex !important; }
+    .grid { display: grid !important; }
+    .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+
+    .items-center { align-items: center !important; }
+    .items-start { align-items: flex-start !important; }
+    .justify-between { justify-content: space-between !important; }
+    .justify-center { justify-content: center !important; }
+    .flex-col { flex-direction: column !important; }
+    .flex-1 { flex: 1 1 0% !important; }
+    .flex-wrap { flex-wrap: wrap !important; }
+    .shrink-0 { flex-shrink: 0 !important; }
+
+    .gap-1 { gap: 0.25rem !important; }
+    .gap-1\.5 { gap: 0.375rem !important; }
+    .gap-2 { gap: 0.5rem !important; }
+    .gap-2\.5 { gap: 0.625rem !important; }
+    .gap-3 { gap: 0.75rem !important; }
+    .gap-4 { gap: 1rem !important; }
+
+    .space-y-1 > * + * { margin-top: 0.25rem !important; }
+    .space-y-1\.5 > * + * { margin-top: 0.375rem !important; }
+    .space-y-2 > * + * { margin-top: 0.5rem !important; }
+    .space-y-2\.5 > * + * { margin-top: 0.625rem !important; }
+    .space-y-3 > * + * { margin-top: 0.75rem !important; }
+    .space-y-4 > * + * { margin-top: 1rem !important; }
+    .space-y-5 > * + * { margin-top: 1.25rem !important; }
+
+    .max-w-md { max-width: 28rem !important; margin-left: auto !important; margin-right: auto !important; }
+    .w-full { width: 100% !important; }
+    .h-full { height: 100% !important; }
+    .min-h-full { min-height: 100% !important; }
+
+    .w-3 { width: 0.75rem !important; }
+    .h-3 { height: 0.75rem !important; }
+    .w-3\.5 { width: 0.875rem !important; }
+    .h-3\.5 { height: 0.875rem !important; }
+    .w-4 { width: 1rem !important; }
+    .h-4 { height: 1rem !important; }
+    .w-5 { width: 1.25rem !important; }
+    .h-5 { height: 1.25rem !important; }
+    .w-10 { width: 2.5rem !important; }
+    .h-10 { height: 2.5rem !important; }
+
+    .sticky { position: sticky !important; }
+    .fixed { position: fixed !important; }
+    .relative { position: relative !important; }
+    .absolute { position: absolute !important; }
+    .top-0 { top: 0 !important; }
+    .bottom-3 { bottom: 0.75rem !important; }
+    .bottom-5 { bottom: 1.25rem !important; }
+    .left-1\/2 { left: 50% !important; }
+    .-translate-x-1\/2 { transform: translateX(-50%) !important; }
+
+    .z-30 { z-index: 30 !important; }
+    .z-40 { z-index: 40 !important; }
+    .z-50 { z-index: 50 !important; }
+
+    .p-1 { padding: 0.25rem !important; }
+    .p-2 { padding: 0.5rem !important; }
+    .p-2\.5 { padding: 0.625rem !important; }
+    .p-3 { padding: 0.75rem !important; }
+    .p-3\.5 { padding: 0.875rem !important; }
+    .p-4 { padding: 1rem !important; }
+    .p-5 { padding: 1.25rem !important; }
+
+    .px-2 { padding-left: 0.5rem !important; padding-right: 0.5rem !important; }
+    .px-2\.5 { padding-left: 0.625rem !important; padding-right: 0.625rem !important; }
+    .px-3 { padding-left: 0.75rem !important; padding-right: 0.75rem !important; }
+    .px-3\.5 { padding-left: 0.875rem !important; padding-right: 0.875rem !important; }
+    .px-4 { padding-left: 1rem !important; padding-right: 1rem !important; }
+    .py-1 { padding-top: 0.25rem !important; padding-bottom: 0.25rem !important; }
+    .py-1\.5 { padding-top: 0.375rem !important; padding-bottom: 0.375rem !important; }
+    .py-2 { padding-top: 0.5rem !important; padding-bottom: 0.5rem !important; }
+    .py-2\.5 { padding-top: 0.625rem !important; padding-bottom: 0.625rem !important; }
+    .py-3 { padding-top: 0.75rem !important; padding-bottom: 0.75rem !important; }
+    .py-3\.5 { padding-top: 0.875rem !important; padding-bottom: 0.875rem !important; }
+    .pb-12 { padding-bottom: 3rem !important; }
+
+    /* Colores de Fondo y Texto */
+    .bg-white { background-color: #ffffff !important; color: #0f172a !important; }
+    .bg-slate-50 { background-color: #f8fafc !important; }
+    .bg-slate-100 { background-color: #f1f5f9 !important; }
+    .bg-slate-200 { background-color: #e2e8f0 !important; }
+    .bg-slate-800 { background-color: #1e293b !important; color: #ffffff !important; }
+    .bg-slate-900 { background-color: #0f172a !important; color: #ffffff !important; }
+
+    .bg-brand-50 { background-color: #fff7ed !important; }
+    .bg-brand-100 { background-color: #ffedd5 !important; }
+    .bg-brand-500 { background-color: #f97316 !important; color: #ffffff !important; }
+    .bg-brand-600 { background-color: #ea580c !important; color: #ffffff !important; }
+    .bg-brand-700 { background-color: #c2410c !important; color: #ffffff !important; }
+
+    .bg-whatsapp-500 { background-color: #25D366 !important; color: #ffffff !important; }
+    .bg-whatsapp-600 { background-color: #128C7E !important; color: #ffffff !important; }
+
+    .text-slate-400 { color: #94a3b8 !important; }
+    .text-slate-500 { color: #64748b !important; }
+    .text-slate-600 { color: #475569 !important; }
+    .text-slate-700 { color: #334155 !important; }
+    .text-slate-800 { color: #1e293b !important; }
+    .text-slate-900 { color: #0f172a !important; }
+    .text-white { color: #ffffff !important; }
+
+    .text-brand-500 { color: #f97316 !important; }
+    .text-brand-600 { color: #ea580c !important; }
+    .text-brand-700 { color: #c2410c !important; }
+
+    .font-semibold { font-weight: 600 !important; }
+    .font-bold { font-weight: 700 !important; }
+    .font-extrabold { font-weight: 800 !important; }
+
+    .text-xs { font-size: 0.75rem !important; line-height: 1rem !important; }
+    .text-sm { font-size: 0.875rem !important; line-height: 1.25rem !important; }
+    .text-base { font-size: 1rem !important; line-height: 1.5rem !important; }
+    .text-lg { font-size: 1.125rem !important; line-height: 1.75rem !important; }
+    .text-xl { font-size: 1.25rem !important; line-height: 1.75rem !important; }
+    .text-center { text-align: center !important; }
+
+    .rounded-lg { border-radius: 0.5rem !important; }
+    .rounded-xl { border-radius: 0.75rem !important; }
+    .rounded-2xl { border-radius: 1rem !important; }
+    .rounded-3xl { border-radius: 1.5rem !important; }
+    .rounded-full { border-radius: 9999px !important; }
+
+    .border { border-width: 1px !important; border-style: solid !important; border-color: #e2e8f0 !important; }
+    .border-2 { border-width: 2px !important; border-style: solid !important; }
+    .border-b { border-bottom-width: 1px !important; border-bottom-style: solid !important; border-bottom-color: #e2e8f0 !important; }
+    .border-t { border-top-width: 1px !important; border-top-style: solid !important; border-top-color: #e2e8f0 !important; }
+
+    .border-slate-100 { border-color: #f1f5f9 !important; }
+    .border-slate-200 { border-color: #e2e8f0 !important; }
+    .border-brand-100 { border-color: #ffedd5 !important; }
+    .border-brand-200 { border-color: #fed7aa !important; }
+    .border-brand-500 { border-color: #f97316 !important; }
+    .border-brand-600 { border-color: #ea580c !important; }
+
+    .shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important; }
+    .shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important; }
+    .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important; }
+
+    /* Estilizado de Formulario Robusto */
+    button {
+      font-family: inherit;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      border: none;
+      background: none;
+    }
+
+    input:not([type="checkbox"]):not([type="radio"]), select, textarea {
+      font-family: inherit;
+      background-color: #f8fafc !important;
+      color: #0f172a !important;
+      border: 1px solid #e2e8f0 !important;
+      border-radius: 0.75rem !important;
+      padding: 0.625rem 0.875rem !important;
+      font-size: 0.875rem !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
+      outline: none;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    input::placeholder, textarea::placeholder {
+      color: #94a3b8 !important;
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.98) !important;
+      backdrop-filter: blur(8px);
+    }
+
+    /* Prevención Modo Oscuro Forzado */
     @media (prefers-color-scheme: dark) {
       :root, html, body {
         color-scheme: light !important;
         background-color: #f1f5f9 !important;
         color: #0f172a !important;
       }
-
       body, header, main, section, div, input, select, textarea, button, p, span, h1, h2, h3, label {
         color-scheme: light !important;
       }
-
-      .bg-white {
-        background-color: #ffffff !important;
-        color: #0f172a !important;
-      }
-
-      .bg-slate-50 {
-        background-color: #f8fafc !important;
-        color: #0f172a !important;
-      }
-
-      .bg-slate-100 {
-        background-color: #f1f5f9 !important;
-      }
-
-      .text-slate-900, .text-slate-800, .text-slate-700, .text-slate-600 {
-        color: #0f172a !important;
-      }
-
-      input, select, textarea {
-        background-color: #f8fafc !important;
-        color: #0f172a !important;
-        border-color: #e2e8f0 !important;
-      }
-
-      input::placeholder, textarea::placeholder {
-        color: #94a3b8 !important;
-      }
-    }
-
-    /* Estilos explícitos para elementos de formulario */
-    input, select, textarea, button {
-      color-scheme: light !important;
-      color: #0f172a;
-    }
-
-    input:not([type="checkbox"]):not([type="radio"]), select, textarea {
-      background-color: #f8fafc;
-      color: #0f172a;
-    }
-
-    input::placeholder, textarea::placeholder {
-      color: #94a3b8;
-    }
-
-    .glass-card {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(8px);
     }
   </style>
 </head>
@@ -459,9 +606,10 @@
             </div>
             <h2 class="font-extrabold text-sm">Panel de Administración</h2>
           </div>
-          <span class="text-[10px] bg-brand-500/20 text-brand-300 font-bold px-2.5 py-1 rounded-full border border-brand-500/30">
-            Modo Administrador
-          </span>
+          <button onclick="logoutAdmin()" class="text-[11px] bg-rose-500/20 text-rose-300 hover:bg-rose-500/30 font-bold px-3 py-1 rounded-full border border-rose-500/30 transition flex items-center gap-1">
+            <i data-lucide="lock" class="w-3 h-3"></i>
+            <span>Cerrar Sesión</span>
+          </button>
         </div>
 
         <!-- Botones de Acción Rápidos (Exportar / WhatsApp General / Reset) -->
@@ -489,6 +637,36 @@
           <input type="text" id="adm-plato-nombre" class="w-full text-xs p-3 rounded-xl border border-slate-200 outline-none font-semibold">
         </div>
 
+        <!-- Foto del Plato con Selector Directo de Galería/Cámara -->
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1.5">Foto del Plato Especial</label>
+          
+          <div class="space-y-2 mb-2">
+            <!-- Vista Previa de la Imagen Actual -->
+            <div class="relative rounded-2xl overflow-hidden aspect-video bg-slate-100 border border-slate-200 shadow-inner group">
+              <img id="adm-dish-preview-img" src="" alt="Vista previa del plato" class="w-full h-full object-cover">
+              <div class="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center pointer-events-none">
+                <span class="bg-white/95 text-slate-800 text-xs font-bold px-3 py-1.5 rounded-xl shadow-md">Vista Previa Actual</span>
+              </div>
+            </div>
+
+            <!-- Input Oculto de Archivos -->
+            <input type="file" id="adm-plato-file" accept="image/*" class="hidden" onchange="handleAdminDishImageUpload(event)">
+            
+            <!-- Botón interactivo para elegir imagen desde cel/PC -->
+            <button type="button" onclick="document.getElementById('adm-plato-file').click()" class="w-full py-3 px-4 rounded-xl border-2 border-dashed border-brand-300 bg-brand-50/60 hover:bg-brand-100 text-brand-700 font-extrabold text-xs flex items-center justify-center gap-2 transition shadow-sm">
+              <i data-lucide="image-plus" class="w-4.5 h-4.5 text-brand-600"></i>
+              <span>Seleccionar Foto desde Galería o Cámara</span>
+            </button>
+          </div>
+
+          <!-- Opción Alternativa URL de Internet -->
+          <details class="text-xs text-slate-500 mt-1">
+            <summary class="cursor-pointer font-semibold text-slate-600 hover:text-brand-600 py-1">O pegar enlace / URL directa de foto de Internet</summary>
+            <input type="text" id="adm-plato-imagen" placeholder="https://..." class="w-full text-xs p-3 rounded-xl border border-slate-200 outline-none truncate mt-1">
+          </details>
+        </div>
+
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-bold text-slate-700 mb-1">Precio Porción ($)</label>
@@ -501,12 +679,7 @@
         </div>
 
         <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">URL Imagen del Plato</label>
-          <input type="text" id="adm-plato-imagen" class="w-full text-xs p-3 rounded-xl border border-slate-200 outline-none truncate">
-        </div>
-
-        <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">Descripción Corta</label>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Descripción Corta del Plato</label>
           <textarea id="adm-plato-desc" rows="2" class="w-full text-xs p-3 rounded-xl border border-slate-200 outline-none"></textarea>
         </div>
 
@@ -525,7 +698,16 @@
           <input type="text" id="adm-banco-detalles" class="w-full text-xs p-3 rounded-xl border border-slate-200 outline-none">
         </div>
 
-        <button onclick="saveAdminConfig()" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-extrabold text-xs py-3 rounded-xl shadow-md transition flex items-center justify-center gap-2">
+        <div class="pt-2 border-t border-slate-100">
+          <label class="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1.5">
+            <i data-lucide="key-round" class="w-3.5 h-3.5 text-brand-600"></i>
+            <span>Código PIN de Seguridad (4 dígitos)</span>
+          </label>
+          <input type="text" id="adm-pin-code" maxlength="10" placeholder="2026" class="w-full text-xs p-3 rounded-xl border border-slate-200 outline-none font-mono font-bold">
+          <p class="text-[11px] text-slate-400 mt-0.5">Clave requerida para ingresar a este panel de administración</p>
+        </div>
+
+        <button onclick="saveAdminConfig()" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-extrabold text-xs py-3.5 rounded-xl shadow-md transition flex items-center justify-center gap-2">
           <i data-lucide="check-circle" class="w-4 h-4"></i>
           <span>Guardar Cambios de Menú</span>
         </button>
@@ -559,6 +741,35 @@
     </div>
 
   </main>
+
+  <!-- MODAL DE SEGURIDAD PARA ACCESO A ADMINISTRACIÓN -->
+  <div id="pin-modal" class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl p-6 max-w-xs w-full shadow-2xl border border-slate-100 text-center space-y-4">
+      <div class="w-12 h-12 rounded-2xl bg-brand-100 text-brand-600 mx-auto flex items-center justify-center shadow-inner">
+        <i data-lucide="lock" class="w-6 h-6"></i>
+      </div>
+      <div>
+        <h3 class="font-extrabold text-slate-900 text-base">Acceso Administrador</h3>
+        <p class="text-xs text-slate-500 mt-1">Ingresa el código PIN de 4 dígitos para acceder al Panel de Administración</p>
+      </div>
+
+      <div>
+        <input type="password" id="pin-input" maxlength="10" placeholder="••••" inputmode="numeric" pattern="[0-9]*"
+               class="w-full text-center text-xl font-bold tracking-widest py-3 px-4 rounded-xl border border-slate-300 focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none bg-slate-50"
+               onkeyup="if(event.key === 'Enter') verifyAdminPin()">
+        <p id="pin-error-msg" class="text-xs text-rose-600 font-bold mt-2 hidden">Código PIN incorrecto</p>
+      </div>
+
+      <div class="grid grid-cols-2 gap-2 pt-1">
+        <button type="button" onclick="closePinModal()" class="py-2.5 rounded-xl border border-slate-200 text-slate-600 font-bold text-xs hover:bg-slate-50 transition">
+          Cancelar
+        </button>
+        <button type="button" onclick="verifyAdminPin()" class="py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-extrabold text-xs shadow-md transition">
+          Ingresar
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- NOTIFICACIÓN TOAST FLOTANTE -->
   <div id="toast" class="fixed bottom-5 left-1/2 -translate-x-1/2 bg-slate-900/90 backdrop-blur-md text-white text-xs font-semibold px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-2 transition-all duration-300 opacity-0 translate-y-10 pointer-events-none z-50 border border-slate-700">
@@ -641,7 +852,62 @@
     let currentQuantity = 1;
     let deliveryMode = 'pickup'; // 'pickup' o 'delivery'
     let uploadedImageBase64 = null;
+    let adminUploadedDishImageBase64 = null;
     let selectedWeekendDay = 'Sábado';
+
+    // Configuración de Seguridad Administrador
+    const DEFAULT_ADMIN_PIN = "2026";
+    let isAdminAuthenticated = false;
+
+    function getAdminPin() {
+      return localStorage.getItem('almuerzos_admin_pin') || DEFAULT_ADMIN_PIN;
+    }
+
+    function openPinModal() {
+      const modal = document.getElementById('pin-modal');
+      const input = document.getElementById('pin-input');
+      const error = document.getElementById('pin-error-msg');
+      if (modal) {
+        modal.classList.remove('hidden');
+        if (input) {
+          input.value = '';
+          setTimeout(() => input.focus(), 150);
+        }
+        if (error) error.classList.add('hidden');
+      }
+    }
+
+    function closePinModal() {
+      const modal = document.getElementById('pin-modal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function verifyAdminPin() {
+      const input = document.getElementById('pin-input');
+      const error = document.getElementById('pin-error-msg');
+      const enteredPin = input ? input.value.trim() : '';
+      const correctPin = getAdminPin();
+
+      if (enteredPin === correctPin) {
+        isAdminAuthenticated = true;
+        closePinModal();
+        switchTab('admin');
+        showToast("Acceso concedido al Panel de Administración");
+      } else {
+        if (error) error.classList.remove('hidden');
+        showToast("Código PIN incorrecto");
+        if (input) {
+          input.value = '';
+          input.focus();
+        }
+      }
+    }
+
+    function logoutAdmin() {
+      isAdminAuthenticated = false;
+      switchTab('client');
+      showToast("Sesión de administración cerrada");
+    }
 
     // Inicializar aplicación al cargar la página
     document.addEventListener("DOMContentLoaded", () => {
@@ -847,6 +1113,16 @@
       localStorage.setItem('almuerzos_orders', JSON.stringify(orders));
     }
 
+    function safeCreateIcons() {
+      if (typeof lucide !== 'undefined' && lucide && typeof lucide.createIcons === 'function') {
+        try {
+          lucide.createIcons();
+        } catch (e) {
+          console.warn("Lucide icon generation skipped:", e);
+        }
+      }
+    }
+
     // 4. RENDERIZADO GENERAL Y VALORES DE INTERFAZ
     function renderApp() {
       // Elementos vista cliente
@@ -864,14 +1140,22 @@
       document.getElementById('adm-plato-nombre').value = config.nombrePlato;
       document.getElementById('adm-plato-precio').value = config.precioPlato;
       document.getElementById('adm-domicilio-precio').value = config.costoDomicilio;
-      document.getElementById('adm-plato-imagen').value = config.imagenPlato;
       document.getElementById('adm-plato-desc').value = config.descripcionPlato;
       document.getElementById('adm-whatsapp-num').value = config.numeroWhatsAppAdmin;
       document.getElementById('adm-nequi-num').value = config.numeroNequi;
       document.getElementById('adm-banco-detalles').value = config.detallesBanco;
+      
+      const pinField = document.getElementById('adm-pin-code');
+      if (pinField) pinField.value = getAdminPin();
+
+      // Vista previa foto plato
+      const previewImg = document.getElementById('adm-dish-preview-img');
+      if (previewImg) previewImg.src = adminUploadedDishImageBase64 || config.imagenPlato;
+      const urlInput = document.getElementById('adm-plato-imagen');
+      if (urlInput) urlInput.value = adminUploadedDishImageBase64 ? '' : config.imagenPlato;
 
       updateTotals();
-      lucide.createIcons();
+      safeCreateIcons();
     }
 
     // Actualizar Subtotal y Total en la Card del Carrito
@@ -929,13 +1213,17 @@
         btnClient.className = "flex-1 py-2.5 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 bg-white text-slate-900 shadow-sm";
         btnAdmin.className = "flex-1 py-2.5 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 text-slate-600 hover:text-slate-900";
       } else {
+        if (!isAdminAuthenticated) {
+          openPinModal();
+          return;
+        }
         viewClient.classList.add('hidden');
         viewAdmin.classList.remove('hidden');
         btnAdmin.className = "flex-1 py-2.5 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 bg-slate-900 text-white shadow-sm";
         btnClient.className = "flex-1 py-2.5 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 text-slate-600 hover:text-slate-900";
         renderOrders();
       }
-      lucide.createIcons();
+      safeCreateIcons();
     }
 
     // 6. PROCESO DE CARGA DE COMPROBANTE DE PAGO
@@ -969,22 +1257,61 @@
       showToast("Comprobante removido");
     }
 
+    // PROCESO DE CARGA DE FOTO DE PLATO DESDE EL ADMIN (Galería / Cámara)
+    function handleAdminDishImageUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      if (file.size > 5 * 1024 * 1024) {
+        showToast("La foto del plato es muy pesada (Máximo 5MB)");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        adminUploadedDishImageBase64 = e.target.result;
+        const imgPreview = document.getElementById('adm-dish-preview-img');
+        if (imgPreview) imgPreview.src = adminUploadedDishImageBase64;
+        const urlInput = document.getElementById('adm-plato-imagen');
+        if (urlInput) urlInput.value = '';
+        showToast("Foto cargada. Haz clic en 'Guardar Cambios de Menú'");
+      };
+      reader.readAsDataURL(file);
+    }
+
     // 7. GUARDAR CONFIGURACIÓN DESDE EL ADMIN
     function saveAdminConfig() {
       config.nombrePlato = document.getElementById('adm-plato-nombre').value.trim() || DEFAULT_CONFIG.nombrePlato;
       config.precioPlato = Number(document.getElementById('adm-plato-precio').value) || DEFAULT_CONFIG.precioPlato;
       config.costoDomicilio = Number(document.getElementById('adm-domicilio-precio').value) || DEFAULT_CONFIG.costoDomicilio;
-      config.imagenPlato = document.getElementById('adm-plato-imagen').value.trim() || DEFAULT_CONFIG.imagenPlato;
       config.descripcionPlato = document.getElementById('adm-plato-desc').value.trim() || DEFAULT_CONFIG.descripcionPlato;
+
+      // Actualizar foto del plato: si se cargó archivo local Base64, priorizarlo; si no, tomar la URL ingresada
+      const urlInput = document.getElementById('adm-plato-imagen').value.trim();
+      if (adminUploadedDishImageBase64) {
+        config.imagenPlato = adminUploadedDishImageBase64;
+      } else if (urlInput) {
+        config.imagenPlato = urlInput;
+        adminUploadedDishImageBase64 = null;
+      }
       
       let numWsp = document.getElementById('adm-whatsapp-num').value.trim().replace(/\D/g, '');
       config.numeroWhatsAppAdmin = numWsp || DEFAULT_CONFIG.numeroWhatsAppAdmin;
       config.numeroNequi = document.getElementById('adm-nequi-num').value.trim() || DEFAULT_CONFIG.numeroNequi;
       config.detallesBanco = document.getElementById('adm-banco-detalles').value.trim() || DEFAULT_CONFIG.detallesBanco;
 
+      // Actualizar PIN de seguridad si el admin lo modificó
+      const newPinInput = document.getElementById('adm-pin-code');
+      if (newPinInput) {
+        const newPin = newPinInput.value.trim();
+        if (newPin && newPin.length >= 2) {
+          localStorage.setItem('almuerzos_admin_pin', newPin);
+        }
+      }
+
       saveConfigToLocalStorage();
       renderApp();
-      showToast("Configuración guardada correctamente");
+      showToast("Menú, precio, foto y configuración actualizados correctamente");
     }
 
     // 8. EXPORTAR PEDIDOS EN FORMATO EXCEL / CSV
@@ -1060,7 +1387,7 @@
             <p class="text-xs font-medium">No hay reservas registradas en este estado.</p>
           </div>
         `;
-        lucide.createIcons();
+        safeCreateIcons();
         return;
       }
 
@@ -1118,7 +1445,7 @@
         </div>
       `).join('');
 
-      lucide.createIcons();
+      safeCreateIcons();
     }
 
     function toggleOrderStatus(orderId) {
