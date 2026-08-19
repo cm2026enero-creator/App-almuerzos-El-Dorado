@@ -10,13 +10,14 @@
 // ============================================================================
 
 const firebaseConfig = {
-  apiKey: "TU_API_KEY_AQUI",
-  authDomain: "tu-proyecto.firebaseapp.com",
-  databaseURL: "https://tu-proyecto-default-rtdb.firebaseio.com",
-  projectId: "tu-proyecto",
-  storageBucket: "tu-proyecto.appspot.com",
-  messagingSenderId: "123456789012",
-  appId: "1:123456789012:web:abcdef1234567890"
+  apiKey: "AIzaSyCBR_auqkJGUTcyD7OSziAGsD03ys7QNYQ",
+  authDomain: "almuerzos-27a0b.firebaseapp.com",
+  databaseURL: "https://almuerzos-27a0b-default-rtdb.firebaseio.com",
+  projectId: "almuerzos-27a0b",
+  storageBucket: "almuerzos-27a0b.firebasestorage.app",
+  messagingSenderId: "724783685178",
+  appId: "1:724783685178:web:d56ac85ad9c0a242c01f03",
+  measurementId: "G-BER65WSV1G"
 };
 
 // Variable global de estado de Firebase
