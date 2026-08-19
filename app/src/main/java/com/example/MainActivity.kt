@@ -1,14 +1,17 @@
 package com.example
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
+import android.webkit.WebResourceRequest
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
@@ -16,6 +19,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
 import com.example.ui.theme.MyApplicationTheme
@@ -45,11 +52,18 @@ class MainActivity : ComponentActivity() {
     enableEdgeToEdge()
     setContent {
       MyApplicationTheme {
+        var webViewInstance by remember { mutableStateOf<WebView?>(null) }
+
+        BackHandler(enabled = webViewInstance?.canGoBack() == true) {
+          webViewInstance?.goBack()
+        }
+
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
           AppWebView(
             modifier = Modifier
               .fillMaxSize()
               .padding(innerPadding),
+            onWebViewCreated = { webViewInstance = it },
             onOpenFileChooser = { callback, intent ->
               filePathCallback = callback
               fileChooserLauncher.launch(intent)
@@ -61,36 +75,63 @@ class MainActivity : ComponentActivity() {
   }
 }
 
+@SuppressLint("SetJavaScriptEnabled")
 @Composable
 fun AppWebView(
   modifier: Modifier = Modifier,
+  onWebViewCreated: (WebView) -> Unit,
   onOpenFileChooser: (ValueCallback<Array<Uri>>, Intent) -> Unit
 ) {
   AndroidView(
     modifier = modifier,
     factory = { context ->
       WebView(context).apply {
-        settings.javaScriptEnabled = true
-        settings.domStorageEnabled = true
-        settings.allowFileAccess = true
-        settings.allowContentAccess = true
-        settings.databaseEnabled = true
-        settings.cacheMode = WebSettings.LOAD_DEFAULT
+        settings.apply {
+          javaScriptEnabled = true
+          domStorageEnabled = true
+          allowFileAccess = true
+          allowContentAccess = true
+          databaseEnabled = true
+          cacheMode = WebSettings.LOAD_DEFAULT
+          useWideViewPort = true
+          loadWithOverviewMode = true
+          mediaPlaybackRequiresUserGesture = false
+          @Suppress("DEPRECATION")
+          allowFileAccessFromFileURLs = true
+          @Suppress("DEPRECATION")
+          allowUniversalAccessFromFileURLs = true
+        }
 
         webViewClient = object : WebViewClient() {
+          override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
+            val url = request?.url?.toString() ?: return false
+            return handleCustomUrl(url, view)
+          }
+
+          @Suppress("DEPRECATION")
           override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
             if (url == null) return false
+            return handleCustomUrl(url, view)
+          }
+
+          private fun handleCustomUrl(url: String, view: WebView?): Boolean {
             if (url.startsWith("whatsapp://") || url.contains("api.whatsapp.com") || url.contains("wa.me")) {
               try {
                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
                 context.startActivity(intent)
                 return true
               } catch (e: Exception) {
-                // If WhatsApp app is not installed, open in browser
-                val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-                context.startActivity(browserIntent)
-                return true
+                try {
+                  val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                  context.startActivity(browserIntent)
+                  return true
+                } catch (_: Exception) {
+                  return false
+                }
               }
+            }
+            if (url.startsWith("file://") || url.startsWith("about:")) {
+              return false
             }
             return false
           }
@@ -111,6 +152,7 @@ fun AppWebView(
           }
         }
 
+        onWebViewCreated(this)
         loadUrl("file:///android_asset/index.html")
       }
     }

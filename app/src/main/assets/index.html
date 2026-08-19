@@ -1,51 +1,25 @@
 <!DOCTYPE html>
-<html lang="es" class="h-full bg-slate-100">
+<html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="color-scheme" content="light">
-  <meta name="supported-color-schemes" content="light">
-  <meta name="theme-color" content="#ffffff">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <title>Almuerzos del Barrio - Reserva Previa y Pago</title>
-
-  <!-- Compiled Tailwind CSS por CDN (Fallback estático sin depender de JS JIT) -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
-
-  <!-- Tailwind CSS JIT Compiler por CDN -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sazón Lau - Almuerzos de Fin de Semana</title>
+  
+  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Google Fonts: Outfit para un look moderno y amigable -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-
-  <!-- Iconos Lucide -->
-  <script src="https://unpkg.com/lucide@latest"></script>
-
-  <!-- Configuración personalizada de colores de Tailwind -->
   <script>
-    if (typeof tailwind !== 'undefined') {
-      tailwind.config = {
-        theme: {
-          extend: {
-            fontFamily: {
-              sans: ['Outfit', 'sans-serif'],
-            },
-            colors: {
-              brand: {
-                50: '#fff7ed',
-                100: '#ffedd5',
-                500: '#f97316',
-                600: '#ea580c',
-                700: '#c2410c',
-              },
-              whatsapp: {
-                500: '#25D366',
-                600: '#128C7E',
-                700: '#075E54',
-              }
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#fff7ed',
+              100: '#ffedd5',
+              200: '#fed7aa',
+              500: '#f97316',
+              600: '#ea580c',
+              700: '#c2410c',
+              800: '#9a3412',
             }
           }
         }
@@ -53,2216 +27,309 @@
     }
   </script>
 
-  <style>
-    /* ==========================================================================
-       ESTILOS BASE, RESET Y NORMALIZACIÓN CRÍTICA PARA NAVEGADORES MÓVILES (WEBVIEW / SAMSUNG INTERNET)
-       ========================================================================== */
-    *, *::before, *::after {
-      -webkit-box-sizing: border-box !important;
-      box-sizing: border-box !important;
-      margin: 0;
-      padding: 0;
-      border-width: 0;
-      border-style: solid;
-      border-color: #e2e8f0;
-      max-width: 100%;
-    }
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
 
-    :root, html, body {
-      color-scheme: light !important;
-      supported-color-schemes: light !important;
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      overflow-x: hidden;
-    }
+  <!-- Estilos Globales -->
+  <link rel="stylesheet" href="styles.css">
 
-    body {
-      font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      -webkit-tap-highlight-color: transparent;
-      background-color: #f1f5f9 !important;
-      color: #0f172a !important;
-      min-height: 100vh;
-      line-height: 1.5;
-    }
+  <!-- Firebase App & Database Compat SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 
-    /* ELIMINACIÓN DE ESTILOS NATIVOS DE SISTEMA EN INPUTS Y BOTONES */
-    input, button, select, textarea, a, label {
-      -webkit-appearance: none !important;
-      -moz-appearance: none !important;
-      appearance: none !important;
-      font-family: inherit;
-      -webkit-tap-highlight-color: transparent;
-      max-width: 100% !important;
-      box-sizing: border-box !important;
-    }
-
-    /* OCULTAR INPUT DE ARCHIVO NATIVO EN TODOS LOS NAVEGADORES */
-    input[type="file"], input[type="file"].hidden {
-      display: none !important;
-      visibility: hidden !important;
-      width: 0 !important;
-      height: 0 !important;
-      opacity: 0 !important;
-      position: absolute !important;
-      pointer-events: none !important;
-    }
-
-    /* REGLAS DE FORMULARIO ROBUSTO */
-    input:not([type="checkbox"]):not([type="radio"]), select, textarea {
-      font-family: inherit;
-      background-color: #f8fafc !important;
-      color: #0f172a !important;
-      border: 1px solid #e2e8f0 !important;
-      border-radius: 0.75rem !important;
-      padding: 0.75rem 0.875rem !important;
-      font-size: 0.8125rem !important;
-      line-height: 1.25rem !important;
-      width: 100% !important;
-      max-width: 100% !important;
-      box-sizing: border-box !important;
-      outline: none !important;
-      display: block !important;
-    }
-
-    input:focus, select:focus, textarea:focus {
-      border-color: #ea580c !important;
-      box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.15) !important;
-      background-color: #ffffff !important;
-    }
-
-    input::placeholder, textarea::placeholder {
-      color: #94a3b8 !important;
-      opacity: 1 !important;
-    }
-
-    button {
-      background: none;
-      border: none;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    /* COMPATIBILIDAD CON SELECTOR DE FECHAS EN WEBVIEW */
-    input[type="date"]::-webkit-calendar-picker-indicator {
-      cursor: pointer;
-      filter: invert(0.35);
-      opacity: 0.8;
-    }
-
-    /* VISIBILIDAD Y ESTRUCTURA GENERAL */
-    .hidden { display: none !important; }
-    .block { display: block !important; }
-    .inline-block { display: inline-block !important; }
-    .flex { display: flex !important; }
-    .inline-flex { display: inline-flex !important; }
-    .grid { display: grid !important; }
-    .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
-
-    .items-center { align-items: center !important; }
-    .items-start { align-items: flex-start !important; }
-    .justify-between { justify-content: space-between !important; }
-    .justify-center { justify-content: center !important; }
-    .flex-col { flex-direction: column !important; }
-    .flex-1 { flex: 1 1 0% !important; }
-    .flex-wrap { flex-wrap: wrap !important; }
-    .shrink-0 { flex-shrink: 0 !important; }
-
-    .gap-1 { gap: 0.25rem !important; }
-    .gap-1\.5 { gap: 0.375rem !important; }
-    .gap-2 { gap: 0.5rem !important; }
-    .gap-2\.5 { gap: 0.625rem !important; }
-    .gap-3 { gap: 0.75rem !important; }
-    .gap-4 { gap: 1rem !important; }
-
-    .space-y-1 > * + * { margin-top: 0.25rem !important; }
-    .space-y-1\.5 > * + * { margin-top: 0.375rem !important; }
-    .space-y-2 > * + * { margin-top: 0.5rem !important; }
-    .space-y-2\.5 > * + * { margin-top: 0.625rem !important; }
-    .space-y-3 > * + * { margin-top: 0.75rem !important; }
-    .space-y-4 > * + * { margin-top: 1rem !important; }
-    .space-y-5 > * + * { margin-top: 1.25rem !important; }
-
-    .max-w-md { max-width: 28rem !important; margin-left: auto !important; margin-right: auto !important; }
-    .w-full { width: 100% !important; max-width: 100% !important; }
-    .h-full { height: 100% !important; }
-    .min-h-full { min-height: 100% !important; }
-
-    .w-3 { width: 0.75rem !important; min-width: 0.75rem !important; }
-    .h-3 { height: 0.75rem !important; min-height: 0.75rem !important; }
-    .w-3\.5 { width: 0.875rem !important; min-width: 0.875rem !important; }
-    .h-3\.5 { height: 0.875rem !important; min-height: 0.875rem !important; }
-    .w-4 { width: 1rem !important; min-width: 1rem !important; }
-    .h-4 { height: 1rem !important; min-height: 1rem !important; }
-    .w-4\.5 { width: 1.125rem !important; min-width: 1.125rem !important; }
-    .h-4\.5 { height: 1.125rem !important; min-height: 1.125rem !important; }
-    .w-5 { width: 1.25rem !important; min-width: 1.25rem !important; }
-    .h-5 { height: 1.25rem !important; min-height: 1.25rem !important; }
-    .w-7 { width: 1.75rem !important; min-width: 1.75rem !important; }
-    .h-7 { height: 1.75rem !important; min-height: 1.75rem !important; }
-    .w-9 { width: 2.25rem !important; min-width: 2.25rem !important; }
-    .h-9 { height: 2.25rem !important; min-height: 2.25rem !important; }
-    .w-10 { width: 2.5rem !important; min-width: 2.5rem !important; }
-    .h-10 { height: 2.5rem !important; min-height: 2.5rem !important; }
-    .w-12 { width: 3rem !important; min-width: 3rem !important; }
-    .h-12 { height: 3rem !important; min-height: 3rem !important; }
-    .max-h-36 { max-height: 9rem !important; }
-    .aspect-video { aspect-ratio: 16 / 9 !important; }
-
-    .sticky { position: sticky !important; }
-    .fixed { position: fixed !important; }
-    .relative { position: relative !important; }
-    .absolute { position: absolute !important; }
-    .top-0 { top: 0 !important; }
-    .bottom-3 { bottom: 0.75rem !important; }
-    .bottom-5 { bottom: 1.25rem !important; }
-    .left-3\.5 { left: 0.875rem !important; }
-    .left-1\/2 { left: 50% !important; }
-    .top-1\/2 { top: 50% !important; }
-    .-translate-y-1\/2 { transform: translateY(-50%) !important; }
-    .-translate-x-1\/2 { transform: translateX(-50%) !important; }
-
-    .z-30 { z-index: 30 !important; }
-    .z-40 { z-index: 40 !important; }
-    .z-50 { z-index: 50 !important; }
-
-    .p-0 { padding: 0 !important; }
-    .p-1 { padding: 0.25rem !important; }
-    .p-2 { padding: 0.5rem !important; }
-    .p-2\.5 { padding: 0.625rem !important; }
-    .p-3 { padding: 0.75rem !important; }
-    .p-3\.5 { padding: 0.875rem !important; }
-    .p-4 { padding: 1rem !important; }
-    .p-5 { padding: 1.25rem !important; }
-
-    .px-2 { padding-left: 0.5rem !important; padding-right: 0.5rem !important; }
-    .px-2\.5 { padding-left: 0.625rem !important; padding-right: 0.625rem !important; }
-    .px-3 { padding-left: 0.75rem !important; padding-right: 0.75rem !important; }
-    .px-3\.5 { padding-left: 0.875rem !important; padding-right: 0.875rem !important; }
-    .px-4 { padding-left: 1rem !important; padding-right: 1rem !important; }
-    .py-0\.5 { padding-top: 0.125rem !important; padding-bottom: 0.125rem !important; }
-    .py-1 { padding-top: 0.25rem !important; padding-bottom: 0.25rem !important; }
-    .py-1\.5 { padding-top: 0.375rem !important; padding-bottom: 0.375rem !important; }
-    .py-2 { padding-top: 0.5rem !important; padding-bottom: 0.5rem !important; }
-    .py-2\.5 { padding-top: 0.625rem !important; padding-bottom: 0.625rem !important; }
-    .py-3 { padding-top: 0.75rem !important; padding-bottom: 0.75rem !important; }
-    .py-3\.5 { padding-top: 0.875rem !important; padding-bottom: 0.875rem !important; }
-    .pl-10 { padding-left: 2.5rem !important; }
-    .pr-3 { padding-right: 0.75rem !important; }
-    .pb-2 { padding-bottom: 0.5rem !important; }
-    .pb-2\.5 { padding-bottom: 0.625rem !important; }
-    .pb-12 { padding-bottom: 3rem !important; }
-    .pt-2 { padding-top: 0.5rem !important; }
-    .pt-3\.5 { padding-top: 0.875rem !important; }
-    .pt-4 { padding-top: 1rem !important; }
-
-    .mt-0\.5 { margin-top: 0.125rem !important; }
-    .mt-1 { margin-top: 0.25rem !important; }
-    .mt-1\.5 { margin-top: 0.375rem !important; }
-    .mt-2 { margin-top: 0.5rem !important; }
-    .mt-3 { margin-top: 0.75rem !important; }
-    .mt-4 { margin-top: 1rem !important; }
-    .mb-1 { margin-bottom: 0.25rem !important; }
-    .mb-1\.5 { margin-bottom: 0.375rem !important; }
-    .mb-2 { margin-bottom: 0.5rem !important; }
-    .mb-2\.5 { margin-bottom: 0.625rem !important; }
-    .mb-3 { margin-bottom: 0.75rem !important; }
-    .mb-3\.5 { margin-bottom: 0.875rem !important; }
-    .mb-4 { margin-bottom: 1rem !important; }
-    .mx-auto { margin-left: auto !important; margin-right: auto !important; }
-
-    /* COLORES DE FONDO Y TEXTO */
-    .bg-white { background-color: #ffffff !important; color: #0f172a !important; }
-    .bg-slate-50 { background-color: #f8fafc !important; }
-    .bg-slate-100 { background-color: #f1f5f9 !important; }
-    .bg-slate-200 { background-color: #e2e8f0 !important; }
-    .bg-slate-700 { background-color: #334155 !important; color: #ffffff !important; }
-    .bg-slate-800 { background-color: #1e293b !important; color: #ffffff !important; }
-    .bg-slate-900 { background-color: #0f172a !important; color: #ffffff !important; }
-
-    .bg-brand-50 { background-color: #fff7ed !important; }
-    .bg-brand-100 { background-color: #ffedd5 !important; }
-    .bg-brand-500 { background-color: #f97316 !important; color: #ffffff !important; }
-    .bg-brand-600 { background-color: #ea580c !important; color: #ffffff !important; }
-    .bg-brand-700 { background-color: #c2410c !important; color: #ffffff !important; }
-
-    .bg-amber-100 { background-color: #fef3c7 !important; }
-    .bg-rose-500 { background-color: #f43f5e !important; color: #ffffff !important; }
-    .bg-whatsapp-500 { background-color: #25D366 !important; color: #ffffff !important; }
-    .bg-whatsapp-600 { background-color: #128C7E !important; color: #ffffff !important; }
-
-    .text-slate-100 { color: #f1f5f9 !important; }
-    .text-slate-300 { color: #cbd5e1 !important; }
-    .text-slate-400 { color: #94a3b8 !important; }
-    .text-slate-500 { color: #64748b !important; }
-    .text-slate-600 { color: #475569 !important; }
-    .text-slate-700 { color: #334155 !important; }
-    .text-slate-800 { color: #1e293b !important; }
-    .text-slate-900 { color: #0f172a !important; }
-    .text-white { color: #ffffff !important; }
-
-    .text-brand-300 { color: #fdba74 !important; }
-    .text-brand-400 { color: #fb923c !important; }
-    .text-brand-500 { color: #f97316 !important; }
-    .text-brand-600 { color: #ea580c !important; }
-    .text-brand-700 { color: #c2410c !important; }
-
-    .text-amber-300 { color: #fcd34d !important; }
-    .text-amber-400 { color: #fbbf24 !important; }
-    .text-amber-500 { color: #f59e0b !important; }
-    .text-amber-600 { color: #d97706 !important; }
-    .text-amber-800 { color: #92400e !important; }
-    .text-rose-500 { color: #f43f5e !important; }
-
-    .font-normal { font-weight: 400 !important; }
-    .font-medium { font-weight: 500 !important; }
-    .font-semibold { font-weight: 600 !important; }
-    .font-bold { font-weight: 700 !important; }
-    .font-extrabold { font-weight: 800 !important; }
-
-    .text-\[10px\] { font-size: 0.625rem !important; line-height: 0.875rem !important; }
-    .text-\[11px\] { font-size: 0.6875rem !important; line-height: 0.9375rem !important; }
-    .text-xs { font-size: 0.75rem !important; line-height: 1rem !important; }
-    .text-sm { font-size: 0.875rem !important; line-height: 1.25rem !important; }
-    .text-base { font-size: 1rem !important; line-height: 1.5rem !important; }
-    .text-lg { font-size: 1.125rem !important; line-height: 1.75rem !important; }
-    .text-xl { font-size: 1.25rem !important; line-height: 1.75rem !important; }
-    .text-2xl { font-size: 1.5rem !important; line-height: 2rem !important; }
-    .text-center { text-align: center !important; }
-    .uppercase { text-transform: uppercase !important; }
-    .tracking-wider { letter-spacing: 0.05em !important; }
-    .tracking-tight { letter-spacing: -0.025em !important; }
-    .truncate { overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important; }
-
-    /* BORDES Y BORDES REDONDEADOS */
-    .rounded-lg { border-radius: 0.5rem !important; }
-    .rounded-xl { border-radius: 0.75rem !important; }
-    .rounded-2xl { border-radius: 1rem !important; }
-    .rounded-3xl { border-radius: 1.5rem !important; }
-    .rounded-full { border-radius: 9999px !important; }
-
-    .border { border-width: 1px !important; border-style: solid !important; border-color: #e2e8f0 !important; }
-    .border-2 { border-width: 2px !important; border-style: solid !important; }
-    .border-dashed { border-style: dashed !important; }
-    .border-b { border-bottom-width: 1px !important; border-bottom-style: solid !important; border-bottom-color: #e2e8f0 !important; }
-    .border-t { border-top-width: 1px !important; border-top-style: solid !important; border-top-color: #e2e8f0 !important; }
-
-    .border-slate-100 { border-color: #f1f5f9 !important; }
-    .border-slate-200 { border-color: #e2e8f0 !important; }
-    .border-slate-300 { border-color: #cbd5e1 !important; }
-    .border-slate-700 { border-color: #334155 !important; }
-    .border-amber-200 { border-color: #fde68a !important; }
-    .border-brand-100 { border-color: #ffedd5 !important; }
-    .border-brand-200 { border-color: #fed7aa !important; }
-    .border-brand-300 { border-color: #fdba74 !important; }
-    .border-brand-400 { border-color: #fb923c !important; }
-    .border-brand-500 { border-color: #f97316 !important; }
-    .border-brand-600 { border-color: #ea580c !important; }
-
-    .shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important; }
-    .shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important; }
-    .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important; }
-    .shadow-2xl { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important; }
-    .shadow-inner { box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06) !important; }
-
-    .overflow-hidden { overflow: hidden !important; }
-    .object-cover { object-fit: cover !important; }
-    .transition { transition-property: all !important; transition-duration: 200ms !important; }
-    .cursor-pointer { cursor: pointer !important; }
-
-    /* MODO OSCURO BLOQUEADO EN TEMA CLARO */
-    @media (prefers-color-scheme: dark) {
-      :root, html, body {
-        color-scheme: light !important;
-        background-color: #f1f5f9 !important;
-        color: #0f172a !important;
-      }
-      body, header, main, section, div, input, select, textarea, button, p, span, h1, h2, h3, label {
-        color-scheme: light !important;
-      }
-    }
-  </style>
+  <!-- Configuración de Firebase -->
+  <script src="firebase-config.js"></script>
 </head>
-<body class="bg-slate-100 text-slate-800 min-h-full pb-12 antialiased selection:bg-brand-500 selection:text-white">
+<body class="bg-slate-50 min-h-screen text-slate-800 antialiased selection:bg-brand-500 selection:text-white pb-16">
 
-  <!-- ========================================== -->
-  <!-- BARRA DE NAVEGACIÓN PRINCIPAL              -->
-  <!-- ========================================== -->
-  <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-200/80 shadow-sm">
-    <div class="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
+  <!-- ENCABEZADO PRINCIPAL -->
+  <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-200">
+    <div class="max-w-xl mx-auto px-4 py-3 flex items-center justify-between">
       <div class="flex items-center gap-2.5">
-        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center text-white shadow-md shadow-brand-500/20">
-          <i data-lucide="utensils" class="w-5 h-5"></i>
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-brand-600 to-amber-500 flex items-center justify-center text-white shadow-md shadow-brand-500/20">
+          <i data-lucide="utensils-crossed" class="w-5 h-5"></i>
         </div>
         <div>
-          <h1 id="header-app-title" class="font-extrabold text-slate-900 text-base leading-tight tracking-tight">Almuerzos del Barrio</h1>
-          <p id="header-app-subtitle" class="text-xs text-brand-600 font-semibold flex items-center gap-1">
-            <span class="w-1.5 h-1.5 rounded-full bg-brand-500 animate-pulse"></span>
-            Reserva previa fin de semana
-          </p>
+          <h1 class="font-extrabold text-base leading-tight text-slate-900 font-serif">Sazón Lau</h1>
+          <p class="text-[11px] font-bold text-brand-600 uppercase tracking-wider">Almuerzos de Fin de Semana</p>
         </div>
       </div>
 
-      <!-- Botón de Acceso Rápido al Panel Admin -->
-      <button onclick="switchTab('admin')" id="nav-btn-admin" class="relative group p-2.5 text-slate-500 hover:text-brand-600 hover:bg-brand-50 rounded-xl transition duration-200 flex items-center gap-1.5 text-xs font-bold border border-slate-200 hover:border-brand-200">
-        <i data-lucide="shield-check" class="w-4 h-4 text-brand-600"></i>
-        <span class="hidden sm:inline">Admin</span>
-      </button>
+      <div class="flex items-center gap-2">
+        <a href="admin.html" class="inline-flex items-center gap-1 text-xs font-bold bg-slate-100 hover:bg-brand-50 hover:text-brand-700 text-slate-600 px-3 py-1.5 rounded-xl border border-slate-200 transition" title="Panel de Administrador">
+          <i data-lucide="shield-check" class="w-3.5 h-3.5 text-brand-600"></i>
+          <span>Admin</span>
+        </a>
+      </div>
     </div>
   </header>
 
-  <!-- Pestañas de Navegación del Cliente / Admin -->
-  <div class="max-w-md mx-auto px-4 mt-3">
-    <div class="bg-slate-200/80 p-1 rounded-2xl flex text-xs font-bold shadow-inner">
-      <button id="tab-btn-client" onclick="switchTab('client')" class="flex-1 py-2.5 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 bg-white text-slate-900 shadow-sm">
-        <i data-lucide="shopping-bag" class="w-4 h-4 text-brand-600"></i>
-        <span>Hacer Reserva</span>
-      </button>
-      <button id="tab-btn-admin" onclick="switchTab('admin')" class="flex-1 py-2.5 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 text-slate-600 hover:text-slate-900">
-        <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
-        <span>Gestión de Pedidos</span>
-      </button>
-    </div>
-  </div>
+  <!-- CONTENEDOR PRINCIPAL (MOBILE-FIRST) -->
+  <main class="max-w-xl mx-auto px-4 pt-4 space-y-4">
 
-  <!-- CONTENEDOR PRINCIPAL DE CONTENIDO -->
-  <main class="max-w-md mx-auto px-4 pt-4">
-
-    <!-- ========================================== -->
-    <!-- VISTA CLIENTE: CATALOGO Y RESERVA          -->
-    <!-- ========================================== -->
-    <div id="view-client" class="space-y-4">
-      
-      <!-- CARD DEL PLATO PRINCIPAL DEL FIN DE SEMANA -->
-      <section class="bg-white rounded-3xl p-5 shadow-sm border border-slate-200/80">
-        <div class="flex items-center justify-between mb-3">
-          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200">
-            <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-600"></i>
-            Especial del Fin de Semana
-          </span>
-          <button onclick="nativeShareMenu()" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-brand-50 text-brand-700 border border-brand-200 hover:bg-brand-100 transition cursor-pointer shadow-sm">
-            <i data-lucide="share-2" class="w-3.5 h-3.5 text-brand-600"></i>
-            <span>Compartir Menú</span>
-          </button>
+    <!-- BANNER DE FIN DE SEMANA Y DISPONIBILIDAD -->
+    <div class="bg-gradient-to-r from-amber-500 via-brand-600 to-orange-600 rounded-3xl p-4 text-white shadow-lg shadow-brand-500/15 flex items-center justify-between">
+      <div class="space-y-0.5">
+        <div class="inline-flex items-center gap-1.5 bg-white/20 backdrop-blur-md px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider">
+          <span class="w-2 h-2 rounded-full bg-emerald-300 animate-pulse"></span>
+          <span>Reservas Abiertas</span>
         </div>
+        <h2 class="text-lg font-black leading-tight">¡Menú del Sábado y Domingo!</h2>
+        <p class="text-xs text-amber-100 font-medium">Pide con tiempo. Porciones limitadas.</p>
+      </div>
+      <div class="w-12 h-12 rounded-2xl bg-white/15 backdrop-blur-md flex items-center justify-center text-white shrink-0">
+        <i data-lucide="calendar-heart" class="w-6 h-6"></i>
+      </div>
+    </div>
 
-        <div class="relative rounded-2xl overflow-hidden aspect-video mb-3.5 bg-slate-100 shadow-inner group">
-          <!-- Imagen del plato principal con protección de fallback -->
-          <img id="dish-image" 
-               src="https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=800&q=80" 
-               alt="Plato del Fin de Semana" 
-               onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=800&q=80';"
-               class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-          
-          <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent flex items-end p-4">
-            <div class="text-white">
-              <p class="text-[10px] font-bold tracking-widest uppercase text-amber-300">Sabor Casero Tradicional</p>
-              <h2 id="dish-name" class="text-xl font-extrabold leading-tight drop-shadow-sm">Pollo con Yuca y Plátano</h2>
-            </div>
+    <!-- TARJETA DEL PLATO PRINCIPAL DESTACADO -->
+    <section class="bg-white rounded-3xl p-4 sm:p-5 shadow-sm border border-slate-200 space-y-3.5">
+      <div class="relative rounded-2xl overflow-hidden aspect-video bg-slate-100 shadow-inner group">
+        <img id="hero-dish-img" 
+             src="https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=800&q=80" 
+             alt="Plato del Fin de Semana" 
+             onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=800&q=80';"
+             class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+        
+        <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent flex items-end p-4">
+          <div class="text-white">
+            <span class="text-[10px] font-bold uppercase tracking-widest text-amber-300">Especial Casero</span>
+            <h3 id="hero-dish-name" class="text-xl font-extrabold leading-tight drop-shadow-sm font-serif">Pollo con Yuca y Plátano</h3>
           </div>
         </div>
+      </div>
 
-        <p id="dish-description" class="text-xs text-slate-600 mb-4 leading-relaxed">
-          Delicioso arroz preparado con cerveza negra, cilantro fresco y presas de pato marinado en especias tradicionales. Acompañado de sarsa criolla de cebolla y ají amarillo.
+      <!-- Reseña y Precios -->
+      <div class="space-y-2">
+        <p id="hero-dish-desc" class="text-xs text-slate-600 leading-relaxed">
+          Pollo jugoso dorado a fuego lento acompañado de yuca sudada, plátano maduro al horno, arroz con coco y ensalada fresca casera.
         </p>
 
-        <!-- Selección de Cantidad y Precio -->
-        <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200/80 flex items-center justify-between">
+        <div class="flex items-center justify-between pt-2 border-t border-slate-100 text-xs">
           <div>
-            <span class="block text-[10px] uppercase tracking-wider font-bold text-slate-400">Precio Porción</span>
-            <span id="dish-price-display" class="text-lg font-extrabold text-slate-900">$25.000</span>
+            <span class="text-slate-400 block text-[10px] font-bold">PRECIO PORCIÓN</span>
+            <span id="hero-dish-price" class="text-lg font-black text-brand-600">$22.000</span>
           </div>
-
-          <div class="flex items-center gap-3 bg-white px-3 py-1.5 rounded-xl border border-slate-200 shadow-sm">
-            <button onclick="updateQuantity(-1)" class="w-7 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 flex items-center justify-center font-bold text-slate-700 transition">
-              <i data-lucide="minus" class="w-3.5 h-3.5"></i>
-            </button>
-            <span id="quantity-display" class="font-bold text-sm w-4 text-center text-slate-900">1</span>
-            <button onclick="updateQuantity(1)" class="w-7 h-7 rounded-lg bg-brand-500 hover:bg-brand-600 text-white flex items-center justify-center font-bold transition shadow-sm">
-              <i data-lucide="plus" class="w-3.5 h-3.5"></i>
-            </button>
+          <div class="text-right">
+            <span class="text-slate-400 block text-[10px] font-bold">COSTO DOMICILIO</span>
+            <span id="hero-delivery-price" class="text-sm font-extrabold text-slate-700">$3.000</span>
           </div>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <!-- SECCIÓN DE DATOS Y MODALIDAD DE ENTREGA -->
-      <section class="bg-white rounded-3xl p-5 shadow-sm border border-slate-200/80 space-y-4">
-        <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2 pb-2 border-b border-slate-100">
-          <i data-lucide="user-check" class="w-4 h-4 text-brand-600"></i>
-          <span>Tus Datos para la Entrega</span>
-        </h3>
-
-        <!-- Nombre del Cliente -->
+    <!-- FORMULARIO RÁPIDO DE RESERVA -->
+    <section class="bg-white rounded-3xl p-5 shadow-sm border border-slate-200 space-y-4">
+      <div class="flex items-center gap-2 pb-3 border-b border-slate-100">
+        <div class="w-8 h-8 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center font-black text-sm">
+          1
+        </div>
         <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">Tu Nombre Completo *</label>
-          <div class="relative">
-            <i data-lucide="user" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
-            <input type="text" id="cli-nombre" placeholder="Ej. María Rodríguez" oninput="guardarDatosClienteEnLocal()"
-                   class="w-full text-xs pl-10 pr-3 py-3 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition bg-slate-50 font-medium">
-          </div>
+          <h3 class="font-extrabold text-sm text-slate-900">Selecciona tu Plato & Cantidad</h3>
+          <p class="text-xs text-slate-400">Escoge tu almuerzo favorito</p>
         </div>
+      </div>
 
-        <!-- Celular del Cliente -->
+      <!-- Lista de platos disponibles -->
+      <div id="dishes-selection-container" class="space-y-2">
+        <!-- Renderizado dinámico desde app.js -->
+      </div>
+
+      <!-- Selector de Cantidad -->
+      <div class="bg-slate-50 rounded-2xl p-3 border border-slate-200 flex items-center justify-between">
         <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">Número de Celular (WhatsApp) *</label>
-          <div class="relative">
-            <i data-lucide="phone" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
-            <input type="tel" id="cli-telefono" placeholder="Ej. 300 123 4567" oninput="guardarDatosClienteEnLocal()"
-                   class="w-full text-xs pl-10 pr-3 py-3 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition bg-slate-50 font-medium">
-          </div>
+          <span class="text-xs font-bold text-slate-700 block">Número de Porciones:</span>
+          <span class="text-[11px] text-slate-400">¿Cuántos almuerzos deseas?</span>
         </div>
-
-        <!-- Modalidad de Entrega (Domicilio o Recoger) -->
-        <div>
-          <label class="block text-xs font-bold text-slate-700 mb-2">¿Cómo deseas recibir tu almuerzo? *</label>
-          <div class="grid grid-cols-2 gap-2.5">
-            <button type="button" onclick="setDeliveryMode('pickup')" id="btn-mode-pickup"
-                    class="p-3 rounded-2xl border-2 transition-all flex flex-col items-center gap-1.5 text-center bg-brand-50 border-brand-500 text-brand-700 font-bold text-xs shadow-sm">
-              <i data-lucide="store" class="w-5 h-5 text-brand-600"></i>
-              <span>Recoger en Sitio</span>
-              <span class="text-[10px] font-normal text-brand-600">Sin costo adicional</span>
-            </button>
-
-            <button type="button" onclick="setDeliveryMode('delivery')" id="btn-mode-delivery"
-                    class="p-3 rounded-2xl border-2 transition-all flex flex-col items-center gap-1.5 text-center bg-slate-50 border-slate-200 text-slate-600 hover:border-slate-300 font-bold text-xs">
-              <i data-lucide="bike" class="w-5 h-5 text-slate-500"></i>
-              <span>Envío a Domicilio</span>
-              <span id="delivery-fee-badge" class="text-[10px] font-semibold text-slate-500">+ $3.000 domicilio</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Campo Dirección / Punto de Encuentro -->
-        <div id="container-direccion">
-          <label id="lbl-direccion" class="block text-xs font-bold text-slate-700 mb-1">Dirección de Envío *</label>
-          <div class="relative">
-            <i data-lucide="map-pin" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
-            <input type="text" id="cli-direccion" placeholder="Calle, número, apto o indicación de entrega" oninput="guardarDatosClienteEnLocal()"
-                   class="w-full text-xs pl-10 pr-3 py-3 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition bg-slate-50 font-medium">
-          </div>
-        </div>
-
-        <!-- Observaciones Adicionales -->
-        <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">Notas o Alergias (Opcional)</label>
-          <input type="text" id="cli-notas" placeholder="Ej. Sin picante, salsa por separado, etc."
-                 class="w-full text-xs p-3 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition bg-slate-50">
-        </div>
-
-        <!-- Selección de Día y Fecha del Fin de Semana -->
-        <div class="mt-4 pt-3.5 border-t border-slate-100">
-          <label class="block text-xs font-bold text-slate-800 mb-2 flex items-center justify-between flex-wrap gap-1">
-            <span class="flex items-center gap-1.5">
-              <i data-lucide="calendar" class="w-4 h-4 text-brand-600"></i>
-              <span>Día preferido de entrega (Fin de Semana) *</span>
-            </span>
-            <span class="text-[10px] bg-brand-50 text-brand-700 font-extrabold px-2 py-0.5 rounded-full border border-brand-200">Sábado o Domingo</span>
-          </label>
-          
-          <!-- Botones de Selección Rápida Sábado / Domingo -->
-          <div class="grid grid-cols-2 gap-2 mb-2.5">
-            <button type="button" id="btn-day-sabado" onclick="selectWeekendDay('Sábado')"
-                    class="py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition duration-200 border bg-brand-600 text-white border-brand-600 shadow-sm cursor-pointer">
-              <i data-lucide="sun" class="w-4 h-4 text-amber-300"></i>
-              <span id="label-sabado">Sábado</span>
-            </button>
-            <button type="button" id="btn-day-domingo" onclick="selectWeekendDay('Domingo')"
-                    class="py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition duration-200 border bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100 cursor-pointer">
-              <i data-lucide="heart-handshake" class="w-4 h-4 text-rose-500"></i>
-              <span id="label-domingo">Domingo</span>
-            </button>
-          </div>
-
-          <!-- Selector de Fecha Específica (Date Picker) -->
-          <div class="space-y-1">
-            <div class="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-xl border border-slate-200 focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-100 transition">
-              <i data-lucide="calendar-days" class="w-4 h-4 text-brand-600 shrink-0"></i>
-              <div class="flex-1">
-                <span class="block text-[10px] font-semibold text-slate-400">Seleccionar fecha específica:</span>
-                <input type="date" id="cli-fecha-entrega" onchange="onDatePickerChange(this.value)"
-                       class="w-full text-xs font-bold text-slate-900 bg-transparent outline-none cursor-pointer p-0 m-0">
-              </div>
-            </div>
-            <p id="date-preview-badge" class="text-[11px] font-semibold text-brand-700 bg-brand-50 p-2 rounded-lg border border-brand-100 flex items-center gap-1.5 mt-1.5">
-              <i data-lucide="clock" class="w-3.5 h-3.5 text-brand-600 shrink-0"></i>
-              <span id="date-preview-text">Entrega programada para el Sábado</span>
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <!-- ========================================== -->
-      <!-- MEDIOS DE PAGO Y COMPROBANTE              -->
-      <!-- ========================================== -->
-      <section class="bg-white rounded-3xl p-5 shadow-sm border border-slate-200/80 space-y-4">
-        <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2 pb-2 border-b border-slate-100">
-          <i data-lucide="credit-card" class="w-4 h-4 text-brand-600"></i>
-          <span>Método de Pago para Confirmar</span>
-        </h3>
-
-        <!-- Cuentas de Transferencia (Nequi / Daviplata / Bancolombia) -->
-        <div class="bg-gradient-to-r from-slate-900 to-slate-800 rounded-2xl p-4 text-white space-y-3 shadow-md">
-          <div class="flex items-center justify-between border-b border-slate-700/80 pb-2.5">
-            <span class="text-xs font-bold text-amber-400 flex items-center gap-1.5">
-              <i data-lucide="qr-code" class="w-4 h-4"></i>
-              Transferencia Anticipada
-            </span>
-            <span class="text-[10px] bg-slate-700 px-2 py-0.5 rounded-full text-slate-300">Reserva Segura</span>
-          </div>
-
-          <div class="grid grid-cols-2 gap-2 text-xs">
-            <div class="bg-slate-800/80 p-2.5 rounded-xl border border-slate-700">
-              <p class="text-[10px] text-slate-400 font-semibold uppercase">Nequi / Daviplata</p>
-              <p id="pay-nequi" class="font-extrabold text-amber-300 tracking-wider">300 123 4567</p>
-            </div>
-            <div class="bg-slate-800/80 p-2.5 rounded-xl border border-slate-700">
-              <p class="text-[10px] text-slate-400 font-semibold uppercase">Titular Cuenta</p>
-              <p id="pay-holder" class="font-bold text-slate-100 truncate">Almuerzos Barrio</p>
-            </div>
-          </div>
-          
-          <p id="pay-bank-details" class="text-[11px] text-slate-300 bg-slate-800/50 p-2 rounded-lg border border-slate-700/50 flex items-center gap-1.5">
-            <i data-lucide="building-2" class="w-3.5 h-3.5 text-amber-400 shrink-0"></i>
-            <span>Bancolombia Ahorros N° <strong>123-456789-00</strong></span>
-          </p>
-        </div>
-
-        <!-- Adjuntar Comprobante de Pago (Opcional/Recomendado) -->
-        <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1.5 flex items-center justify-between">
-            <span>Comprobante de Pago (Foto / Captura)</span>
-            <span class="text-[10px] text-brand-600 font-semibold">Garantiza tu cupo</span>
-          </label>
-
-          <div class="border-2 border-dashed border-slate-200 hover:border-brand-400 transition-colors rounded-2xl p-3.5 text-center bg-slate-50 cursor-pointer relative group"
-               onclick="document.getElementById('file-receipt').click()">
-            <input type="file" id="file-receipt" accept="image/*" class="hidden" onchange="previewImage(event)">
-            
-            <div id="upload-placeholder" class="space-y-1">
-              <div class="w-9 h-9 rounded-full bg-brand-50 text-brand-600 flex items-center justify-center mx-auto group-hover:scale-110 transition">
-                <i data-lucide="camera" class="w-5 h-5"></i>
-              </div>
-              <p class="text-xs font-bold text-slate-700">Adjuntar captura de pago</p>
-              <p class="text-[10px] text-slate-400">Formatos JPG, PNG o captura de pantalla</p>
-            </div>
-
-            <!-- Previsualización de la imagen cargada -->
-            <div id="upload-preview-container" class="hidden relative">
-              <img id="upload-preview-img" src="" alt="Comprobante" class="max-h-36 mx-auto rounded-xl shadow-sm border border-slate-200">
-              <button type="button" onclick="removeImage(event)" class="absolute -top-2 -right-2 bg-rose-500 text-white rounded-full p-1 shadow-md hover:bg-rose-600 transition">
-                <i data-lucide="x" class="w-4 h-4"></i>
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- RESUMEN DE TOTAL Y BOTÓN DE WHATSAPP -->
-      <section class="bg-white rounded-3xl p-5 shadow-lg border border-slate-200/80 space-y-3 sticky bottom-3 z-30">
-        <div class="space-y-1.5 text-xs text-slate-600">
-          <div class="flex justify-between">
-            <span>Subtotal (<span id="summary-qty">1</span> porciones):</span>
-            <span id="summary-subtotal" class="font-bold text-slate-800">$25.000</span>
-          </div>
-          <div class="flex justify-between">
-            <span>Costo de Envío:</span>
-            <span id="summary-shipping" class="font-bold text-slate-800">$0</span>
-          </div>
-          <div class="flex justify-between text-base font-extrabold text-slate-900 pt-2 border-t border-slate-100">
-            <span>Total a Pagar:</span>
-            <span id="summary-total" class="text-brand-600 text-lg">$25.000</span>
-          </div>
-        </div>
-
-        <button onclick="sendOrderToWhatsApp()" 
-                class="w-full bg-whatsapp-500 hover:bg-whatsapp-600 active:scale-[0.99] text-white font-extrabold py-3.5 px-4 rounded-2xl shadow-lg shadow-whatsapp-500/25 flex items-center justify-center gap-2.5 transition text-sm">
-          <i data-lucide="message-circle" class="w-5 h-5 fill-current"></i>
-          <span>Confirmar y Enviar Pedido por WhatsApp</span>
-        </button>
-        <p class="text-[10px] text-center text-slate-400">
-          Al hacer clic se abrirá WhatsApp con el resumen de tu pedido y comprobante prellenado.
-        </p>
-      </section>
-
-      <!-- SECCIÓN DE OPINIONES Y COMENTARIOS -->
-      <section class="bg-white rounded-3xl p-5 shadow-sm border border-slate-200/80 space-y-3">
-        <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2">
-          <i data-lucide="star" class="w-4 h-4 text-amber-500 fill-amber-500"></i>
-          <span>Lo que dicen nuestros vecinos</span>
-        </h3>
-        <div id="reviews-list" class="space-y-2.5">
-          <!-- Las reseñas se renderizan dinámicamente -->
-        </div>
-
-        <form onsubmit="submitReview(event)" class="pt-3 border-t border-slate-100 space-y-2">
-          <p class="text-xs font-bold text-slate-700">Déjanos tu opinión:</p>
-          <input type="text" id="rev-name" placeholder="Tu nombre" required class="w-full text-xs p-2.5 rounded-xl border border-slate-200 outline-none">
-          <textarea id="rev-comment" placeholder="¿Qué tal estuvo el almuerzo?" rows="2" required class="w-full text-xs p-2.5 rounded-xl border border-slate-200 outline-none"></textarea>
-          <button type="submit" class="w-full bg-slate-800 text-white font-bold text-xs py-2 rounded-xl hover:bg-slate-900 transition">
-            Publicar Comentario
+        <div class="flex items-center gap-3 bg-white px-2 py-1.5 rounded-xl border border-slate-200 shadow-sm">
+          <button type="button" id="btn-minus" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-brand-50 hover:text-brand-600 flex items-center justify-center text-slate-700 font-black transition">
+            <i data-lucide="minus" class="w-4 h-4"></i>
           </button>
-        </form>
-      </section>
-
-    </div>
-
-    <!-- ========================================== -->
-    <!-- VISTA ADMINISTRADOR: GESTIÓN DE CONFIG Y RESERVAS -->
-    <!-- ========================================== -->
-    <div id="view-admin" class="hidden space-y-5">
-      
-      <!-- CONTROLES DE SEGURIDAD DEL PANEL -->
-      <div class="bg-slate-900 rounded-3xl p-5 text-white shadow-xl space-y-4">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <div class="w-8 h-8 rounded-xl bg-brand-500/20 text-brand-400 flex items-center justify-center">
-              <i data-lucide="settings-2" class="w-4 h-4"></i>
-            </div>
-            <h2 class="font-extrabold text-sm">Panel de Administración</h2>
-          </div>
-          <button onclick="switchTab('client')" class="text-[11px] bg-brand-500/20 text-brand-300 hover:bg-brand-500/30 font-bold px-3 py-1 rounded-full border border-brand-500/30 transition flex items-center gap-1">
-            <i data-lucide="arrow-left" class="w-3 h-3"></i>
-            <span>Volver a Clientes</span>
-          </button>
-        </div>
-
-        <!-- Botones de Acción Rápidos (Exportar / WhatsApp General / Reset) -->
-        <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-800">
-          <button onclick="exportOrdersCSV()" class="bg-slate-800 hover:bg-slate-700 text-xs font-bold py-2.5 px-3 rounded-xl flex items-center justify-center gap-1.5 transition text-slate-200">
-            <i data-lucide="download" class="w-3.5 h-3.5 text-brand-400"></i>
-            <span>Descargar CSV</span>
-          </button>
-          <button onclick="clearAllOrders()" class="bg-rose-950/60 hover:bg-rose-900/80 text-rose-300 text-xs font-bold py-2.5 px-3 rounded-xl flex items-center justify-center gap-1.5 transition border border-rose-800/50">
-            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-            <span>Limpiar Historial</span>
+          <span id="order-quantity" class="w-6 text-center font-black text-sm text-slate-900">1</span>
+          <button type="button" id="btn-plus" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-brand-50 hover:text-brand-600 flex items-center justify-center text-slate-700 font-black transition">
+            <i data-lucide="plus" class="w-4 h-4"></i>
           </button>
         </div>
       </div>
 
-      <!-- CONFIGURACIÓN DEL PLATO Y CUENTAS -->
-      <section class="bg-white rounded-3xl p-5 shadow-sm border border-slate-200 space-y-4">
-        <div class="flex items-center justify-between pb-2 border-b border-slate-100">
-          <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2">
-            <i data-lucide="edit-3" class="w-4 h-4 text-brand-600"></i>
-            <span>Editar Menú del Fin de Semana</span>
-          </h3>
-          <span class="text-[10px] bg-brand-50 text-brand-700 font-extrabold px-2 py-0.5 rounded-full border border-brand-100">
-            Sincronización en vivo
-          </span>
-        </div>
-
-        <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">Nombre del Plato Especial</label>
-          <input type="text" id="adm-plato-nombre" placeholder="Ej. Pollo con Yuca y Plátano" class="w-full text-xs p-3 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none font-bold text-slate-900">
-        </div>
-
-        <!-- Foto del Plato con Selector Directo de Galería/Cámara y URL -->
-        <div class="space-y-2">
-          <div class="flex items-center justify-between">
-            <label class="block text-xs font-bold text-slate-700">Foto del Plato Especial</label>
-            <span id="adm-photo-type-badge" class="text-[10px] text-slate-400 font-semibold">Foto por defecto</span>
-          </div>
-          
-          <!-- Vista Previa de la Imagen Actual -->
-          <div class="relative rounded-2xl overflow-hidden aspect-video bg-slate-100 border border-slate-200 shadow-inner group">
-            <img id="adm-dish-preview-img" 
-                 src="https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=800&q=80" 
-                 alt="Vista previa del plato" 
-                 onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=800&q=80';"
-                 class="w-full h-full object-cover">
-            
-            <div class="absolute bottom-2 left-2 right-2 flex items-center justify-between pointer-events-none">
-              <span class="bg-slate-900/80 backdrop-blur-sm text-white text-[10px] font-bold px-2.5 py-1 rounded-lg">
-                Vista Previa del Menú
-              </span>
-            </div>
-          </div>
-
-          <!-- Input Oculto de Archivos -->
-          <input type="file" id="adm-plato-file" accept="image/*" class="hidden" onchange="handleAdminDishImageUpload(event)">
-          
-          <!-- Botones de Acción de Imagen -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            <button type="button" onclick="document.getElementById('adm-plato-file').click()" class="py-2.5 px-3 rounded-xl border-2 border-dashed border-brand-300 bg-brand-50 hover:bg-brand-100 text-brand-700 font-extrabold text-xs flex items-center justify-center gap-2 transition shadow-sm cursor-pointer">
-              <i data-lucide="image-plus" class="w-4 h-4 text-brand-600"></i>
-              <span>Cargar de Galería / Cámara</span>
-            </button>
-            <button type="button" onclick="resetAdminDishImage()" id="btn-reset-dish-img" class="py-2.5 px-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-xs flex items-center justify-center gap-2 transition cursor-pointer">
-              <i data-lucide="rotate-ccw" class="w-3.5 h-3.5 text-slate-500"></i>
-              <span>Restaurar Foto Sugerida</span>
-            </button>
-          </div>
-
-          <!-- Fotos Predeterminadas Rápida Selección (6 Platos Típicos Populares) -->
-          <div class="mt-2 space-y-1.5 pt-1 border-t border-slate-100">
-            <span class="block text-[11px] font-bold text-slate-600">O elige un plato típico con foto y reseña lista (1 clic):</span>
-            <div class="grid grid-cols-3 sm:grid-cols-6 gap-1.5">
-              <button type="button" onclick="selectPresetDishImage('PolloYuca')" class="p-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-brand-50 hover:border-brand-400 text-center transition cursor-pointer group">
-                <img src="https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=300&q=70" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=300&q=70';" class="w-full h-12 object-cover rounded-lg mb-1 group-hover:scale-105 transition duration-200">
-                <span class="block text-[10px] font-extrabold text-slate-800 truncate">Pollo & Yuca</span>
-              </button>
-              <button type="button" onclick="selectPresetDishImage('Sancocho')" class="p-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-brand-50 hover:border-brand-400 text-center transition cursor-pointer group">
-                <img src="https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=300&q=70" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=300&q=70';" class="w-full h-12 object-cover rounded-lg mb-1 group-hover:scale-105 transition duration-200">
-                <span class="block text-[10px] font-bold text-slate-700 truncate">Sancocho</span>
-              </button>
-              <button type="button" onclick="selectPresetDishImage('BandejaPaisa')" class="p-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-brand-50 hover:border-brand-400 text-center transition cursor-pointer group">
-                <img src="https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=300&q=70" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=300&q=70';" class="w-full h-12 object-cover rounded-lg mb-1 group-hover:scale-105 transition duration-200">
-                <span class="block text-[10px] font-bold text-slate-700 truncate">Frijolada</span>
-              </button>
-              <button type="button" onclick="selectPresetDishImage('Pescado')" class="p-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-brand-50 hover:border-brand-400 text-center transition cursor-pointer group">
-                <img src="https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=300&q=70" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=300&q=70';" class="w-full h-12 object-cover rounded-lg mb-1 group-hover:scale-105 transition duration-200">
-                <span class="block text-[10px] font-bold text-slate-700 truncate">Pescado Frito</span>
-              </button>
-              <button type="button" onclick="selectPresetDishImage('Empanadas')" class="p-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-brand-50 hover:border-brand-400 text-center transition cursor-pointer group">
-                <img src="https://images.unsplash.com/photo-1626700051175-6818013e1d4f?auto=format&fit=crop&w=300&q=70" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1626700051175-6818013e1d4f?auto=format&fit=crop&w=300&q=70';" class="w-full h-12 object-cover rounded-lg mb-1 group-hover:scale-105 transition duration-200">
-                <span class="block text-[10px] font-bold text-slate-700 truncate">Empanadas</span>
-              </button>
-              <button type="button" onclick="selectPresetDishImage('CarneAsada')" class="p-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-brand-50 hover:border-brand-400 text-center transition cursor-pointer group">
-                <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=300&q=70" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=300&q=70';" class="w-full h-12 object-cover rounded-lg mb-1 group-hover:scale-105 transition duration-200">
-                <span class="block text-[10px] font-bold text-slate-700 truncate">Carne Asada</span>
-              </button>
-            </div>
-          </div>
-
-          <!-- Opción Alternativa URL de Internet -->
-          <details class="text-xs text-slate-500 mt-2 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
-            <summary class="cursor-pointer font-bold text-slate-700 hover:text-brand-600">O pegar enlace / URL de foto de Internet</summary>
-            <div class="mt-2 space-y-1.5">
-              <input type="text" id="adm-plato-imagen" placeholder="https://ejemplo.com/foto-plato.jpg" class="w-full text-xs p-2.5 rounded-lg border border-slate-200 bg-white outline-none truncate font-mono">
-              <p class="text-[10px] text-slate-400">Pega cualquier enlace directo de imagen JPG, PNG o WebP.</p>
-            </div>
-          </details>
-        </div>
-
-        <!-- RESEÑA / DESCRIPCIÓN DEL PLATO -->
-        <div class="space-y-1.5">
-          <div class="flex items-center justify-between">
-            <label class="block text-xs font-bold text-slate-700">Reseña / Descripción del Plato</label>
-            <span class="text-[10px] text-brand-600 font-semibold">Lo que leerán los comensales</span>
-          </div>
-          
-          <textarea id="adm-plato-desc" rows="3" placeholder="Describe los ingredientes, guarniciones y preparación especial del plato..." class="w-full text-xs p-3 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none leading-relaxed"></textarea>
-          
-          <!-- Frases y sugerencias de reseña rápida -->
-          <div class="flex flex-wrap gap-1 pt-1">
-            <span class="text-[10px] text-slate-400 font-bold self-center mr-1">Sugerencias:</span>
-            <button type="button" onclick="setQuickDescription('Pollo jugoso dorado a fuego lento acompañado de yuca sudada, plátano maduro al horno, arroz con coco y ensalada fresca.')" class="text-[10px] bg-slate-100 hover:bg-brand-50 hover:text-brand-700 text-slate-600 px-2 py-1 rounded-lg transition border border-slate-200">Pollo con Yuca</button>
-            <button type="button" onclick="setQuickDescription('Sancocho criollo tradicional con gallina, cerdo y res, mazorca tierna, plátano verde, yuca, arroz blanco y aguacate.')" class="text-[10px] bg-slate-100 hover:bg-brand-50 hover:text-brand-700 text-slate-600 px-2 py-1 rounded-lg transition border border-slate-200">Sancocho</button>
-            <button type="button" onclick="setQuickDescription('Frijoles cargamanto en salsa casera, chicharrón crocante, carne molida, huevo frito, tajadas de maduro, arepa y aguacate.')" class="text-[10px] bg-slate-100 hover:bg-brand-50 hover:text-brand-700 text-slate-600 px-2 py-1 rounded-lg transition border border-slate-200">Bandeja Paisa</button>
-            <button type="button" onclick="setQuickDescription('Mojarra dorada crocante con patacones de plátano verde, yuca frita, arroz con coco y ensalada mixta de la huerta.')" class="text-[10px] bg-slate-100 hover:bg-brand-50 hover:text-brand-700 text-slate-600 px-2 py-1 rounded-lg transition border border-slate-200">Pescado Frito</button>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">Precio Porción ($)</label>
-            <input type="number" id="adm-plato-precio" class="w-full text-xs p-3 rounded-xl border border-slate-200 focus:border-brand-500 outline-none font-bold text-slate-900">
+      <!-- DATOS DEL CLIENTE Y ENTREGA -->
+      <form id="order-form" class="space-y-4 pt-2">
+        <div class="flex items-center gap-2 pb-2 border-b border-slate-100">
+          <div class="w-8 h-8 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center font-black text-sm">
+            2
           </div>
           <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">Costo Domicilio ($)</label>
-            <input type="number" id="adm-domicilio-precio" class="w-full text-xs p-3 rounded-xl border border-slate-200 focus:border-brand-500 outline-none font-bold text-slate-900">
+            <h3 class="font-extrabold text-sm text-slate-900">Datos de Entrega y Contacto</h3>
+            <p class="text-xs text-slate-400">Sin necesidad de crear cuenta</p>
           </div>
         </div>
 
-        <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">Número WhatsApp Administrador (Recibe Pedidos)</label>
-          <input type="text" id="adm-whatsapp-num" placeholder="Ej. 573001234567" class="w-full text-xs p-3 rounded-xl border border-slate-200 outline-none font-mono">
-        </div>
-
-        <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">Número Nequi / Daviplata</label>
-          <input type="text" id="adm-nequi-num" class="w-full text-xs p-3 rounded-xl border border-slate-200 outline-none font-mono">
-        </div>
-
-        <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">Detalles de Cuenta Bancolombia / Otros</label>
-          <input type="text" id="adm-banco-detalles" class="w-full text-xs p-3 rounded-xl border border-slate-200 outline-none">
-        </div>
-
-        <button onclick="saveAdminConfig()" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-extrabold text-xs py-3.5 rounded-xl shadow-md transition flex items-center justify-center gap-2 cursor-pointer">
-          <i data-lucide="check-circle" class="w-4 h-4"></i>
-          <span>Guardar Cambios de Menú</span>
-        </button>
-      </section>
-
-      <!-- GENERADOR DE ENLACE COMPARTIBLE Y DIFUSIÓN -->
-      <section class="bg-gradient-to-br from-brand-900 to-slate-900 rounded-3xl p-5 text-white shadow-md border border-brand-800 space-y-3.5">
-        <div class="flex items-center gap-2 pb-2 border-b border-brand-800/80">
-          <i data-lucide="share-2" class="w-4 h-4 text-brand-400"></i>
-          <h3 class="font-extrabold text-xs uppercase tracking-wider text-brand-200">Compartir Menú del Fin de Semana</h3>
-        </div>
-        
-        <p class="text-xs text-slate-300 leading-relaxed">
-          Los cambios que realices en el nombre del plato, precio o fechas se guardan en tiempo real. Haz clic en <strong>"Compartir Menú"</strong> para enviarlo por WhatsApp o redes; los clientes verán únicamente el almuerzo que configuraste.
-        </p>
-
-        <!-- Botón Principal Prominente para Compartir -->
-        <button onclick="nativeShareMenu()" class="w-full bg-brand-500 hover:bg-brand-600 text-white font-extrabold text-xs py-3.5 px-4 rounded-2xl flex items-center justify-center gap-2 transition shadow-lg border border-brand-400 cursor-pointer">
-          <i data-lucide="share-2" class="w-4.5 h-4.5"></i>
-          <span>Compartir Menú Actualizado (Celular / WhatsApp)</span>
-        </button>
-
-        <div class="space-y-2 pt-1 border-t border-brand-800/60">
-          <span class="block text-[10px] uppercase font-bold text-slate-400">Enlace Dinámico Personalizado:</span>
-          <div class="flex items-center gap-2 bg-slate-950/70 p-2.5 rounded-xl border border-slate-800">
-            <input type="text" id="share-link-input" readonly class="bg-transparent text-xs text-brand-300 font-mono w-full outline-none truncate" value="">
-            <button onclick="copyShareableLink()" class="shrink-0 bg-brand-600 hover:bg-brand-500 text-white p-2 rounded-lg transition cursor-pointer" title="Copiar enlace">
-              <i data-lucide="copy" class="w-4 h-4"></i>
-            </button>
+        <div class="space-y-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Nombre Completo *</label>
+            <input type="text" id="cliente-nombre" required placeholder="Ej. Doña Martha Ramírez" class="w-full text-xs p-3 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none font-semibold text-slate-800">
           </div>
 
-          <div class="grid grid-cols-2 gap-2 pt-1">
-            <button onclick="copyShareableLink()" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs py-2.5 px-3 rounded-xl flex items-center justify-center gap-1.5 transition border border-slate-700 cursor-pointer">
-              <i data-lucide="link" class="w-3.5 h-3.5 text-brand-400"></i>
-              <span>Copiar Enlace</span>
-            </button>
-            <button onclick="shareMenuOnWhatsApp()" class="w-full bg-whatsapp-500 hover:bg-whatsapp-600 text-white font-bold text-xs py-2.5 px-3 rounded-xl flex items-center justify-center gap-1.5 transition shadow-sm cursor-pointer">
-              <i data-lucide="message-circle" class="w-3.5 h-3.5"></i>
-              <span>Enviar WhatsApp</span>
-            </button>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Teléfono / WhatsApp *</label>
+              <input type="tel" id="cliente-telefono" required placeholder="Ej. 300 123 4567" class="w-full text-xs p-3 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none font-semibold text-slate-800">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Día y Hora de Entrega *</label>
+              <select id="cliente-dia" class="w-full text-xs p-3 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none font-semibold text-slate-800 bg-white">
+                <option value="Sábado - 12:00 PM a 1:30 PM">Sábado (12:00 PM - 1:30 PM)</option>
+                <option value="Sábado - 1:30 PM a 3:00 PM">Sábado (1:30 PM - 3:00 PM)</option>
+                <option value="Domingo - 12:00 PM a 1:30 PM">Domingo (12:00 PM - 1:30 PM)</option>
+                <option value="Domingo - 1:30 PM a 3:00 PM">Domingo (1:30 PM - 3:00 PM)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Tipo de Entrega (Domicilio vs Recoger) -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1.5">Método de Entrega</label>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <input type="radio" name="tipo-entrega" id="entrega-domicilio" value="domicilio" checked class="hidden peer">
+                <label for="entrega-domicilio" class="flex flex-col items-center justify-center p-3 rounded-xl border-2 border-slate-200 peer-checked:border-brand-600 peer-checked:bg-brand-50 peer-checked:text-brand-900 cursor-pointer text-center transition">
+                  <i data-lucide="bike" class="w-5 h-5 text-brand-600 mb-1"></i>
+                  <span class="text-xs font-extrabold">A Domicilio</span>
+                  <span class="text-[10px] text-slate-500">+ Domicilio</span>
+                </label>
+              </div>
+
+              <div>
+                <input type="radio" name="tipo-entrega" id="entrega-recoger" value="recoger" class="hidden peer">
+                <label for="entrega-recoger" class="flex flex-col items-center justify-center p-3 rounded-xl border-2 border-slate-200 peer-checked:border-brand-600 peer-checked:bg-brand-50 peer-checked:text-brand-900 cursor-pointer text-center transition">
+                  <i data-lucide="store" class="w-5 h-5 text-brand-600 mb-1"></i>
+                  <span class="text-xs font-extrabold">Recoger en Sitio</span>
+                  <span class="text-[10px] text-emerald-600 font-bold">Sin costo extra</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Campo Dirección (se oculta si es recoger) -->
+          <div id="direccion-container">
+            <label class="block text-xs font-bold text-slate-700 mb-1">Dirección y Barrio *</label>
+            <input type="text" id="cliente-direccion" placeholder="Ej. Cra 15 # 45-12 Apto 302, Barrio San José" class="w-full text-xs p-3 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none font-semibold text-slate-800">
+          </div>
+
+          <!-- Métodos de Pago -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1.5">Forma de Pago</label>
+            <div class="grid grid-cols-3 gap-2">
+              <label class="flex flex-col items-center p-2.5 rounded-xl border-2 border-slate-200 has-[:checked]:border-brand-600 has-[:checked]:bg-brand-50 cursor-pointer text-center transition">
+                <input type="radio" name="metodo-pago" value="nequi" checked class="hidden">
+                <span class="text-xs font-black text-slate-800">Nequi</span>
+                <span class="text-[10px] text-slate-400">Transferencia</span>
+              </label>
+
+              <label class="flex flex-col items-center p-2.5 rounded-xl border-2 border-slate-200 has-[:checked]:border-brand-600 has-[:checked]:bg-brand-50 cursor-pointer text-center transition">
+                <input type="radio" name="metodo-pago" value="bancolombia" class="hidden">
+                <span class="text-xs font-black text-slate-800">Bancolombia</span>
+                <span class="text-[10px] text-slate-400">Ahorros / QR</span>
+              </label>
+
+              <label class="flex flex-col items-center p-2.5 rounded-xl border-2 border-slate-200 has-[:checked]:border-brand-600 has-[:checked]:bg-brand-50 cursor-pointer text-center transition">
+                <input type="radio" name="metodo-pago" value="efectivo" class="hidden">
+                <span class="text-xs font-black text-slate-800">Efectivo</span>
+                <span class="text-[10px] text-slate-400">Contraentrega</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Notas Adicionales -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Notas o Acompañamientos Especiales</label>
+            <textarea id="cliente-notas" rows="2" placeholder="Ej. Sin cebolla en la ensalada, con ají picante extra, etc." class="w-full text-xs p-3 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none"></textarea>
           </div>
         </div>
-      </section>
 
-      <!-- PLANTILLA DE CONFIRMACIÓN DE PEDIDO -->
-      <section class="bg-white rounded-3xl p-5 shadow-sm border border-slate-200 space-y-3.5">
-        <div class="flex items-center justify-between pb-2 border-b border-slate-100">
-          <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2">
-            <i data-lucide="message-square-check" class="w-4 h-4 text-emerald-600"></i>
-            <span>Plantilla de Confirmación de Pedido</span>
-          </h3>
-          <span class="text-[10px] bg-emerald-50 text-emerald-700 font-bold px-2 py-0.5 rounded-full border border-emerald-100">Para Clientes</span>
+        <!-- RESUMEN DE COMPRA Y BOTÓN DE CONFIRMACIÓN -->
+        <div class="bg-amber-50/70 border border-amber-200/80 rounded-2xl p-4 space-y-2">
+          <div class="flex justify-between text-xs text-slate-600">
+            <span>Subtotal de porciones:</span>
+            <span id="summary-subtotal" class="font-bold text-slate-800">$22.000</span>
+          </div>
+          <div class="flex justify-between text-xs text-slate-600">
+            <span>Costo de envío:</span>
+            <span id="summary-envio" class="font-bold text-slate-800">$3.000</span>
+          </div>
+          <div class="flex justify-between text-sm font-black text-slate-900 pt-2 border-t border-amber-200">
+            <span>Total a Pagar:</span>
+            <span id="summary-total" class="text-base text-brand-600 font-extrabold">$25.000</span>
+          </div>
         </div>
 
-        <p class="text-xs text-slate-500 leading-relaxed">
-          Mensaje preformateado para responder rápidamente a los clientes en WhatsApp notificando que su reserva ha sido confirmada:
-        </p>
-
-        <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200/80 font-mono text-[11px] text-slate-700 leading-relaxed space-y-1 relative">
-          <p class="font-bold text-emerald-700">✅ ¡RESERVA CONFIRMADA CON ÉXITO! 🍲</p>
-          <p>Hola [Nombre Cliente], tu pedido ha sido registrado correctamente.</p>
-          <p class="text-slate-500">• Plato: <span id="template-dish-preview" class="font-semibold text-slate-800"></span></p>
-          <p class="text-slate-500">• Fecha: [Día de Entrega]</p>
-          <p class="text-slate-500">• Total: <span id="template-total-preview" class="font-semibold text-brand-600"></span></p>
-          <p class="text-slate-500">• Cuentas: Nequi <span id="template-nequi-preview" class="font-semibold text-slate-800"></span></p>
-        </div>
-
-        <button onclick="copyConfirmationTemplate()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs py-3 rounded-xl shadow-md transition flex items-center justify-center gap-2">
-          <i data-lucide="copy" class="w-4 h-4 text-emerald-400"></i>
-          <span>Copiar Plantilla de Confirmación General</span>
+        <!-- Botón Principal -->
+        <button type="submit" class="w-full py-4 px-6 rounded-2xl bg-brand-600 hover:bg-brand-700 active:scale-[0.99] text-white font-extrabold text-sm flex items-center justify-center gap-2 shadow-lg shadow-brand-600/25 transition cursor-pointer">
+          <i data-lucide="check-circle-2" class="w-5 h-5"></i>
+          <span>Confirmar Reserva (<span id="btn-submit-total">$25.000</span>)</span>
         </button>
-      </section>
+      </form>
+    </section>
 
-      <!-- HISTORIAL DE PEDIDOS RECIBIDOS -->
-      <section class="bg-white rounded-3xl p-5 shadow-sm border border-slate-200 space-y-3">
-        <div class="flex items-center justify-between pb-2 border-b border-slate-100">
-          <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2">
-            <i data-lucide="clipboard-list" class="w-4 h-4 text-brand-600"></i>
-            <span>Reservas Registradas</span>
-          </h3>
-          <span id="badge-total-orders" class="bg-brand-100 text-brand-700 font-extrabold text-xs px-2.5 py-0.5 rounded-full">
-            0 pedidos
-          </span>
+    <!-- INFORMACIÓN DE CUENTAS BANCARIAS -->
+    <section class="bg-white rounded-3xl p-5 border border-slate-200 text-xs space-y-3">
+      <h4 class="font-extrabold text-slate-800 flex items-center gap-2">
+        <i data-lucide="wallet" class="w-4 h-4 text-brand-600"></i>
+        <span>Cuentas para Transferencias</span>
+      </h4>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
+        <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+          <span class="text-purple-700 font-bold block">Nequi:</span>
+          <strong id="info-nequi" class="text-slate-800 font-mono text-xs">300 123 4567</strong>
         </div>
-
-        <!-- Filtros Rápidos de Pedidos -->
-        <div class="flex gap-1.5 overflow-x-auto pb-1 text-[11px] font-bold">
-          <button onclick="filterOrders('todos')" id="filter-todos" class="px-3 py-1.5 rounded-xl bg-slate-800 text-white shadow-sm whitespace-nowrap">Todos</button>
-          <button onclick="filterOrders('pendiente')" id="filter-pendiente" class="px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap">Por Confirmar</button>
-          <button onclick="filterOrders('confirmado')" id="filter-confirmado" class="px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap">Confirmados</button>
+        <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+          <span class="text-amber-700 font-bold block">Bancolombia:</span>
+          <strong id="info-banco" class="text-slate-800 font-mono text-xs">Ahorros N° 123-456789-00</strong>
         </div>
-
-        <!-- Lista de Pedidos -->
-        <div id="orders-list-container" class="space-y-3 pt-1">
-          <!-- Los pedidos se renderizan dinámicamente -->
-        </div>
-      </section>
-
-    </div>
-
+      </div>
+      <p class="text-[10px] text-slate-400 text-center">Titular: <span id="info-titular" class="font-bold text-slate-600">Sazón Lau - Almuerzos del Barrio</span></p>
+    </section>
   </main>
 
-  <!-- NOTIFICACIÓN TOAST FLOTANTE -->
-  <div id="toast" class="fixed bottom-5 left-1/2 -translate-x-1/2 bg-slate-900/90 backdrop-blur-md text-white text-xs font-semibold px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-2 transition-all duration-300 opacity-0 translate-y-10 pointer-events-none z-50 border border-slate-700">
-    <i data-lucide="info" class="w-4 h-4 text-brand-400"></i>
-    <span id="toast-msg">Mensaje de notificación</span>
+  <!-- MODAL DE CONFIRMACIÓN DE RESERVA -->
+  <div id="success-modal" class="modal-overlay">
+    <div class="modal-card text-center space-y-4">
+      <div class="w-14 h-14 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto shadow-md">
+        <i data-lucide="check" class="w-8 h-8"></i>
+      </div>
+
+      <div>
+        <span class="text-[11px] font-extrabold text-emerald-600 uppercase tracking-wider">¡Reserva Registrada con Éxito!</span>
+        <h3 class="text-lg font-black text-slate-900 mt-0.5">Número de Pedido: <span id="modal-order-id" class="text-brand-600 font-mono">ALM-0000</span></h3>
+        <p class="text-xs text-slate-500 mt-1">Tu reserva ya fue guardada en el sistema. Ahora solo falta enviar la confirmación a nuestro WhatsApp para coordinar la entrega.</p>
+      </div>
+
+      <div class="bg-slate-50 rounded-2xl p-3 border border-slate-200 text-left text-xs space-y-1.5">
+        <div class="flex justify-between">
+          <span class="text-slate-500">Plato:</span>
+          <strong id="modal-order-plato" class="text-slate-800 font-bold">1x Pollo con Yuca</strong>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-slate-500">Total:</span>
+          <strong id="modal-order-total" class="text-brand-600 font-black text-sm">$25.000</strong>
+        </div>
+      </div>
+
+      <div class="space-y-2 pt-2">
+        <button id="btn-send-whatsapp" class="w-full py-3.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/25 transition cursor-pointer">
+          <i data-lucide="send" class="w-4 h-4"></i>
+          <span>Enviar Confirmación por WhatsApp</span>
+        </button>
+
+        <button onclick="closeSuccessModal()" class="w-full py-2.5 text-slate-500 hover:text-slate-700 font-bold text-xs">
+          Cerrar
+        </button>
+      </div>
+    </div>
   </div>
 
-  <!-- SCRIPT CON LA LÓGICA DE NEGOCIO Y PERSISTENCIA -->
-  <script>
-    // 1. CONFIGURACIÓN Y ESTADO DE LA APLICACIÓN
-    const DEFAULT_CONFIG = {
-      nombrePlato: "Pollo con Yuca y Plátano",
-      precioPlato: 22000,
-      costoDomicilio: 3000,
-      descripcionPlato: "Pollo jugoso dorado a fuego lento acompañado de yuca sudada, plátano maduro al horno, arroz con coco y ensalada fresca casera.",
-      imagenPlato: "https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=800&q=80",
-      numeroWhatsAppAdmin: "573001234567",
-      numeroNequi: "300 123 4567",
-      titularCuenta: "Sazón Lau - Almuerzos del Barrio",
-      detallesBanco: "Bancolombia Ahorros N° 123-456789-00"
-    };
-
-    // Reseñas de ejemplo predeterminadas
-    const DEFAULT_REVIEWS = [
-      { nombre: "Carlos M.", comentario: "Excelente sazón, el pollo con yuca llegó bien calientito y el plátano delicioso.", fecha: "Hace 2 días" },
-      { nombre: "Lucía P.", comentario: "Super recomendado para pedir con tiempo. La atención por WhatsApp muy rápida.", fecha: "Hace 5 días" }
-    ];
-
-    // Pedidos de ejemplo predeterminados para el administrador
-    const DEFAULT_ORDERS = [
-      {
-        id: "RES-8901",
-        fecha: "08/08/2026 10:30 AM",
-        cliente: "Doña Martha R.",
-        telefono: "3001112233",
-        diaEntrega: "Sábado, 8 de agosto",
-        plato: "Pollo con Yuca y Plátano",
-        cantidad: 3,
-        tipoEntrega: "Domicilio",
-        direccion: "Cra 15 # 45-12 Apto 302",
-        comprobanteBase64: null,
-        estado: "confirmado",
-        total: 69000
-      },
-      {
-        id: "RES-8902",
-        fecha: "08/08/2026 11:15 AM",
-        cliente: "Don Gonzalo P.",
-        telefono: "3104445566",
-        diaEntrega: "Sábado, 8 de agosto",
-        plato: "Pollo con Yuca y Plátano",
-        cantidad: 2,
-        tipoEntrega: "Recoger en sitio",
-        direccion: "Punto Principal Barrio",
-        comprobanteBase64: null,
-        estado: "pendiente",
-        total: 50000
-      },
-      {
-        id: "RES-8903",
-        fecha: "08/08/2026 11:45 AM",
-        cliente: "Familia Gómez",
-        telefono: "3207778899",
-        diaEntrega: "Domingo, 9 de agosto",
-        plato: "Arroz con Pato Criollo",
-        cantidad: 4,
-        tipoEntrega: "Domicilio",
-        direccion: "Calle 8 # 12-34 Casa 2",
-        comprobanteBase64: null,
-        estado: "confirmado",
-        total: 103000
-      }
-    ];
-
-    let config = { ...DEFAULT_CONFIG };
-    let reviews = [...DEFAULT_REVIEWS];
-    let orders = [...DEFAULT_ORDERS];
-    let currentFilter = 'todos';
-
-    let currentQuantity = 1;
-    let deliveryMode = 'pickup'; // 'pickup' o 'delivery'
-    let uploadedImageBase64 = null;
-    let adminUploadedDishImageBase64 = null;
-    let selectedWeekendDay = 'Sábado';
-
-    // Inicializar aplicación al cargar la página
-    document.addEventListener("DOMContentLoaded", () => {
-      loadConfigFromLocalStorage();
-      loadReviewsFromLocalStorage();
-      loadOrdersFromLocalStorage();
-      initWeekendPicker();
-      cargarVista();
-      renderApp();
-      renderReviews();
-      renderOrders();
-      attachAdminListeners();
-    });
-
-    // LÓGICA DEL SELECTOR Y PICKER DE FECHA DE FIN DE SEMANA
-    function initWeekendPicker() {
-      const today = new Date();
-      const currentDay = today.getDay(); // 0 = Dom, 1 = Lun, ..., 6 = Sáb
-      
-      let daysToSat = (6 - currentDay + 7) % 7;
-      let daysToSun = (0 - currentDay + 7) % 7;
-      if (daysToSun === 0 && currentDay !== 0) daysToSun = 7;
-
-      const nextSat = new Date(today);
-      nextSat.setDate(today.getDate() + daysToSat);
-
-      const nextSun = new Date(today);
-      nextSun.setDate(today.getDate() + (daysToSat === 0 ? 1 : daysToSun));
-
-      const btnSat = document.getElementById('btn-day-sabado');
-      const btnSun = document.getElementById('btn-day-domingo');
-
-      const satISO = formatDateToISO(nextSat);
-      const sunISO = formatDateToISO(nextSun);
-
-      if (btnSat) btnSat.dataset.date = satISO;
-      if (btnSun) btnSun.dataset.date = sunISO;
-
-      const lblSat = document.getElementById('label-sabado');
-      const lblSun = document.getElementById('label-domingo');
-      
-      if (lblSat) lblSat.innerText = `Sábado (${nextSat.getDate()} ${getMonthNameShort(nextSat.getMonth())})`;
-      if (lblSun) lblSun.innerText = `Domingo (${nextSun.getDate()} ${getMonthNameShort(nextSun.getMonth())})`;
-
-      if (currentDay === 0) {
-        selectWeekendDay('Domingo');
-      } else {
-        selectWeekendDay('Sábado');
-      }
-    }
-
-    function getMonthNameShort(m) {
-      const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-      return months[m];
-    }
-
-    function formatDateToISO(d) {
-      const yyyy = d.getFullYear();
-      const mm = String(d.getMonth() + 1).padStart(2, '0');
-      const dd = String(d.getDate()).padStart(2, '0');
-      return `${yyyy}-${mm}-${dd}`;
-    }
-
-    function selectWeekendDay(dayName) {
-      selectedWeekendDay = dayName;
-      const btnSat = document.getElementById('btn-day-sabado');
-      const btnSun = document.getElementById('btn-day-domingo');
-      const dateInput = document.getElementById('cli-fecha-entrega');
-
-      if (dayName === 'Sábado') {
-        if (btnSat) {
-          btnSat.className = "py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition duration-200 border bg-brand-600 text-white border-brand-600 shadow-sm cursor-pointer";
-        }
-        if (btnSun) {
-          btnSun.className = "py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition duration-200 border bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100 cursor-pointer";
-        }
-        if (dateInput && btnSat && btnSat.dataset.date) {
-          dateInput.value = btnSat.dataset.date;
-        }
-      } else {
-        if (btnSun) {
-          btnSun.className = "py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition duration-200 border bg-brand-600 text-white border-brand-600 shadow-sm cursor-pointer";
-        }
-        if (btnSat) {
-          btnSat.className = "py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition duration-200 border bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100 cursor-pointer";
-        }
-        if (dateInput && btnSun && btnSun.dataset.date) {
-          dateInput.value = btnSun.dataset.date;
-        }
-      }
-
-      updateDatePreviewText();
-    }
-
-    function onDatePickerChange(dateVal) {
-      if (!dateVal) return;
-      const parts = dateVal.split('-');
-      if (parts.length === 3) {
-        const selectedDate = new Date(parts[0], parts[1] - 1, parts[2]);
-        const dayOfWeek = selectedDate.getDay(); // 0 = Dom, 6 = Sáb
-        
-        if (dayOfWeek === 6) {
-          selectedWeekendDay = 'Sábado';
-        } else if (dayOfWeek === 0) {
-          selectedWeekendDay = 'Domingo';
-        } else {
-          const dayNames = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
-          selectedWeekendDay = dayNames[dayOfWeek];
-        }
-
-        const btnSat = document.getElementById('btn-day-sabado');
-        const btnSun = document.getElementById('btn-day-domingo');
-
-        if (dayOfWeek === 6) {
-          if (btnSat) btnSat.className = "py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition duration-200 border bg-brand-600 text-white border-brand-600 shadow-sm cursor-pointer";
-          if (btnSun) btnSun.className = "py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition duration-200 border bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100 cursor-pointer";
-        } else if (dayOfWeek === 0) {
-          if (btnSun) btnSun.className = "py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition duration-200 border bg-brand-600 text-white border-brand-600 shadow-sm cursor-pointer";
-          if (btnSat) btnSat.className = "py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition duration-200 border bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100 cursor-pointer";
-        } else {
-          if (btnSat) btnSat.className = "py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition duration-200 border bg-slate-50 border-slate-200 text-slate-600 cursor-pointer";
-          if (btnSun) btnSun.className = "py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition duration-200 border bg-slate-50 border-slate-200 text-slate-600 cursor-pointer";
-        }
-
-        updateDatePreviewText();
-      }
-    }
-
-    function updateDatePreviewText() {
-      const previewEl = document.getElementById('date-preview-text');
-      const dateInput = document.getElementById('cli-fecha-entrega');
-      if (!previewEl || !dateInput) return;
-
-      const dateVal = dateInput.value;
-      if (dateVal) {
-        const parts = dateVal.split('-');
-        if (parts.length === 3) {
-          const d = new Date(parts[0], parts[1] - 1, parts[2]);
-          const options = { weekday: 'long', day: 'numeric', month: 'long' };
-          let dateStr = d.toLocaleDateString('es-CO', options);
-          dateStr = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
-          previewEl.innerText = `Entrega programada para el: ${dateStr}`;
-          return;
-        }
-      }
-      previewEl.innerText = `Entrega programada para el: ${selectedWeekendDay}`;
-    }
-
-    // 2. AUTOCOMPLETADO AUTOMÁTICO (Sin Login)
-    function cargarVista() {
-      const savedData = localStorage.getItem('datos_cliente');
-      if (savedData) {
-        try {
-          const parsed = JSON.parse(savedData);
-          if (parsed.nombre) document.getElementById('cli-nombre').value = parsed.nombre;
-          if (parsed.telefono) document.getElementById('cli-telefono').value = parsed.telefono;
-          if (parsed.direccion) document.getElementById('cli-direccion').value = parsed.direccion;
-        } catch (e) {
-          console.error("Error al cargar datos locales:", e);
-        }
-      }
-    }
-
-    function guardarDatosClienteEnLocal() {
-      const datos = {
-        nombre: document.getElementById('cli-nombre').value.trim(),
-        telefono: document.getElementById('cli-telefono').value.trim(),
-        direccion: document.getElementById('cli-direccion').value.trim()
-      };
-      localStorage.setItem('datos_cliente', JSON.stringify(datos));
-    }
-
-    // 3. CARGAR / GUARDAR EN LOCALSTORAGE Y PARSEO DE URL
-    function loadConfigFromLocalStorage() {
-      const saved = localStorage.getItem('almuerzos_config');
-      if (saved) {
-        try { config = { ...DEFAULT_CONFIG, ...JSON.parse(saved) }; } catch (e) {}
-      }
-
-      // LECTURA AUTOMÁTICA DE PARÁMETROS URL
-      const urlParams = new URLSearchParams(window.location.search);
-      let updatedFromUrl = false;
-
-      if (urlParams.has('plato') && urlParams.get('plato').trim()) {
-        config.nombrePlato = urlParams.get('plato').trim();
-        updatedFromUrl = true;
-      }
-      if (urlParams.has('precio') && !isNaN(Number(urlParams.get('precio')))) {
-        config.precioPlato = Number(urlParams.get('precio'));
-        updatedFromUrl = true;
-      }
-      if (urlParams.has('domicilio') && !isNaN(Number(urlParams.get('domicilio')))) {
-        config.costoDomicilio = Number(urlParams.get('domicilio'));
-        updatedFromUrl = true;
-      }
-      if (urlParams.has('desc') && urlParams.get('desc').trim()) {
-        config.descripcionPlato = urlParams.get('desc').trim();
-        updatedFromUrl = true;
-      }
-      if (urlParams.has('img') && urlParams.get('img').trim()) {
-        config.imagenPlato = urlParams.get('img').trim();
-        updatedFromUrl = true;
-      }
-      if (urlParams.has('wsp') && urlParams.get('wsp').trim()) {
-        config.numeroWhatsAppAdmin = urlParams.get('wsp').trim().replace(/\D/g, '');
-        updatedFromUrl = true;
-      }
-      if (urlParams.has('nequi') && urlParams.get('nequi').trim()) {
-        config.numeroNequi = urlParams.get('nequi').trim();
-        updatedFromUrl = true;
-      }
-      if (urlParams.has('banco') && urlParams.get('banco').trim()) {
-        config.detallesBanco = urlParams.get('banco').trim();
-        updatedFromUrl = true;
-      }
-      if (urlParams.has('titular') && urlParams.get('titular').trim()) {
-        config.titularCuenta = urlParams.get('titular').trim();
-        updatedFromUrl = true;
-      }
-
-      // Garantizar que no haya campos vacíos sin valor por defecto
-      if (!config.nombrePlato) config.nombrePlato = DEFAULT_CONFIG.nombrePlato;
-      if (!config.precioPlato || isNaN(config.precioPlato)) config.precioPlato = DEFAULT_CONFIG.precioPlato;
-      if (!config.descripcionPlato) config.descripcionPlato = DEFAULT_CONFIG.descripcionPlato;
-
-      if (updatedFromUrl) {
-        saveConfigToLocalStorage();
-      }
-    }
-
-    // LISTENER EN TIEMPO REAL PARA CAMPOS DEL ADMINISTRADOR
-    function attachAdminListeners() {
-      const adminInputIds = [
-        'adm-plato-nombre',
-        'adm-plato-precio',
-        'adm-domicilio-precio',
-        'adm-plato-desc',
-        'adm-whatsapp-num',
-        'adm-nequi-num',
-        'adm-banco-detalles',
-        'adm-plato-imagen'
-      ];
-
-      adminInputIds.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) {
-          el.addEventListener('input', () => saveAdminConfigQuietly());
-          el.addEventListener('change', () => saveAdminConfigQuietly());
-        }
-      });
-    }
-
-    function getBestDishImage(dishName, currentImage) {
-      if (adminUploadedDishImageBase64) return adminUploadedDishImageBase64;
-      if (currentImage) return currentImage;
-      
-      const urlInput = document.getElementById('adm-plato-imagen');
-      if (urlInput && urlInput.value.trim()) {
-        return urlInput.value.trim();
-      }
-
-      const lowerName = (dishName || '').toLowerCase();
-      
-      if (lowerName.includes('yuca') || lowerName.includes('plátano') || lowerName.includes('platano')) {
-        return PRESET_DISH_IMAGES.PolloYuca;
-      }
-      if (lowerName.includes('empanada')) {
-        return PRESET_DISH_IMAGES.Empanadas;
-      }
-      if (lowerName.includes('sancocho') || lowerName.includes('sopa') || lowerName.includes('caldo')) {
-        return PRESET_DISH_IMAGES.Sancocho;
-      }
-      if (lowerName.includes('frijol') || lowerName.includes('paisa') || lowerName.includes('bandeja')) {
-        return PRESET_DISH_IMAGES.BandejaPaisa;
-      }
-      if (lowerName.includes('pollo')) {
-        return PRESET_DISH_IMAGES.PolloYuca;
-      }
-      if (lowerName.includes('pescado') || lowerName.includes('mojarra') || lowerName.includes('trucha')) {
-        return PRESET_DISH_IMAGES.Pescado;
-      }
-
-      return DEFAULT_CONFIG.imagenPlato;
-    }
-
-    function saveAdminConfigQuietly() {
-      const nombreEl = document.getElementById('adm-plato-nombre');
-      const precioEl = document.getElementById('adm-plato-precio');
-      const domiEl = document.getElementById('adm-domicilio-precio');
-      const descEl = document.getElementById('adm-plato-desc');
-      const wspEl = document.getElementById('adm-whatsapp-num');
-      const nequiEl = document.getElementById('adm-nequi-num');
-      const bancoEl = document.getElementById('adm-banco-detalles');
-      const imgUrlEl = document.getElementById('adm-plato-imagen');
-
-      if (nombreEl) config.nombrePlato = nombreEl.value.trim() || DEFAULT_CONFIG.nombrePlato;
-      if (precioEl) config.precioPlato = Number(precioEl.value) || DEFAULT_CONFIG.precioPlato;
-      if (domiEl) config.costoDomicilio = Number(domiEl.value) || DEFAULT_CONFIG.costoDomicilio;
-      if (descEl) config.descripcionPlato = descEl.value.trim() || DEFAULT_CONFIG.descripcionPlato;
-
-      if (adminUploadedDishImageBase64) {
-        config.imagenPlato = adminUploadedDishImageBase64;
-      } else if (imgUrlEl && imgUrlEl.value.trim()) {
-        config.imagenPlato = imgUrlEl.value.trim();
-      } else if (!config.imagenPlato) {
-        config.imagenPlato = getBestDishImage(config.nombrePlato, null);
-      }
-
-      if (wspEl) config.numeroWhatsAppAdmin = wspEl.value.trim().replace(/\D/g, '') || DEFAULT_CONFIG.numeroWhatsAppAdmin;
-      if (nequiEl) config.numeroNequi = nequiEl.value.trim() || DEFAULT_CONFIG.numeroNequi;
-      if (bancoEl) config.detallesBanco = bancoEl.value.trim() || DEFAULT_CONFIG.detallesBanco;
-
-      saveConfigToLocalStorage();
-
-      // Actualizar vista cliente
-      const nameEl = document.getElementById('dish-name');
-      if (nameEl) nameEl.innerText = config.nombrePlato;
-
-      const descElClient = document.getElementById('dish-description');
-      if (descElClient) descElClient.innerText = config.descripcionPlato;
-
-      const priceEl = document.getElementById('dish-price-display');
-      if (priceEl) priceEl.innerText = '$' + Number(config.precioPlato).toLocaleString('es-CO');
-
-      const imgEl = document.getElementById('dish-image');
-      if (imgEl && config.imagenPlato) imgEl.src = config.imagenPlato;
-
-      const previewImg = document.getElementById('adm-dish-preview-img');
-      if (previewImg && config.imagenPlato) previewImg.src = config.imagenPlato;
-
-      const deliveryBadge = document.getElementById('delivery-fee-badge');
-      if (deliveryBadge) deliveryBadge.innerText = `+ $${Number(config.costoDomicilio).toLocaleString('es-CO')} domicilio`;
-
-      const payNequi = document.getElementById('pay-nequi');
-      if (payNequi) payNequi.innerText = config.numeroNequi;
-
-      const payHolder = document.getElementById('pay-holder');
-      if (payHolder) payHolder.innerText = config.titularCuenta;
-
-      const shareInput = document.getElementById('share-link-input');
-      if (shareInput) shareInput.value = getShareableURL();
-
-      const prevDish = document.getElementById('template-dish-preview');
-      if (prevDish) prevDish.innerText = config.nombrePlato;
-
-      const prevTotal = document.getElementById('template-total-preview');
-      if (prevTotal) prevTotal.innerText = '$' + Number(config.precioPlato).toLocaleString('es-CO');
-
-      const prevNequi = document.getElementById('template-nequi-preview');
-      if (prevNequi) prevNequi.innerText = config.numeroNequi;
-
-      // Actualizar la URL de la barra de direcciones sin recargar
-      try {
-        const shareUrl = getShareableURL();
-        window.history.replaceState(null, '', shareUrl);
-      } catch (e) {
-        console.warn("No se pudo actualizar history state:", e);
-      }
-
-      updateTotals();
-    }
-
-    // GENERADOR DE ENLACE COMPARTIBLE
-    function getShareableURL() {
-      const baseUrl = window.location.origin + window.location.pathname;
-      const params = new URLSearchParams();
-
-      const plato = config.nombrePlato || DEFAULT_CONFIG.nombrePlato;
-      const precio = config.precioPlato || DEFAULT_CONFIG.precioPlato;
-      const domicilio = config.costoDomicilio !== undefined ? config.costoDomicilio : DEFAULT_CONFIG.costoDomicilio;
-      const desc = config.descripcionPlato || DEFAULT_CONFIG.descripcionPlato;
-
-      if (plato) params.set('plato', plato);
-      if (precio) params.set('precio', precio);
-      if (domicilio !== undefined) params.set('domicilio', domicilio);
-      if (desc) params.set('desc', desc);
-
-      if (config.imagenPlato && !config.imagenPlato.startsWith('data:image')) {
-        params.set('img', config.imagenPlato);
-      }
-      if (config.numeroWhatsAppAdmin) params.set('wsp', config.numeroWhatsAppAdmin);
-      if (config.numeroNequi) params.set('nequi', config.numeroNequi);
-      if (config.detallesBanco) params.set('banco', config.detallesBanco);
-      if (config.titularCuenta) params.set('titular', config.titularCuenta);
-
-      return baseUrl + '?' + params.toString();
-    }
-
-    function nativeShareMenu() {
-      saveAdminConfigQuietly();
-      const link = getShareableURL();
-      const title = `🍲 Menú Especial: ${config.nombrePlato}`;
-      const text = `🍲 *¡MENÚ ESPECIAL DE ESTE FIN DE SEMANA!* 🍲\n\n` +
-        `*${config.nombrePlato}*\n` +
-        `📝 ${config.descripcionPlato}\n\n` +
-        `💰 *Precio Porción:* $${Number(config.precioPlato).toLocaleString('es-CO')}\n` +
-        `🛵 *Domicilio:* $${Number(config.costoDomicilio).toLocaleString('es-CO')}\n\n` +
-        `👉 *Haz tu pedido en nuestro menú interactivo aquí:*\n${link}`;
-
-      if (navigator.share) {
-        navigator.share({
-          title: title,
-          text: text,
-          url: link
-        }).then(() => {
-          showToast("¡Menú compartido con éxito!");
-        }).catch((err) => {
-          if (err.name !== 'AbortError') {
-            shareMenuOnWhatsApp();
-          }
-        });
-      } else {
-        shareMenuOnWhatsApp();
-      }
-    }
-
-    function copyShareableLink() {
-      saveAdminConfigQuietly();
-      const link = getShareableURL();
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(link).then(() => {
-          showToast("¡Enlace del menú copiado al portapapeles!");
-        }).catch(() => fallbackCopyText(link, "¡Enlace del menú copiado!"));
-      } else {
-        fallbackCopyText(link, "¡Enlace del menú copiado!");
-      }
-    }
-
-    function shareMenuOnWhatsApp() {
-      saveAdminConfigQuietly();
-      const link = getShareableURL();
-      const text = `🍲 *¡MENÚ ESPECIAL DE ESTE FIN DE SEMANA!* 🍲\n\n` +
-        `*${config.nombrePlato}*\n` +
-        `📝 ${config.descripcionPlato}\n\n` +
-        `💰 *Precio Porción:* $${Number(config.precioPlato).toLocaleString('es-CO')}\n` +
-        `🛵 *Domicilio:* $${Number(config.costoDomicilio).toLocaleString('es-CO')}\n\n` +
-        `👉 *Haz tu pedido en nuestro menú interactivo aquí:* \n${link}`;
-
-      const wspUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
-      window.open(wspUrl, '_blank');
-      fallbackCopyText(link, "¡Enlace copiado y abriendo WhatsApp!");
-    }
-
-    // PLANTILLA Y CONFIRMACIÓN DE PEDIDO POR WHATSAPP
-    function generateConfirmationMessage(order = null) {
-      const plato = order ? order.plato : config.nombrePlato;
-      const cliente = order ? order.cliente : "[Nombre Cliente]";
-      const dia = order ? order.diaEntrega : selectedWeekendDay;
-      const total = order ? `$${Number(order.total).toLocaleString('es-CO')}` : `$${Number(config.precioPlato).toLocaleString('es-CO')}`;
-      const dirInfo = (order && order.tipoEntrega === 'Domicilio') ? `📍 *Dirección de Entrega:* ${order.direccion}\n` : '';
-
-      return `✅ *¡RESERVA CONFIRMADA CON ÉXITO!* 🍲\n\n` +
-        `Hola *${cliente}*, tu pedido ha sido registrado y confirmado correctamente.\n\n` +
-        `📌 *Detalles de la Reserva:*\n` +
-        `• *Plato:* ${plato}\n` +
-        `• *Fecha:* ${dia}\n` +
-        `${dirInfo}` +
-        `• *Total a Pagar:* ${total}\n\n` +
-        `💳 *Información para Pago:*\n` +
-        `• Nequi / Daviplata: ${config.numeroNequi}\n` +
-        `• ${config.detallesBanco}\n\n` +
-        `¡Muchas gracias por preferir *Almuerzos del Barrio*! Buen provecho. 🙏✨`;
-    }
-
-    function copyConfirmationTemplate(orderId = null) {
-      let order = null;
-      if (orderId) {
-        order = orders.find(o => o.id === orderId);
-      }
-      const text = generateConfirmationMessage(order);
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).then(() => {
-          showToast("¡Plantilla de confirmación copiada al portapapeles!");
-        }).catch(() => fallbackCopyText(text, "¡Plantilla de confirmación copiada!"));
-      } else {
-        fallbackCopyText(text, "¡Plantilla de confirmación copiada!");
-      }
-    }
-
-    function sendConfirmationWhatsApp(orderId) {
-      const order = orders.find(o => o.id === orderId);
-      if (!order) return;
-
-      const text = generateConfirmationMessage(order);
-      let phone = order.telefono ? order.telefono.replace(/\D/g, '') : '';
-      if (phone.length === 10) phone = '57' + phone;
-
-      const wspUrl = phone ? 
-        `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(text)}` :
-        `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
-
-      window.open(wspUrl, '_blank');
-      showToast("Abriendo WhatsApp para confirmar pedido...");
-    }
-
-    function fallbackCopyText(text, toastMsg) {
-      const dummy = document.createElement('textarea');
-      document.body.appendChild(dummy);
-      dummy.value = text;
-      dummy.select();
-      document.execCommand('copy');
-      document.body.removeChild(dummy);
-      showToast(toastMsg || "Texto copiado");
-    }
-
-    function saveConfigToLocalStorage() {
-      localStorage.setItem('almuerzos_config', JSON.stringify(config));
-    }
-
-    function loadReviewsFromLocalStorage() {
-      const saved = localStorage.getItem('almuerzos_reviews');
-      if (saved) {
-        try { reviews = JSON.parse(saved); } catch (e) {}
-      }
-    }
-
-    function saveReviewsToLocalStorage() {
-      localStorage.setItem('almuerzos_reviews', JSON.stringify(reviews));
-    }
-
-    function loadOrdersFromLocalStorage() {
-      const saved = localStorage.getItem('almuerzos_orders');
-      if (saved) {
-        try { orders = JSON.parse(saved); } catch (e) {}
-      }
-    }
-
-    function saveOrdersToLocalStorage() {
-      localStorage.setItem('almuerzos_orders', JSON.stringify(orders));
-    }
-
-    function safeCreateIcons() {
-      if (typeof lucide !== 'undefined' && lucide && typeof lucide.createIcons === 'function') {
-        try {
-          lucide.createIcons();
-        } catch (e) {
-          console.warn("Lucide icon generation skipped:", e);
-        }
-      }
-    }
-
-    // 4. RENDERIZADO GENERAL Y VALORES DE INTERFAZ
-    function renderApp() {
-      // Elementos vista cliente
-      document.getElementById('dish-name').innerText = config.nombrePlato;
-      document.getElementById('dish-description').innerText = config.descripcionPlato;
-      document.getElementById('dish-price-display').innerText = '$' + Number(config.precioPlato).toLocaleString('es-CO');
-      document.getElementById('dish-image').src = config.imagenPlato;
-
-      document.getElementById('pay-nequi').innerText = config.numeroNequi;
-      document.getElementById('pay-holder').innerText = config.titularCuenta;
-      document.getElementById('pay-bank-details').innerHTML = `<i data-lucide="building-2" class="w-3.5 h-3.5 text-amber-400 shrink-0"></i><span>${config.detallesBanco}</span>`;
-      document.getElementById('delivery-fee-badge').innerText = `+ $${Number(config.costoDomicilio).toLocaleString('es-CO')} domicilio`;
-
-      // Formulario admin prellenado
-      document.getElementById('adm-plato-nombre').value = config.nombrePlato;
-      document.getElementById('adm-plato-precio').value = config.precioPlato;
-      document.getElementById('adm-domicilio-precio').value = config.costoDomicilio;
-      document.getElementById('adm-plato-desc').value = config.descripcionPlato;
-      document.getElementById('adm-whatsapp-num').value = config.numeroWhatsAppAdmin;
-      document.getElementById('adm-nequi-num').value = config.numeroNequi;
-      document.getElementById('adm-banco-detalles').value = config.detallesBanco;
-
-      // Vista previa foto plato
-      const previewImg = document.getElementById('adm-dish-preview-img');
-      if (previewImg) previewImg.src = adminUploadedDishImageBase64 || config.imagenPlato;
-      const urlInput = document.getElementById('adm-plato-imagen');
-      if (urlInput) urlInput.value = adminUploadedDishImageBase64 ? '' : config.imagenPlato;
-
-      // Actualizar vista previa de enlace compartible y plantilla
-      const shareInput = document.getElementById('share-link-input');
-      if (shareInput) shareInput.value = getShareableURL();
-
-      const prevDish = document.getElementById('template-dish-preview');
-      if (prevDish) prevDish.innerText = config.nombrePlato;
-
-      const prevTotal = document.getElementById('template-total-preview');
-      if (prevTotal) prevTotal.innerText = '$' + Number(config.precioPlato).toLocaleString('es-CO');
-
-      const prevNequi = document.getElementById('template-nequi-preview');
-      if (prevNequi) prevNequi.innerText = config.numeroNequi;
-
-      updateTotals();
-      safeCreateIcons();
-    }
-
-    // Actualizar Subtotal y Total en la Card del Carrito
-    function updateTotals() {
-      const subtotal = currentQuantity * config.precioPlato;
-      const shipping = (deliveryMode === 'delivery') ? Number(config.costoDomicilio) : 0;
-      const total = subtotal + shipping;
-
-      document.getElementById('summary-qty').innerText = currentQuantity;
-      document.getElementById('summary-subtotal').innerText = '$' + subtotal.toLocaleString('es-CO');
-      document.getElementById('summary-shipping').innerText = '$' + shipping.toLocaleString('es-CO');
-      document.getElementById('summary-total').innerText = '$' + total.toLocaleString('es-CO');
-    }
-
-    function updateQuantity(delta) {
-      currentQuantity += delta;
-      if (currentQuantity < 1) currentQuantity = 1;
-      document.getElementById('quantity-display').innerText = currentQuantity;
-      updateTotals();
-    }
-
-    // Cambiar Modalidad Domicilio / Recoger en Sitio
-    function setDeliveryMode(mode) {
-      deliveryMode = mode;
-      const btnPickup = document.getElementById('btn-mode-pickup');
-      const btnDelivery = document.getElementById('btn-mode-delivery');
-      const containerDir = document.getElementById('container-direccion');
-      const lblDir = document.getElementById('lbl-direccion');
-
-      if (mode === 'pickup') {
-        btnPickup.className = "p-3 rounded-2xl border-2 transition-all flex flex-col items-center gap-1.5 text-center bg-brand-50 border-brand-500 text-brand-700 font-bold text-xs shadow-sm";
-        btnDelivery.className = "p-3 rounded-2xl border-2 transition-all flex flex-col items-center gap-1.5 text-center bg-slate-50 border-slate-200 text-slate-600 hover:border-slate-300 font-bold text-xs";
-        lblDir.innerText = "Punto / Hora de Recogida Preferida";
-        document.getElementById('cli-direccion').placeholder = "Ej. Recojo a las 12:30 PM en el local";
-      } else {
-        btnDelivery.className = "p-3 rounded-2xl border-2 transition-all flex flex-col items-center gap-1.5 text-center bg-brand-50 border-brand-500 text-brand-700 font-bold text-xs shadow-sm";
-        btnPickup.className = "p-3 rounded-2xl border-2 transition-all flex flex-col items-center gap-1.5 text-center bg-slate-50 border-slate-200 text-slate-600 hover:border-slate-300 font-bold text-xs";
-        lblDir.innerText = "Dirección Completa de Envío *";
-        document.getElementById('cli-direccion').placeholder = "Ej. Calle 10 # 20-30 Apt 401, Barrio Central";
-      }
-
-      updateTotals();
-    }
-
-    // 5. NAVEGACIÓN ENTRE PESTAÑAS
-    function switchTab(tab) {
-      const viewClient = document.getElementById('view-client');
-      const viewAdmin = document.getElementById('view-admin');
-      const btnClient = document.getElementById('tab-btn-client');
-      const btnAdmin = document.getElementById('tab-btn-admin');
-
-      if (tab === 'client') {
-        viewClient.classList.remove('hidden');
-        viewAdmin.classList.add('hidden');
-        btnClient.className = "flex-1 py-2.5 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 bg-white text-slate-900 shadow-sm";
-        btnAdmin.className = "flex-1 py-2.5 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 text-slate-600 hover:text-slate-900";
-      } else {
-        viewClient.classList.add('hidden');
-        viewAdmin.classList.remove('hidden');
-        btnAdmin.className = "flex-1 py-2.5 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 bg-slate-900 text-white shadow-sm";
-        btnClient.className = "flex-1 py-2.5 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 text-slate-600 hover:text-slate-900";
-        renderOrders();
-      }
-      safeCreateIcons();
-    }
-
-    // 6. PROCESO DE CARGA DE COMPROBANTE DE PAGO
-    function previewImage(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      if (file.size > 5 * 1024 * 1024) {
-        showToast("La imagen es muy pesada (Máximo 5MB)");
-        return;
-      }
-
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        uploadedImageBase64 = e.target.result;
-        document.getElementById('upload-placeholder').classList.add('hidden');
-        const previewContainer = document.getElementById('upload-preview-container');
-        previewContainer.classList.remove('hidden');
-        document.getElementById('upload-preview-img').src = uploadedImageBase64;
-        showToast("Comprobante adjuntado con éxito");
-      };
-      reader.readAsDataURL(file);
-    }
-
-    function removeImage(event) {
-      event.stopPropagation();
-      uploadedImageBase64 = null;
-      document.getElementById('file-receipt').value = '';
-      document.getElementById('upload-preview-container').classList.add('hidden');
-      document.getElementById('upload-placeholder').classList.remove('hidden');
-      showToast("Comprobante removido");
-    }
-
-    // SELECCIÓN DE FOTO DE PLATO PREDETERMINADA (Pollo con Yuca, Sancocho, Bandeja Paisa, Pescado, Empanadas, Carne Asada)
-    const PRESET_DISH_IMAGES = {
-      PolloYuca: "https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=800&q=80",
-      Sancocho: "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=800&q=80",
-      BandejaPaisa: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80",
-      Pescado: "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=800&q=80",
-      Empanadas: "https://images.unsplash.com/photo-1626700051175-6818013e1d4f?auto=format&fit=crop&w=800&q=80",
-      CarneAsada: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=800&q=80"
-    };
-
-    function selectPresetDishImage(type) {
-      if (PRESET_DISH_IMAGES[type]) {
-        adminUploadedDishImageBase64 = null;
-        config.imagenPlato = PRESET_DISH_IMAGES[type];
-
-        const nombreInput = document.getElementById('adm-plato-nombre');
-        const descInput = document.getElementById('adm-plato-desc');
-        const precioInput = document.getElementById('adm-plato-precio');
-
-        if (type === 'PolloYuca') {
-          if (nombreInput) { nombreInput.value = "Pollo con Yuca y Plátano"; config.nombrePlato = "Pollo con Yuca y Plátano"; }
-          if (descInput) { descInput.value = "Pollo jugoso dorado a fuego lento acompañado de yuca sudada, plátano maduro al horno, arroz con coco y ensalada fresca."; config.descripcionPlato = descInput.value; }
-          if (precioInput && (!precioInput.value || Number(precioInput.value) <= 0)) { precioInput.value = "22000"; config.precioPlato = 22000; }
-        } else if (type === 'Sancocho') {
-          if (nombreInput) { nombreInput.value = "Sancocho Trifásico Tradicional"; config.nombrePlato = "Sancocho Trifásico Tradicional"; }
-          if (descInput) { descInput.value = "Sancocho criollo tradicional con gallina, cerdo y res, mazorca tierna, plátano verde, yuca, arroz blanco y aguacate."; config.descripcionPlato = descInput.value; }
-          if (precioInput && (!precioInput.value || Number(precioInput.value) <= 0)) { precioInput.value = "25000"; config.precioPlato = 25000; }
-        } else if (type === 'BandejaPaisa') {
-          if (nombreInput) { nombreInput.value = "Bandeja Paisa con Frijoles"; config.nombrePlato = "Bandeja Paisa con Frijoles"; }
-          if (descInput) { descInput.value = "Frijoles cargamanto en salsa casera, chicharrón crocante, carne molida, huevo frito, tajadas de maduro, arepa y aguacate."; config.descripcionPlato = descInput.value; }
-          if (precioInput && (!precioInput.value || Number(precioInput.value) <= 0)) { precioInput.value = "26000"; config.precioPlato = 26000; }
-        } else if (type === 'Pescado') {
-          if (nombreInput) { nombreInput.value = "Mojarra Frita con Patacón y Yuca"; config.nombrePlato = "Mojarra Frita con Patacón y Yuca"; }
-          if (descInput) { descInput.value = "Mojarra dorada crocante con patacones de plátano verde, yuca frita, arroz con coco y ensalada mixta de la huerta."; config.descripcionPlato = descInput.value; }
-          if (precioInput && (!precioInput.value || Number(precioInput.value) <= 0)) { precioInput.value = "28000"; config.precioPlato = 28000; }
-        } else if (type === 'Empanadas') {
-          if (nombreInput) { nombreInput.value = "Combo de Empanadas Caseras (x5)"; config.nombrePlato = "Combo de Empanadas Caseras (x5)"; }
-          if (descInput) { descInput.value = "Porción de 5 empanadas crocantes recién fritas rellenas de carne desmechada y papa criolla con ají casero."; config.descripcionPlato = descInput.value; }
-          if (precioInput && (!precioInput.value || Number(precioInput.value) <= 0)) { precioInput.value = "15000"; config.precioPlato = 15000; }
-        } else if (type === 'CarneAsada') {
-          if (nombreInput) { nombreInput.value = "Carne Asada a la Brasa con Patacón"; config.nombrePlato = "Carne Asada a la Brasa con Patacón"; }
-          if (descInput) { descInput.value = "Jugoso corte de res asado al carbón con patacón pisao, papa salada, chimichurri casero, arroz y ensalada."; config.descripcionPlato = descInput.value; }
-          if (precioInput && (!precioInput.value || Number(precioInput.value) <= 0)) { precioInput.value = "25000"; config.precioPlato = 25000; }
-        }
-
-        const urlInput = document.getElementById('adm-plato-imagen');
-        if (urlInput) urlInput.value = config.imagenPlato;
-        const imgPreview = document.getElementById('adm-dish-preview-img');
-        if (imgPreview) imgPreview.src = config.imagenPlato;
-        const badge = document.getElementById('adm-photo-type-badge');
-        if (badge) badge.innerText = "Plato sugerido seleccionado";
-
-        saveAdminConfigQuietly();
-        showToast(`¡Plato de ${config.nombrePlato} seleccionado!`);
-      }
-    }
-
-    function setQuickDescription(text) {
-      const descInput = document.getElementById('adm-plato-desc');
-      if (descInput) {
-        descInput.value = text;
-        config.descripcionPlato = text;
-        saveAdminConfigQuietly();
-        showToast("Reseña / descripción actualizada");
-      }
-    }
-
-    function resetAdminDishImage() {
-      adminUploadedDishImageBase64 = null;
-      const urlInput = document.getElementById('adm-plato-imagen');
-      if (urlInput) urlInput.value = '';
-      
-      config.imagenPlato = getBestDishImage(config.nombrePlato, null);
-      const imgPreview = document.getElementById('adm-dish-preview-img');
-      if (imgPreview) imgPreview.src = config.imagenPlato;
-      const badge = document.getElementById('adm-photo-type-badge');
-      if (badge) badge.innerText = "Foto por defecto restaurada";
-
-      saveAdminConfigQuietly();
-      showToast("Foto restaurada a la sugerencia predeterminada");
-    }
-
-    // PROCESO DE CARGA Y COMPRESIÓN DE FOTO DE PLATO DESDE EL ADMIN (Galería / Cámara)
-    function handleAdminDishImageUpload(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      if (file.size > 12 * 1024 * 1024) {
-        showToast("La foto del plato es muy pesada (Máximo 12MB)");
-        return;
-      }
-
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const rawImg = new Image();
-        rawImg.onload = function() {
-          // Compresor canvas HTML5 para optimizar tamaño para URL y LocalStorage
-          const canvas = document.createElement('canvas');
-          const maxDim = 600; // Ancho/Alto máximo ideal para web móvil
-          let width = rawImg.width;
-          let height = rawImg.height;
-
-          if (width > height) {
-            if (width > maxDim) {
-              height = Math.round((height * maxDim) / width);
-              width = maxDim;
-            }
-          } else {
-            if (height > maxDim) {
-              width = Math.round((width * maxDim) / height);
-              height = maxDim;
-            }
-          }
-
-          canvas.width = width;
-          canvas.height = height;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(rawImg, 0, 0, width, height);
-
-          // Genera un JPEG super optimizado (~10-20KB base64)
-          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.70);
-
-          adminUploadedDishImageBase64 = compressedBase64;
-          config.imagenPlato = compressedBase64;
-
-          const imgPreview = document.getElementById('adm-dish-preview-img');
-          if (imgPreview) imgPreview.src = compressedBase64;
-          const urlInput = document.getElementById('adm-plato-imagen');
-          if (urlInput) urlInput.value = '';
-          const badge = document.getElementById('adm-photo-type-badge');
-          if (badge) badge.innerText = "Foto personalizada cargada";
-
-          // Guardado silencioso y actualización inmediata
-          saveAdminConfigQuietly();
-          showToast("¡Foto cargada de tu galería y guardada en el menú!");
-        };
-        rawImg.onerror = function() {
-          showToast("Error al procesar la foto seleccionada");
-        };
-        rawImg.src = e.target.result;
-      };
-      reader.readAsDataURL(file);
-    }
-
-    // 7. GUARDAR CONFIGURACIÓN DESDE EL ADMIN
-    function saveAdminConfig() {
-      config.nombrePlato = document.getElementById('adm-plato-nombre').value.trim() || DEFAULT_CONFIG.nombrePlato;
-      config.precioPlato = Number(document.getElementById('adm-plato-precio').value) || DEFAULT_CONFIG.precioPlato;
-      config.costoDomicilio = Number(document.getElementById('adm-domicilio-precio').value) || DEFAULT_CONFIG.costoDomicilio;
-      config.descripcionPlato = document.getElementById('adm-plato-desc').value.trim() || DEFAULT_CONFIG.descripcionPlato;
-
-      // Actualizar foto del plato: si se cargó archivo local Base64, priorizarlo; si no, tomar la URL ingresada
-      const urlInput = document.getElementById('adm-plato-imagen').value.trim();
-      if (adminUploadedDishImageBase64) {
-        config.imagenPlato = adminUploadedDishImageBase64;
-      } else if (urlInput) {
-        config.imagenPlato = urlInput;
-        adminUploadedDishImageBase64 = null;
-      }
-      
-      let numWsp = document.getElementById('adm-whatsapp-num').value.trim().replace(/\D/g, '');
-      config.numeroWhatsAppAdmin = numWsp || DEFAULT_CONFIG.numeroWhatsAppAdmin;
-      config.numeroNequi = document.getElementById('adm-nequi-num').value.trim() || DEFAULT_CONFIG.numeroNequi;
-      config.detallesBanco = document.getElementById('adm-banco-detalles').value.trim() || DEFAULT_CONFIG.detallesBanco;
-
-      saveConfigToLocalStorage();
-      renderApp();
-      showToast("¡Menú, foto y reseña guardados correctamente!");
-    }
-
-    // 8. EXPORTAR PEDIDOS EN FORMATO EXCEL / CSV
-    function exportOrdersCSV() {
-      if (orders.length === 0) {
-        showToast("No hay pedidos para exportar");
-        return;
-      }
-
-      let csvContent = "\uFEFF"; // UTF-8 BOM
-      csvContent += "ID Reserva,Fecha Registro,Cliente,Teléfono,Día Entrega,Plato,Cantidad,Tipo Entrega,Dirección,Estado,Total ($)\n";
-
-      orders.forEach(o => {
-        const row = [
-          `"${o.id}"`,
-          `"${o.fecha}"`,
-          `"${(o.cliente || '').replace(/"/g, '""')}"`,
-          `"${(o.telefono || '').replace(/"/g, '""')}"`,
-          `"${(o.diaEntrega || '').replace(/"/g, '""')}"`,
-          `"${(o.plato || '').replace(/"/g, '""')}"`,
-          `"${o.cantidad}"`,
-          `"${(o.tipoEntrega || '').replace(/"/g, '""')}"`,
-          `"${(o.direccion || '').replace(/"/g, '""')}"`,
-          `"${o.estado}"`,
-          `"${o.total}"`
-        ];
-        csvContent += row.join(",") + "\n";
-      });
-
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.setAttribute("href", url);
-      link.setAttribute("download", `Reservas_Almuerzos_Barrio_${new Date().toISOString().slice(0,10)}.csv`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      showToast("Archivo CSV descargado con éxito");
-    }
-
-    // 9. FILTRAR Y GERENCIAR RESERVAS EN EL ADMIN
-    function filterOrders(status) {
-      currentFilter = status;
-      const btnTodos = document.getElementById('filter-todos');
-      const btnPend = document.getElementById('filter-pendiente');
-      const btnConf = document.getElementById('filter-confirmado');
-
-      const activeClass = "px-3 py-1.5 rounded-xl bg-slate-800 text-white shadow-sm whitespace-nowrap font-bold";
-      const inactiveClass = "px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap font-bold";
-
-      btnTodos.className = status === 'todos' ? activeClass : inactiveClass;
-      btnPend.className = status === 'pendiente' ? activeClass : inactiveClass;
-      btnConf.className = status === 'confirmado' ? activeClass : inactiveClass;
-
-      renderOrders();
-    }
-
-    function renderOrders() {
-      const container = document.getElementById('orders-list-container');
-      const badgeTotal = document.getElementById('badge-total-orders');
-
-      badgeTotal.innerText = `${orders.length} reservas`;
-
-      let filtered = orders;
-      if (currentFilter !== 'todos') {
-        filtered = orders.filter(o => o.estado === currentFilter);
-      }
-
-      if (filtered.length === 0) {
-        container.innerHTML = `
-          <div class="text-center py-8 text-slate-400 space-y-2">
-            <i data-lucide="inbox" class="w-8 h-8 mx-auto stroke-1"></i>
-            <p class="text-xs font-medium">No hay reservas registradas en este estado.</p>
-          </div>
-        `;
-        safeCreateIcons();
-        return;
-      }
-
-      container.innerHTML = filtered.map(o => `
-        <div class="bg-slate-50 rounded-2xl p-3.5 border border-slate-200 space-y-2.5 relative">
-          <div class="flex items-start justify-between">
-            <div>
-              <div class="flex items-center gap-2 font-bold text-slate-900 text-xs">
-                <span>${o.cliente}</span>
-                <span class="bg-slate-200 text-slate-700 font-semibold text-[10px] px-2 py-0.5 rounded-full">${o.id}</span>
-              </div>
-              <div class="text-[11px] text-slate-500 flex items-center gap-2 mt-0.5 flex-wrap">
-                <span class="flex items-center gap-1"><i data-lucide="phone" class="w-3 h-3 text-slate-400"></i>${o.telefono || 'Sin celular'}</span>
-                <span>•</span>
-                <span class="font-semibold text-brand-700 flex items-center gap-1 bg-brand-50 px-1.5 py-0.5 rounded border border-brand-100"><i data-lucide="calendar" class="w-3 h-3 text-brand-600"></i>${o.diaEntrega || 'Fin de semana'}</span>
-              </div>
-            </div>
-
-            <span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold ${
-              o.estado === 'confirmado' 
-                ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' 
-                : 'bg-amber-100 text-amber-800 border border-amber-200'
-            }">
-              ${o.estado === 'confirmado' ? 'CONFIRMADO' : 'POR CONFIRMAR'}
-            </span>
-          </div>
-
-          <div class="bg-white p-2.5 rounded-xl border border-slate-200/80 text-xs space-y-1">
-            <div class="flex justify-between font-bold text-slate-800">
-              <span>${o.cantidad}x ${o.plato}</span>
-              <span class="text-brand-600">$${Number(o.total).toLocaleString('es-CO')}</span>
-            </div>
-            <p class="text-[11px] text-slate-600 flex items-center gap-1">
-              <i data-lucide="${o.tipoEntrega === 'Domicilio' ? 'bike' : 'store'}" class="w-3.5 h-3.5 text-slate-400"></i>
-              <strong>${o.tipoEntrega}:</strong> ${o.direccion}
-            </p>
-          </div>
-
-          <!-- Acciones de Gestión de Reserva -->
-          <div class="flex items-center justify-between pt-1 text-xs flex-wrap gap-1.5">
-            <div class="flex items-center gap-1.5 flex-wrap">
-              <button onclick="toggleOrderStatus('${o.id}')" class="px-2.5 py-1.5 bg-slate-200 hover:bg-slate-300 rounded-lg font-bold text-slate-700 transition text-[11px]">
-                ${o.estado === 'confirmado' ? 'Marcar Pendiente' : 'Confirmar Estado'}
-              </button>
-              <button onclick="sendConfirmationWhatsApp('${o.id}')" class="px-2.5 py-1.5 bg-whatsapp-500 hover:bg-whatsapp-600 text-white rounded-lg font-bold transition flex items-center gap-1 text-[11px] shadow-sm">
-                <i data-lucide="message-circle" class="w-3 h-3"></i>
-                Confirmar WhatsApp
-              </button>
-              <button onclick="copyConfirmationTemplate('${o.id}')" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-900 text-slate-200 rounded-lg font-bold transition flex items-center gap-1 text-[11px]">
-                <i data-lucide="copy" class="w-3 h-3 text-emerald-400"></i>
-                Copiar
-              </button>
-            </div>
-
-            <button onclick="deleteOrder('${o.id}')" class="text-rose-500 hover:text-rose-700 p-1.5 rounded-lg hover:bg-rose-50 transition" title="Eliminar reserva">
-              <i data-lucide="trash-2" class="w-4 h-4"></i>
-            </button>
-          </div>
-        </div>
-      `).join('');
-
-      safeCreateIcons();
-    }
-
-    function toggleOrderStatus(orderId) {
-      orders = orders.map(o => {
-        if (o.id === orderId) {
-          o.estado = (o.estado === 'confirmado') ? 'pendiente' : 'confirmado';
-        }
-        return o;
-      });
-      saveOrdersToLocalStorage();
-      renderOrders();
-      showToast("Estado actualizado");
-    }
-
-    function notifyCustomerWhatsApp(orderId) {
-      const order = orders.find(o => o.id === orderId);
-      if (!order) return;
-
-      let phone = order.telefono.replace(/\D/g, '');
-      if (phone.length === 10) {
-        phone = '57' + phone; // Asumir Colombia si tiene 10 dígitos sin prefijo
-      }
-
-      const diaStr = order.diaEntrega ? `para el *${order.diaEntrega}*` : 'para este fin de semana';
-      const msg = `¡Hola ${order.cliente}! 🍲 Te escribimos desde *Almuerzos de Barrio*.\n\nLe recordamos amablemente que su reserva de *${order.cantidad}x ${order.plato}* (${order.tipoEntrega}) está programada ${diaStr}.\n\n💰 *Total a pagar/confirmado:* $${Number(order.total).toLocaleString('es-CO')}\n📍 *Dirección/Punto:* ${order.direccion}\n\n¡Muchas gracias por su confianza y buen provecho!`;
-
-      const whatsappUrl = `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(msg)}`;
-      window.open(whatsappUrl, '_blank');
-      showToast("Abriendo WhatsApp con el recordatorio...");
-    }
-
-    // Eliminar una reserva individual
-    function deleteOrder(orderId) {
-      if (confirm("¿Seguro que deseas eliminar esta reserva del registro?")) {
-        orders = orders.filter(o => o.id !== orderId);
-        saveOrdersToLocalStorage();
-        renderOrders();
-        showToast("Reserva eliminada");
-      }
-    }
-
-    function clearAllOrders() {
-      if (confirm("¿Atención: Deseas borrar TODOS los pedidos del historial local?")) {
-        orders = [];
-        saveOrdersToLocalStorage();
-        renderOrders();
-        showToast("Historial vaciado por completo");
-      }
-    }
-
-    // 10. PUBLICACIÓN DE RESEÑAS
-    function renderReviews() {
-      const container = document.getElementById('reviews-list');
-      container.innerHTML = reviews.map(r => `
-        <div class="bg-slate-50 p-3 rounded-2xl border border-slate-100 text-xs space-y-1">
-          <div class="flex items-center justify-between font-bold text-slate-800">
-            <span>${r.nombre}</span>
-            <span class="text-[10px] font-normal text-slate-400">${r.fecha}</span>
-          </div>
-          <p class="text-slate-600 italic">"${r.comentario}"</p>
-        </div>
-      `).join('');
-    }
-
-    function submitReview(e) {
-      e.preventDefault();
-      const name = document.getElementById('rev-name').value.trim();
-      const comment = document.getElementById('rev-comment').value.trim();
-
-      if (!name || !comment) return;
-
-      reviews.unshift({
-        nombre: name,
-        comentario: comment,
-        fecha: "Ahora mismo"
-      });
-
-      saveReviewsToLocalStorage();
-      renderReviews();
-
-      document.getElementById('rev-name').value = '';
-      document.getElementById('rev-comment').value = '';
-      showToast("¡Gracias por tu comentario!");
-    }
-
-    // 11. CONSTRUCCIÓN Y ENVÍO DEL PEDIDO A WHATSAPP
-    function sendOrderToWhatsApp() {
-      const customerName = document.getElementById('cli-nombre').value.trim();
-      const phoneClean = document.getElementById('cli-telefono').value.trim();
-      const address = document.getElementById('cli-direccion').value.trim();
-      const notes = document.getElementById('cli-notas').value.trim();
-
-      // 1. Validaciones
-      if (!customerName) {
-        showToast("Por favor ingresa tu nombre completo");
-        document.getElementById('cli-nombre').focus();
-        return;
-      }
-
-      if (!phoneClean || phoneClean.length < 7) {
-        showToast("Ingresa un número de celular o WhatsApp válido");
-        document.getElementById('cli-telefono').focus();
-        return;
-      }
-
-      if (!address) {
-        showToast(deliveryMode === 'delivery' ? "Por favor escribe la dirección de entrega" : "Indica una hora/punto para recoger");
-        document.getElementById('cli-direccion').focus();
-        return;
-      }
-
-      const subtotal = currentQuantity * config.precioPlato;
-      const deliveryFee = (deliveryMode === 'delivery') ? Number(config.costoDomicilio) : 0;
-      const total = subtotal + deliveryFee;
-
-      // Obtener día y fecha de entrega del fin de semana seleccionados
-      const inputFecha = document.getElementById('cli-fecha-entrega');
-      let fechaTexto = selectedWeekendDay;
-      if (inputFecha && inputFecha.value) {
-        const parts = inputFecha.value.split('-');
-        if (parts.length === 3) {
-          const d = new Date(parts[0], parts[1] - 1, parts[2]);
-          const options = { weekday: 'long', day: 'numeric', month: 'long' };
-          let formatted = d.toLocaleDateString('es-CO', options);
-          formatted = formatted.charAt(0).toUpperCase() + formatted.slice(1);
-          fechaTexto = formatted;
-        }
-      }
-
-      // 3. FORMATO DEL MENSAJE DE WHATSAPP: Incluye el número de teléfono del cliente en el registro claro del chat
-      let msg = `*NUEVA RESERVA DE ALMUERZO DE FIN DE SEMANA* 🍽️\n\n`;
-      msg += `👤 *Cliente:* ${customerName}\n`;
-      msg += `📞 *Teléfono:* ${phoneClean}\n`;
-      msg += `📅 *DÍA DE ENTREGA:* ${fechaTexto}\n\n`;
-
-      msg += `🍲 *PEDIDO:* ${currentQuantity} x ${config.nombrePlato}\n`;
-      msg += `💵 *Subtotal:* $${subtotal.toLocaleString('es-CO')}\n\n`;
-
-      if (deliveryMode === 'delivery') {
-        msg += `🛵 *Modalidad:* Envío a Domicilio (+$${deliveryFee.toLocaleString('es-CO')})\n`;
-        msg += `📍 *Dirección de Envío:* ${address}\n\n`;
-      } else {
-        msg += `🏪 *Modalidad:* Recoger en Sitio\n`;
-        msg += `📍 *Nota / Hora de recogida:* ${address}\n\n`;
-      }
-
-      if (notes) {
-        msg += `📝 *Observaciones adicionales:* ${notes}\n\n`;
-      }
-
-      msg += `💰 *TOTAL A PAGAR:* $${total.toLocaleString('es-CO')}\n`;
-      
-      if (uploadedImageBase64) {
-        msg += `📸 *Comprobante de Pago:* (Adjuntado captura de pantalla)\n`;
-      } else {
-        msg += `⚠️ *Estado Pago:* Pendiente por enviar comprobante\n`;
-      }
-
-      msg += `\nQuedo a la espera de la confirmación. ¡Muchas gracias!`;
-
-      // 4. Registrar pedido en el almacenamiento local para el administrador
-      const newOrder = {
-        id: "RES-" + Math.floor(1000 + Math.random() * 9000),
-        fecha: new Date().toLocaleDateString('es-CO') + ' ' + new Date().toLocaleTimeString('es-CO', {hour: '2-digit', minute:'2-digit'}),
-        cliente: customerName,
-        telefono: phoneClean,
-        diaEntrega: fechaTexto,
-        plato: config.nombrePlato,
-        cantidad: currentQuantity,
-        tipoEntrega: deliveryMode === 'delivery' ? 'Domicilio' : 'Recoger en sitio',
-        direccion: address,
-        comprobanteBase64: uploadedImageBase64,
-        estado: 'pendiente',
-        total: total
-      };
-
-      orders.unshift(newOrder);
-      saveOrdersToLocalStorage();
-
-      // Guardar datos del cliente para la próxima vez
-      guardarDatosClienteEnLocal();
-
-      // 5. Redireccionar a WhatsApp
-      let cleanAdminNum = config.numeroWhatsAppAdmin.replace(/\D/g, '');
-      if (!cleanAdminNum.startsWith('57') && cleanAdminNum.length === 10) {
-        cleanAdminNum = '57' + cleanAdminNum;
-      }
-
-      const encodedMsg = encodeURIComponent(msg);
-      const whatsappUrl = `https://api.whatsapp.com/send?phone=${cleanAdminNum}&text=${encodedMsg}`;
-
-      window.open(whatsappUrl, '_blank');
-      showToast("¡Reserva generada! Redirigiendo a WhatsApp...");
-    }
-
-    // 12. SISTEMA DE TOAST
-    function showToast(message) {
-      const toast = document.getElementById('toast');
-      const toastMsg = document.getElementById('toast-msg');
-      toastMsg.innerText = message;
-
-      toast.classList.remove('opacity-0', 'translate-y-10', 'pointer-events-none');
-      toast.classList.add('opacity-100', 'translate-y-0');
-
-      setTimeout(() => {
-        toast.classList.remove('opacity-100', 'translate-y-0');
-        toast.classList.add('opacity-0', 'translate-y-10', 'pointer-events-none');
-      }, 3500);
-    }
-  </script>
+  <!-- Scripts de la Aplicación -->
+  <script src="app.js"></script>
 </body>
 </html>
