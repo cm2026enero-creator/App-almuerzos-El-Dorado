@@ -35,10 +35,6 @@ document.addEventListener("DOMContentLoaded", () => {
   startRealtimeOrdersListener();
   loadMenuData();
   setupEventListeners();
-
-  if (window.lucide) {
-    window.lucide.createIcons();
-  }
 });
 
 function checkAdminSession() {
@@ -58,7 +54,6 @@ function showLogin() {
 function showDashboard() {
   document.getElementById("admin-login-section")?.classList.add("hidden");
   document.getElementById("admin-dashboard-section")?.classList.remove("hidden");
-  if (window.lucide) window.lucide.createIcons();
 }
 
 window.handleAdminLogin = async function(e) {
@@ -205,68 +200,62 @@ function renderOrders() {
 
   if (filtered.length === 0) {
     container.innerHTML = `
-      <div class="bg-white rounded-2xl border border-slate-200 p-8 text-center text-xs text-slate-400">
-        <i data-lucide="inbox" class="w-10 h-10 mx-auto mb-2 text-slate-300"></i>
-        <p class="font-bold text-slate-600">No hay pedidos con este filtro</p>
-        <p class="text-slate-400 mt-0.5">Los nuevos pedidos recibidos se mostrarán aquí al instante.</p>
+      <div style="background:white; border-radius:14px; border:1px solid #e2e8f0; padding:24px; text-align:center; color:#64748b; font-size:12px;">
+        <div style="font-size:24px; margin-bottom:6px;">📭</div>
+        <strong>No hay pedidos con este filtro</strong>
+        <p style="color:#94a3b8; margin-top:2px;">Los nuevos pedidos recibidos se mostrarán aquí en tiempo real.</p>
       </div>
     `;
-    if (window.lucide) window.lucide.createIcons();
     return;
   }
 
   container.innerHTML = filtered.map(order => `
-    <div class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-sm space-y-3">
-      <div class="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-slate-100">
-        <div class="flex items-center gap-2">
-          <span class="font-mono font-black text-sm text-slate-900">${order.id}</span>
-          <span class="badge-status badge-${order.estado}">${order.estado.toUpperCase()}</span>
+    <div class="order-item">
+      <div class="order-top">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span class="order-id">${order.id}</span>
+          <span class="badge badge-${order.estado}">${order.estado.toUpperCase()}</span>
         </div>
-        <div class="text-right">
-          <span class="text-xs text-slate-400 block">${formatTime(order.timestamp)}</span>
-          <span class="text-sm font-black text-orange-600">${formatCurrency(order.total)}</span>
+        <div style="text-align:right;">
+          <span style="font-size:11px; color:#94a3b8; display:block;">${formatTime(order.timestamp)}</span>
+          <span style="font-size:15px; font-weight:900; color:#ea580c;">${formatCurrency(order.total)}</span>
         </div>
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+      <div class="order-grid">
         <div>
-          <span class="text-slate-400 font-bold block text-[10px]">CLIENTE:</span>
-          <p class="font-bold text-slate-900 text-sm">${order.cliente}</p>
-          <a href="https://wa.me/${(order.telefono || '').replace(/\D/g,'')}?text=Hola%20${encodeURIComponent(order.cliente)},%20te%20escribimos%20de%20Sazón%20Lau%20sobre%20tu%20reserva%20${order.id}" target="_blank" class="inline-flex items-center gap-1 text-emerald-600 font-extrabold hover:underline mt-0.5">
-            <i data-lucide="phone" class="w-3 h-3"></i>
-            <span>${order.telefono} (WhatsApp)</span>
+          <span class="order-label">Cliente:</span>
+          <div class="order-customer">${order.cliente}</div>
+          <a href="https://wa.me/${(order.telefono || '').replace(/\D/g,'')}?text=Hola%20${encodeURIComponent(order.cliente)},%20te%20escribimos%20de%20Sazón%20Lau%20sobre%20tu%20reserva%20${order.id}" target="_blank" class="wsp-link">
+            💬 ${order.telefono} (WhatsApp)
           </a>
         </div>
         <div>
-          <span class="text-slate-400 font-bold block text-[10px]">PEDIDO:</span>
-          <p class="font-extrabold text-slate-900">${order.cantidad}x ${order.plato}</p>
-          <span class="text-slate-500 font-medium">Horario: <strong>${order.diaEntrega}</strong></span>
+          <span class="order-label">Plato y Horario:</span>
+          <div style="font-weight:800; color:#0f172a;">${order.cantidad}x ${order.plato}</div>
+          <div style="font-size:11px; color:#475569;">${order.diaEntrega}</div>
         </div>
       </div>
 
-      <div class="bg-slate-50 p-3 rounded-xl text-xs space-y-1 border border-slate-100">
-        <p class="text-slate-700"><strong>${order.tipoEntrega}:</strong> ${order.direccion}</p>
-        ${order.notas ? `<p class="text-slate-600 italic">"${order.notas}"</p>` : ''}
-        <div class="flex justify-between text-[11px] text-slate-500 pt-1 border-t border-slate-200">
+      <div class="order-detail-box">
+        <div><strong>${order.tipoEntrega}:</strong> ${order.direccion}</div>
+        ${order.notas && order.notas !== 'Sin notas' ? `<div style="color:#64748b; font-style:italic; margin-top:2px;">"${order.notas}"</div>` : ''}
+        <div style="display:flex; justify-content:space-between; font-size:10px; color:#64748b; margin-top:4px; padding-top:4px; border-top:1px solid #e2e8f0;">
           <span>Pago: <strong>${order.metodoPago}</strong></span>
           <span>Envío: <strong>${formatCurrency(order.costoEnvio)}</strong></span>
         </div>
       </div>
 
-      <div class="pt-1 flex flex-wrap items-center justify-between gap-2">
-        <span class="text-[11px] font-bold text-slate-500">Cambiar estado:</span>
-        <div class="flex flex-wrap gap-1">
-          <button onclick="updateOrderStatus('${order.id}', 'pendiente')" class="px-2.5 py-1 rounded-lg text-[10px] font-bold ${order.estado === 'pendiente' ? 'bg-amber-500 text-white' : 'bg-slate-100 text-slate-600 hover:bg-amber-100'}">Pendiente</button>
-          <button onclick="updateOrderStatus('${order.id}', 'preparacion')" class="px-2.5 py-1 rounded-lg text-[10px] font-bold ${order.estado === 'preparacion' ? 'bg-sky-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-sky-100'}">Preparación</button>
-          <button onclick="updateOrderStatus('${order.id}', 'camino')" class="px-2.5 py-1 rounded-lg text-[10px] font-bold ${order.estado === 'camino' ? 'bg-purple-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-purple-100'}">En Camino</button>
-          <button onclick="updateOrderStatus('${order.id}', 'entregado')" class="px-2.5 py-1 rounded-lg text-[10px] font-bold ${order.estado === 'entregado' ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-emerald-100'}">Entregado</button>
-          <button onclick="updateOrderStatus('${order.id}', 'cancelado')" class="px-2.5 py-1 rounded-lg text-[10px] font-bold ${order.estado === 'cancelado' ? 'bg-rose-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-rose-100'}">Cancelado</button>
-        </div>
+      <div class="status-actions">
+        <span style="font-size:11px; font-weight:800; color:#64748b; margin-right:4px;">Cambiar estado:</span>
+        <button onclick="updateOrderStatus('${order.id}', 'pendiente')" class="status-btn ${order.estado === 'pendiente' ? 'current' : ''}">Pendiente</button>
+        <button onclick="updateOrderStatus('${order.id}', 'preparacion')" class="status-btn ${order.estado === 'preparacion' ? 'current' : ''}">Preparación</button>
+        <button onclick="updateOrderStatus('${order.id}', 'camino')" class="status-btn ${order.estado === 'camino' ? 'current' : ''}">En Camino</button>
+        <button onclick="updateOrderStatus('${order.id}', 'entregado')" class="status-btn ${order.estado === 'entregado' ? 'current' : ''}">Entregado</button>
+        <button onclick="updateOrderStatus('${order.id}', 'cancelado')" class="status-btn ${order.estado === 'cancelado' ? 'current' : ''}">Cancelado</button>
       </div>
     </div>
   `).join("");
-
-  if (window.lucide) window.lucide.createIcons();
 }
 
 window.updateOrderStatus = async function(orderId, newStatus) {
@@ -293,10 +282,15 @@ function updateDashboardStats() {
   const prep = ordersList.filter(o => o.estado === "preparacion" || o.estado === "camino").length;
   const rev = ordersList.filter(o => o.estado !== "cancelado").reduce((acc, c) => acc + (Number(c.total) || 0), 0);
 
-  document.getElementById("stat-total-orders").textContent = total;
-  document.getElementById("stat-pending-orders").textContent = pending;
-  document.getElementById("stat-prep-orders").textContent = prep;
-  document.getElementById("stat-total-revenue").textContent = formatCurrency(rev);
+  const elTotal = document.getElementById("stat-total-orders");
+  const elPending = document.getElementById("stat-pending-orders");
+  const elPrep = document.getElementById("stat-prep-orders");
+  const elRev = document.getElementById("stat-total-revenue");
+
+  if (elTotal) elTotal.textContent = total;
+  if (elPending) elPending.textContent = pending;
+  if (elPrep) elPrep.textContent = prep;
+  if (elRev) elRev.textContent = formatCurrency(rev);
 }
 
 function loadMenuData() {
@@ -369,14 +363,10 @@ window.exportOrdersToCSV = function() {
 };
 
 function setupEventListeners() {
-  document.querySelectorAll(".filter-status-btn").forEach(btn => {
+  document.querySelectorAll(".filter-btn").forEach(btn => {
     btn.addEventListener("click", () => {
-      document.querySelectorAll(".filter-status-btn").forEach(b => {
-        b.classList.remove("bg-orange-600", "text-white");
-        b.classList.add("bg-slate-100", "text-slate-700");
-      });
-      btn.classList.add("bg-orange-600", "text-white");
-      btn.classList.remove("bg-slate-100", "text-slate-700");
+      document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
       activeFilterStatus = btn.dataset.status;
       renderOrders();
     });

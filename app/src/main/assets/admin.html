@@ -3,70 +3,434 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  
+  <!-- Directivas Anti-Caché para Móviles -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+
   <title>Panel de Administración - Sazón Lau</title>
   
-  <!-- Google Fonts -->
+  <!-- Tipografía -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            brand: {
-              50: '#fff7ed',
-              100: '#ffedd5',
-              200: '#fed7aa',
-              500: '#f97316',
-              600: '#ea580c',
-              700: '#c2410c',
-            }
-          }
-        }
-      }
-    }
-  </script>
-
-  <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
-
-  <!-- Estilos Embebidos (Resilientes a GitHub Pages) -->
+  <!-- =====================================================================
+       CSS NATIVO PURO Y AUTOCONTENIDO (Cero dependencias de CDNs externos)
+       ===================================================================== -->
   <style>
-    :root {
-      --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      --font-serif: 'Playfair Display', Georgia, serif;
-    }
-    * { box-sizing: border-box; }
-    body {
-      font-family: var(--font-sans);
-      background-color: #f1f5f9;
-      color: #1e293b;
+    *, *::before, *::after {
+      box-sizing: border-box !important;
       margin: 0;
       padding: 0;
-      -webkit-font-smoothing: antialiased;
+      -webkit-tap-highlight-color: transparent;
     }
-    .font-serif { font-family: var(--font-serif); }
-    img { max-width: 100%; height: auto; }
-    
-    .badge-status {
-      display: inline-flex;
+
+    :root {
+      --brand: #ea580c;
+      --brand-hover: #c2410c;
+      --brand-light: #fff7ed;
+      --bg: #f1f5f9;
+      --card-bg: #ffffff;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --border: #cbd5e1;
+      --border-light: #e2e8f0;
+      --radius: 16px;
+      --radius-sm: 10px;
+      --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      --font-serif: 'Playfair Display', Georgia, serif;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.4;
+      padding-bottom: 60px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 14px;
+    }
+
+    /* HEADER */
+    .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background-color: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border-light);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    }
+    .header-content {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 10px 14px;
+      display: flex;
       align-items: center;
-      padding: 0.25rem 0.65rem;
-      border-radius: 9999px;
-      font-size: 0.72rem;
+      justify-content: space-between;
+    }
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .brand-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #ea580c, #f59e0b);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      box-shadow: 0 4px 10px rgba(234, 88, 12, 0.25);
+    }
+    .brand-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: #0f172a;
+      line-height: 1.1;
+    }
+    .brand-status {
+      font-size: 11px;
+      font-weight: 700;
+      color: #16a34a;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      background: #16a34a;
+      border-radius: 50%;
+    }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-action-nav {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 6px 10px;
+      border-radius: 8px;
+      text-decoration: none;
+      border: 1px solid var(--border);
+      background: white;
+      color: #334155;
+      cursor: pointer;
+    }
+    .btn-logout {
+      background: #fee2e2;
+      color: #b91c1c;
+      border-color: #fca5a5;
+    }
+
+    /* LOGIN SCREEN */
+    .login-wrapper {
+      min-height: 85vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .login-card {
+      background: white;
+      width: 100%;
+      max-width: 400px;
+      border-radius: 20px;
+      padding: 24px;
+      border: 1px solid var(--border-light);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+      text-align: center;
+    }
+    .login-logo {
+      width: 52px;
+      height: 52px;
+      background: linear-gradient(135deg, #ea580c, #f59e0b);
+      color: white;
+      font-size: 24px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 12px;
+      box-shadow: 0 4px 12px rgba(234, 88, 12, 0.3);
+    }
+    .login-title {
+      font-family: var(--font-serif);
+      font-size: 22px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+    .login-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+
+    /* STATS METRICS */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    @media (min-width: 600px) {
+      .metrics-grid {
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+      }
+    }
+    .metric-card {
+      background: white;
+      border-radius: var(--radius);
+      padding: 14px;
+      border: 1px solid var(--border-light);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+    }
+    .metric-card.highlight-amber {
+      background: #fffbeb;
+      border-color: #fde68a;
+    }
+    .metric-card.highlight-sky {
+      background: #f0f9ff;
+      border-color: #bae6fd;
+    }
+    .metric-card.highlight-green {
+      background: #f0fdf4;
+      border-color: #bbf7d0;
+    }
+    .metric-label {
+      font-size: 10px;
       font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.03em;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+      display: block;
     }
-    .badge-pendiente { background-color: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
-    .badge-preparacion { background-color: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
-    .badge-camino { background-color: #f3e8ff; color: #7e22ce; border: 1px solid #e9d5ff; }
-    .badge-entregado { background-color: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
-    .badge-cancelado { background-color: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
+    .metric-value {
+      font-size: 20px;
+      font-weight: 900;
+      color: #0f172a;
+      margin-top: 2px;
+    }
+
+    /* CARDS */
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 16px;
+      border: 1px solid var(--border-light);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+      margin-bottom: 16px;
+    }
+    .card-header-flex {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    .card-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* SEARCH & FILTERS */
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .filter-btn {
+      background: #f1f5f9;
+      color: #475569;
+      border: 1px solid var(--border-light);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .filter-btn.active {
+      background: var(--brand);
+      color: white;
+      border-color: var(--brand);
+    }
+
+    /* PEDIDOS LIST */
+    .order-item {
+      background: white;
+      border: 1px solid var(--border-light);
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+    .order-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #f1f5f9;
+      margin-bottom: 8px;
+    }
+    .order-id {
+      font-family: monospace;
+      font-size: 14px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+    .badge-pendiente { background: #fef3c7; color: #b45309; }
+    .badge-preparacion { background: #e0f2fe; color: #0369a1; }
+    .badge-camino { background: #f3e8ff; color: #7e22ce; }
+    .badge-entregado { background: #dcfce7; color: #15803d; }
+    .badge-cancelado { background: #fee2e2; color: #b91c1c; }
+
+    .order-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      font-size: 12px;
+      margin-bottom: 8px;
+    }
+    .order-label {
+      font-size: 9px;
+      font-weight: 800;
+      color: #94a3b8;
+      text-transform: uppercase;
+      display: block;
+    }
+    .order-customer {
+      font-size: 13px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+    .wsp-link {
+      color: #16a34a;
+      font-weight: 800;
+      text-decoration: none;
+      font-size: 11px;
+      display: inline-block;
+      margin-top: 2px;
+    }
+    .order-detail-box {
+      background: #f8fafc;
+      border: 1px solid #f1f5f9;
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-size: 11px;
+      color: #334155;
+      margin-bottom: 8px;
+    }
+
+    .status-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 4px;
+      padding-top: 6px;
+      border-top: 1px solid #f1f5f9;
+    }
+    .status-btn {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 6px;
+      border: 1px solid #e2e8f0;
+      background: #f8fafc;
+      color: #475569;
+      cursor: pointer;
+    }
+    .status-btn.current {
+      background: #0f172a;
+      color: white;
+      border-color: #0f172a;
+    }
+
+    /* FORMS & INPUTS */
+    .form-group {
+      margin-bottom: 10px;
+      text-align: left;
+    }
+    .form-label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      color: #475569;
+      margin-bottom: 4px;
+    }
+    .input-text, .textarea-box {
+      width: 100%;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: white;
+      color: #0f172a;
+      outline: none;
+    }
+    .input-text:focus, .textarea-box:focus {
+      border-color: var(--brand);
+      box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.12);
+    }
+    .btn-primary {
+      width: 100%;
+      background: var(--brand);
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(234, 88, 12, 0.25);
+    }
+    .btn-secondary {
+      background: #f1f5f9;
+      color: #334155;
+      border: 1px solid var(--border);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .hidden { display: none !important; }
   </style>
 
   <!-- Firebase Compat SDKs -->
@@ -75,189 +439,147 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="firebase-config.js"></script>
 </head>
-<body class="bg-slate-100 min-h-screen text-slate-800 antialiased selection:bg-orange-500 selection:text-white pb-20">
+<body>
 
-  <!-- SECCIÓN 1: LOGIN DE SEGURIDAD -->
-  <section id="admin-login-section" class="min-h-screen flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-xl border border-slate-200 space-y-6">
-      
-      <div class="text-center space-y-2">
-        <div class="w-14 h-14 rounded-2xl bg-orange-600 text-white flex items-center justify-center mx-auto shadow-lg shadow-orange-600/25">
-          <i data-lucide="shield-check" class="w-7 h-7"></i>
-        </div>
-        <h2 class="text-2xl font-black text-slate-900 font-serif">Sazón Lau</h2>
-        <p class="text-xs text-slate-500 font-medium">Panel Administrativo de Almuerzos</p>
-      </div>
+  <!-- ==================== 1. PANTALLA DE LOGIN ==================== -->
+  <section id="admin-login-section" class="login-wrapper">
+    <div class="login-card">
+      <div class="login-logo">🔒</div>
+      <h1 class="login-title">Sazón Lau</h1>
+      <p class="login-sub">Panel Administrativo de Almuerzos</p>
 
-      <div id="login-error" class="hidden bg-rose-50 border border-rose-200 text-rose-700 text-xs p-3 rounded-xl font-semibold"></div>
+      <div id="login-error" class="hidden" style="background:#fee2e2; color:#b91c1c; padding:8px; border-radius:8px; font-size:12px; font-weight:700; margin-bottom:12px;"></div>
 
-      <form onsubmit="handleAdminLogin(event)" class="space-y-4">
-        <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">Correo Electrónico Administrador</label>
-          <input type="email" id="admin-email" value="admin@sazonlau.com" required placeholder="admin@sazonlau.com" class="w-full text-xs p-3 rounded-xl border border-slate-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none font-semibold transition">
+      <form onsubmit="handleAdminLogin(event)">
+        <div class="form-group">
+          <label class="form-label">Correo Electrónico Administrador</label>
+          <input type="email" id="admin-email" value="admin@sazonlau.com" required placeholder="admin@sazonlau.com" class="input-text">
         </div>
 
-        <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">Contraseña</label>
-          <input type="password" id="admin-password" value="admin123" required placeholder="••••••••" class="w-full text-xs p-3 rounded-xl border border-slate-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none font-semibold transition">
+        <div class="form-group">
+          <label class="form-label">Contraseña</label>
+          <input type="password" id="admin-password" value="admin123" required placeholder="••••••••" class="input-text">
         </div>
 
-        <button type="submit" class="w-full py-3.5 rounded-xl bg-orange-600 hover:bg-orange-700 active:scale-[0.99] text-white font-extrabold text-xs shadow-lg shadow-orange-600/25 transition cursor-pointer">
+        <button type="submit" class="btn-primary" style="margin-top: 6px;">
           Ingresar al Panel
         </button>
       </form>
 
-      <div class="text-center pt-2">
-        <a href="index.html" class="inline-flex items-center gap-1 text-xs text-slate-500 hover:text-orange-600 font-bold transition">
-          <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
-          <span>Volver al Menú de Clientes</span>
-        </a>
+      <div style="margin-top: 16px;">
+        <a href="index.html" class="btn-secondary">← Volver al Menú de Clientes</a>
       </div>
     </div>
   </section>
 
-  <!-- SECCIÓN 2: DASHBOARD EN TIEMPO REAL -->
+  <!-- ==================== 2. DASHBOARD ADMINISTRATIVO ==================== -->
   <section id="admin-dashboard-section" class="hidden">
     
-    <!-- Barra Superior -->
-    <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
-      <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-2xl bg-orange-600 flex items-center justify-center text-white shadow-md shadow-orange-600/20">
-            <i data-lucide="utensils" class="w-5 h-5"></i>
-          </div>
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-content">
+        <div class="brand-group">
+          <div class="brand-icon">🍲</div>
           <div>
-            <h1 class="font-extrabold text-sm text-slate-900 leading-tight">Sazón Lau - Admin</h1>
-            <div class="flex items-center gap-1.5 text-[11px] text-emerald-600 font-bold">
-              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              <span>Firebase Realtime Database Activo</span>
+            <div class="brand-title">Sazón Lau - Admin</div>
+            <div class="brand-status">
+              <span class="status-dot"></span>
+              <span>Firebase RTDB Conectado</span>
             </div>
           </div>
         </div>
 
-        <div class="flex items-center gap-2">
-          <a href="index.html" target="_blank" class="hidden sm:inline-flex items-center gap-1 text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-xl border border-slate-200 transition">
-            <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
-            <span>Ver Menú Cliente</span>
-          </a>
-          <button onclick="handleAdminLogout()" class="text-xs font-bold bg-rose-50 hover:bg-rose-100 text-rose-700 px-3 py-1.5 rounded-xl border border-rose-200 transition cursor-pointer">
-            Cerrar Sesión
-          </button>
+        <div class="header-actions">
+          <a href="index.html" target="_blank" class="btn-action-nav">👁️ Menú Cliente</a>
+          <button onclick="handleAdminLogout()" class="btn-action-nav btn-logout">Salir</button>
         </div>
       </div>
     </header>
 
-    <main class="max-w-6xl mx-auto px-4 pt-6 space-y-6">
-
-      <!-- Métricas Clave -->
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
-        <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm">
-          <span class="text-[11px] font-bold text-slate-400 block uppercase tracking-wider">Total Reservas</span>
-          <span id="stat-total-orders" class="text-2xl font-black text-slate-900">0</span>
+    <main class="container">
+      
+      <!-- Métricas -->
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <span class="metric-label">Total Reservas</span>
+          <div id="stat-total-orders" class="metric-value">0</div>
         </div>
-
-        <div class="bg-white rounded-2xl p-4 border border-amber-200 bg-amber-50/40 shadow-sm">
-          <span class="text-[11px] font-bold text-amber-700 block uppercase tracking-wider">Pendientes</span>
-          <span id="stat-pending-orders" class="text-2xl font-black text-amber-600">0</span>
+        <div class="metric-card highlight-amber">
+          <span class="metric-label" style="color: #b45309;">Pendientes</span>
+          <div id="stat-pending-orders" class="metric-value" style="color: #b45309;">0</div>
         </div>
-
-        <div class="bg-white rounded-2xl p-4 border border-sky-200 bg-sky-50/40 shadow-sm">
-          <span class="text-[11px] font-bold text-sky-700 block uppercase tracking-wider">En Preparación</span>
-          <span id="stat-prep-orders" class="text-2xl font-black text-sky-600">0</span>
+        <div class="metric-card highlight-sky">
+          <span class="metric-label" style="color: #0369a1;">En Preparación</span>
+          <div id="stat-prep-orders" class="metric-value" style="color: #0369a1;">0</div>
         </div>
-
-        <div class="bg-white rounded-2xl p-4 border border-emerald-200 bg-emerald-50/40 shadow-sm">
-          <span class="text-[11px] font-bold text-emerald-700 block uppercase tracking-wider">Ventas Estimadas</span>
-          <span id="stat-total-revenue" class="text-xl font-black text-emerald-600">$0</span>
+        <div class="metric-card highlight-green">
+          <span class="metric-label" style="color: #15803d;">Ventas Estimadas</span>
+          <div id="stat-total-revenue" class="metric-value" style="color: #15803d;">$0</div>
         </div>
       </div>
 
-      <!-- Contenedor Principal: Lista de Pedidos + Gestor de Menú -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Gestor de Menú en Vivo (Formulario Compacto) -->
+      <div class="card">
+        <div class="card-header-flex">
+          <h2 class="card-title">🍲 Gestor del Menú en Vivo</h2>
+          <button onclick="saveMenuConfig()" class="btn-secondary" style="background:#ea580c; color:white; border-color:#ea580c;">
+            💾 Guardar en Firebase
+          </button>
+        </div>
 
-        <!-- Columna de Pedidos (2/3) -->
-        <div class="lg:col-span-2 space-y-4">
-          
-          <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm space-y-3">
-            <div class="flex flex-wrap items-center justify-between gap-2">
-              <h3 class="font-extrabold text-sm text-slate-900 flex items-center gap-2">
-                <i data-lucide="bell" class="w-4 h-4 text-orange-600"></i>
-                <span>Recepción de Pedidos (/pedidos)</span>
-              </h3>
-              <button onclick="exportOrdersToCSV()" class="inline-flex items-center gap-1 text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-xl border border-slate-200 transition cursor-pointer">
-                <i data-lucide="download" class="w-3.5 h-3.5"></i>
-                <span>Exportar CSV</span>
-              </button>
-            </div>
-
-            <!-- Buscador y Filtros -->
-            <div class="space-y-2">
-              <input type="text" id="admin-search-input" placeholder="Buscar por cliente, teléfono o plato..." class="w-full text-xs p-2.5 rounded-xl border border-slate-200 focus:border-orange-500 outline-none">
-              
-              <div class="flex flex-wrap gap-1.5 pt-1">
-                <button class="filter-status-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-orange-600 text-white transition cursor-pointer" data-status="todos">Todos</button>
-                <button class="filter-status-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 transition cursor-pointer" data-status="pendiente">Pendientes</button>
-                <button class="filter-status-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 transition cursor-pointer" data-status="preparacion">En Prep.</button>
-                <button class="filter-status-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 transition cursor-pointer" data-status="camino">En Camino</button>
-                <button class="filter-status-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 transition cursor-pointer" data-status="entregado">Entregados</button>
-              </div>
-            </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">Nombre del Plato Destacado</label>
+            <input type="text" id="adm-plato-nombre" class="input-text">
           </div>
-
-          <!-- Lista de Pedidos -->
-          <div id="admin-orders-list" class="space-y-3">
-            <!-- Pedidos renderizados en tiempo real mediante admin.js -->
+          <div class="form-group">
+            <label class="form-label">Precio ($)</label>
+            <input type="number" id="adm-plato-precio" class="input-text">
           </div>
         </div>
 
-        <!-- Columna de Configuración de Menú (1/3) -->
-        <div class="space-y-4">
-          <div class="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm space-y-4 sticky top-20">
-            <div class="flex items-center gap-2 pb-2 border-b border-slate-100">
-              <div class="w-8 h-8 rounded-xl bg-orange-100 text-orange-700 flex items-center justify-center font-black">
-                <i data-lucide="edit-3" class="w-4 h-4"></i>
-              </div>
-              <div>
-                <h3 class="font-extrabold text-sm text-slate-900">Gestor de Menú en Vivo</h3>
-                <p class="text-[11px] text-slate-500">Actualiza platos y precios al instante</p>
-              </div>
-            </div>
-
-            <div class="space-y-3">
-              <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Nombre del Plato Destacado</label>
-                <input type="text" id="adm-plato-nombre" class="w-full text-xs p-2.5 rounded-xl border border-slate-200 font-bold focus:border-orange-500 outline-none">
-              </div>
-
-              <div class="grid grid-cols-2 gap-2">
-                <div>
-                  <label class="block text-xs font-bold text-slate-700 mb-1">Precio Plato ($)</label>
-                  <input type="number" id="adm-plato-precio" class="w-full text-xs p-2.5 rounded-xl border border-slate-200 focus:border-orange-500 outline-none font-bold">
-                </div>
-                <div>
-                  <label class="block text-xs font-bold text-slate-700 mb-1">Domicilio ($)</label>
-                  <input type="number" id="adm-domicilio-precio" class="w-full text-xs p-2.5 rounded-xl border border-slate-200 focus:border-orange-500 outline-none font-bold">
-                </div>
-              </div>
-
-              <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">URL de Imagen del Plato</label>
-                <input type="url" id="adm-plato-imagen" class="w-full text-xs p-2.5 rounded-xl border border-slate-200 focus:border-orange-500 outline-none">
-              </div>
-
-              <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Descripción de Preparación</label>
-                <textarea id="adm-plato-desc" rows="3" class="w-full text-xs p-2.5 rounded-xl border border-slate-200 focus:border-orange-500 outline-none text-slate-700"></textarea>
-              </div>
-
-              <button onclick="saveMenuConfig()" class="w-full py-3 px-4 rounded-xl bg-orange-600 hover:bg-orange-700 text-white font-extrabold text-xs shadow-md shadow-orange-600/20 transition cursor-pointer flex items-center justify-center gap-2">
-                <i data-lucide="save" class="w-4 h-4"></i>
-                <span>Guardar Cambios en Firebase</span>
-              </button>
-            </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">Costo Domicilio ($)</label>
+            <input type="number" id="adm-domicilio-precio" class="input-text">
+          </div>
+          <div class="form-group">
+            <label class="form-label">URL Imagen</label>
+            <input type="url" id="adm-plato-imagen" class="input-text">
           </div>
         </div>
 
+        <div class="form-group">
+          <label class="form-label">Descripción</label>
+          <textarea id="adm-plato-desc" rows="2" class="textarea-box"></textarea>
+        </div>
+      </div>
+
+      <!-- Recepción de Pedidos -->
+      <div class="card">
+        <div class="card-header-flex">
+          <h2 class="card-title">🔔 Pedidos Recibidos (/pedidos)</h2>
+          <button onclick="exportOrdersToCSV()" class="btn-secondary">📥 Exportar CSV</button>
+        </div>
+
+        <!-- Buscador -->
+        <div class="form-group">
+          <input type="text" id="admin-search-input" placeholder="Buscar por cliente, teléfono o plato..." class="input-text">
+        </div>
+
+        <!-- Filtros -->
+        <div class="filter-bar">
+          <button class="filter-btn active" data-status="todos">Todos</button>
+          <button class="filter-btn" data-status="pendiente">Pendientes</button>
+          <button class="filter-btn" data-status="preparacion">En Prep.</button>
+          <button class="filter-btn" data-status="camino">En Camino</button>
+          <button class="filter-btn" data-status="entregado">Entregados</button>
+        </div>
+      </div>
+
+      <!-- Lista de Pedidos en Vivo -->
+      <div id="admin-orders-list">
+        <!-- Renderizado dinámico desde admin.js -->
       </div>
 
     </main>
