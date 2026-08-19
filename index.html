@@ -449,16 +449,17 @@
         </div>
 
         <div class="relative rounded-2xl overflow-hidden aspect-video mb-3.5 bg-slate-100 shadow-inner group">
-          <!-- Imagen del plato principal -->
+          <!-- Imagen del plato principal con protección de fallback -->
           <img id="dish-image" 
-               src="https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80" 
+               src="https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=800&q=80" 
                alt="Plato del Fin de Semana" 
+               onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=800&q=80';"
                class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
           
           <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent flex items-end p-4">
             <div class="text-white">
               <p class="text-[10px] font-bold tracking-widest uppercase text-amber-300">Sabor Casero Tradicional</p>
-              <h2 id="dish-name" class="text-xl font-extrabold leading-tight drop-shadow-sm">Arroz con Pato Criollo</h2>
+              <h2 id="dish-name" class="text-xl font-extrabold leading-tight drop-shadow-sm">Pollo con Yuca y Plátano</h2>
             </div>
           </div>
         </div>
@@ -742,87 +743,127 @@
 
       <!-- CONFIGURACIÓN DEL PLATO Y CUENTAS -->
       <section class="bg-white rounded-3xl p-5 shadow-sm border border-slate-200 space-y-4">
-        <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2 pb-2 border-b border-slate-100">
-          <i data-lucide="edit-3" class="w-4 h-4 text-brand-600"></i>
-          <span>Editar Menú del Fin de Semana</span>
-        </h3>
+        <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+          <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+            <i data-lucide="edit-3" class="w-4 h-4 text-brand-600"></i>
+            <span>Editar Menú del Fin de Semana</span>
+          </h3>
+          <span class="text-[10px] bg-brand-50 text-brand-700 font-extrabold px-2 py-0.5 rounded-full border border-brand-100">
+            Sincronización en vivo
+          </span>
+        </div>
 
         <div>
           <label class="block text-xs font-bold text-slate-700 mb-1">Nombre del Plato Especial</label>
-          <input type="text" id="adm-plato-nombre" class="w-full text-xs p-3 rounded-xl border border-slate-200 outline-none font-semibold">
+          <input type="text" id="adm-plato-nombre" placeholder="Ej. Pollo con Yuca y Plátano" class="w-full text-xs p-3 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none font-bold text-slate-900">
         </div>
 
-        <!-- Foto del Plato con Selector Directo de Galería/Cámara -->
-        <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1.5">Foto del Plato Especial</label>
+        <!-- Foto del Plato con Selector Directo de Galería/Cámara y URL -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between">
+            <label class="block text-xs font-bold text-slate-700">Foto del Plato Especial</label>
+            <span id="adm-photo-type-badge" class="text-[10px] text-slate-400 font-semibold">Foto por defecto</span>
+          </div>
           
-          <div class="space-y-2 mb-2">
-            <!-- Vista Previa de la Imagen Actual -->
-            <div class="relative rounded-2xl overflow-hidden aspect-video bg-slate-100 border border-slate-200 shadow-inner group">
-              <img id="adm-dish-preview-img" src="" alt="Vista previa del plato" class="w-full h-full object-cover">
-              <div class="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center pointer-events-none">
-                <span class="bg-white/95 text-slate-800 text-xs font-bold px-3 py-1.5 rounded-xl shadow-md">Vista Previa Actual</span>
-              </div>
-            </div>
-
-            <!-- Input Oculto de Archivos -->
-            <input type="file" id="adm-plato-file" accept="image/*" class="hidden" onchange="handleAdminDishImageUpload(event)">
+          <!-- Vista Previa de la Imagen Actual -->
+          <div class="relative rounded-2xl overflow-hidden aspect-video bg-slate-100 border border-slate-200 shadow-inner group">
+            <img id="adm-dish-preview-img" 
+                 src="https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=800&q=80" 
+                 alt="Vista previa del plato" 
+                 onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=800&q=80';"
+                 class="w-full h-full object-cover">
             
-            <!-- Botón interactivo para elegir imagen desde cel/PC -->
-            <button type="button" onclick="document.getElementById('adm-plato-file').click()" class="w-full py-3 px-4 rounded-xl border-2 border-dashed border-brand-300 bg-brand-50/60 hover:bg-brand-100 text-brand-700 font-extrabold text-xs flex items-center justify-center gap-2 transition shadow-sm cursor-pointer">
-              <i data-lucide="image-plus" class="w-4.5 h-4.5 text-brand-600"></i>
-              <span>Cargar Foto desde Galería o Cámara</span>
+            <div class="absolute bottom-2 left-2 right-2 flex items-center justify-between pointer-events-none">
+              <span class="bg-slate-900/80 backdrop-blur-sm text-white text-[10px] font-bold px-2.5 py-1 rounded-lg">
+                Vista Previa del Menú
+              </span>
+            </div>
+          </div>
+
+          <!-- Input Oculto de Archivos -->
+          <input type="file" id="adm-plato-file" accept="image/*" class="hidden" onchange="handleAdminDishImageUpload(event)">
+          
+          <!-- Botones de Acción de Imagen -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <button type="button" onclick="document.getElementById('adm-plato-file').click()" class="py-2.5 px-3 rounded-xl border-2 border-dashed border-brand-300 bg-brand-50 hover:bg-brand-100 text-brand-700 font-extrabold text-xs flex items-center justify-center gap-2 transition shadow-sm cursor-pointer">
+              <i data-lucide="image-plus" class="w-4 h-4 text-brand-600"></i>
+              <span>Cargar de Galería / Cámara</span>
+            </button>
+            <button type="button" onclick="resetAdminDishImage()" id="btn-reset-dish-img" class="py-2.5 px-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-xs flex items-center justify-center gap-2 transition cursor-pointer">
+              <i data-lucide="rotate-ccw" class="w-3.5 h-3.5 text-slate-500"></i>
+              <span>Restaurar Foto Sugerida</span>
             </button>
           </div>
 
-          <!-- Fotos Predeterminadas Rápida Selección (Pollo con Yuca, Empanadas, Sancocho, etc.) -->
-          <div class="mt-2.5 space-y-1.5">
-            <span class="block text-[11px] font-bold text-slate-600">O elige un plato del menú con foto y características sugeridas (1 clic):</span>
-            <div class="grid grid-cols-3 sm:grid-cols-5 gap-1.5">
+          <!-- Fotos Predeterminadas Rápida Selección (6 Platos Típicos Populares) -->
+          <div class="mt-2 space-y-1.5 pt-1 border-t border-slate-100">
+            <span class="block text-[11px] font-bold text-slate-600">O elige un plato típico con foto y reseña lista (1 clic):</span>
+            <div class="grid grid-cols-3 sm:grid-cols-6 gap-1.5">
               <button type="button" onclick="selectPresetDishImage('PolloYuca')" class="p-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-brand-50 hover:border-brand-400 text-center transition cursor-pointer group">
-                <img src="https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=300&q=70" class="w-full h-12 object-cover rounded-lg mb-1 group-hover:scale-105 transition duration-200">
-                <span class="block text-[10px] font-extrabold text-slate-800 truncate">Pollo con Yuca</span>
-              </button>
-              <button type="button" onclick="selectPresetDishImage('Empanadas')" class="p-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-brand-50 hover:border-brand-400 text-center transition cursor-pointer group">
-                <img src="https://images.unsplash.com/photo-1626700051175-6818013e1d4f?auto=format&fit=crop&w=300&q=70" class="w-full h-12 object-cover rounded-lg mb-1 group-hover:scale-105 transition duration-200">
-                <span class="block text-[10px] font-bold text-slate-700 truncate">Empanadas</span>
+                <img src="https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=300&q=70" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=300&q=70';" class="w-full h-12 object-cover rounded-lg mb-1 group-hover:scale-105 transition duration-200">
+                <span class="block text-[10px] font-extrabold text-slate-800 truncate">Pollo & Yuca</span>
               </button>
               <button type="button" onclick="selectPresetDishImage('Sancocho')" class="p-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-brand-50 hover:border-brand-400 text-center transition cursor-pointer group">
-                <img src="https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=300&q=70" class="w-full h-12 object-cover rounded-lg mb-1 group-hover:scale-105 transition duration-200">
+                <img src="https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=300&q=70" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=300&q=70';" class="w-full h-12 object-cover rounded-lg mb-1 group-hover:scale-105 transition duration-200">
                 <span class="block text-[10px] font-bold text-slate-700 truncate">Sancocho</span>
               </button>
               <button type="button" onclick="selectPresetDishImage('BandejaPaisa')" class="p-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-brand-50 hover:border-brand-400 text-center transition cursor-pointer group">
-                <img src="https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=300&q=70" class="w-full h-12 object-cover rounded-lg mb-1 group-hover:scale-105 transition duration-200">
-                <span class="block text-[10px] font-bold text-slate-700 truncate">Frijoles</span>
+                <img src="https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=300&q=70" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=300&q=70';" class="w-full h-12 object-cover rounded-lg mb-1 group-hover:scale-105 transition duration-200">
+                <span class="block text-[10px] font-bold text-slate-700 truncate">Frijolada</span>
               </button>
               <button type="button" onclick="selectPresetDishImage('Pescado')" class="p-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-brand-50 hover:border-brand-400 text-center transition cursor-pointer group">
-                <img src="https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=300&q=70" class="w-full h-12 object-cover rounded-lg mb-1 group-hover:scale-105 transition duration-200">
+                <img src="https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=300&q=70" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=300&q=70';" class="w-full h-12 object-cover rounded-lg mb-1 group-hover:scale-105 transition duration-200">
                 <span class="block text-[10px] font-bold text-slate-700 truncate">Pescado Frito</span>
+              </button>
+              <button type="button" onclick="selectPresetDishImage('Empanadas')" class="p-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-brand-50 hover:border-brand-400 text-center transition cursor-pointer group">
+                <img src="https://images.unsplash.com/photo-1626700051175-6818013e1d4f?auto=format&fit=crop&w=300&q=70" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1626700051175-6818013e1d4f?auto=format&fit=crop&w=300&q=70';" class="w-full h-12 object-cover rounded-lg mb-1 group-hover:scale-105 transition duration-200">
+                <span class="block text-[10px] font-bold text-slate-700 truncate">Empanadas</span>
+              </button>
+              <button type="button" onclick="selectPresetDishImage('CarneAsada')" class="p-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-brand-50 hover:border-brand-400 text-center transition cursor-pointer group">
+                <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=300&q=70" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=300&q=70';" class="w-full h-12 object-cover rounded-lg mb-1 group-hover:scale-105 transition duration-200">
+                <span class="block text-[10px] font-bold text-slate-700 truncate">Carne Asada</span>
               </button>
             </div>
           </div>
 
           <!-- Opción Alternativa URL de Internet -->
-          <details class="text-xs text-slate-500 mt-2">
-            <summary class="cursor-pointer font-semibold text-slate-600 hover:text-brand-600 py-1">O pegar enlace / URL directa de foto de Internet</summary>
-            <input type="text" id="adm-plato-imagen" placeholder="https://..." class="w-full text-xs p-3 rounded-xl border border-slate-200 outline-none truncate mt-1">
+          <details class="text-xs text-slate-500 mt-2 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+            <summary class="cursor-pointer font-bold text-slate-700 hover:text-brand-600">O pegar enlace / URL de foto de Internet</summary>
+            <div class="mt-2 space-y-1.5">
+              <input type="text" id="adm-plato-imagen" placeholder="https://ejemplo.com/foto-plato.jpg" class="w-full text-xs p-2.5 rounded-lg border border-slate-200 bg-white outline-none truncate font-mono">
+              <p class="text-[10px] text-slate-400">Pega cualquier enlace directo de imagen JPG, PNG o WebP.</p>
+            </div>
           </details>
+        </div>
+
+        <!-- RESEÑA / DESCRIPCIÓN DEL PLATO -->
+        <div class="space-y-1.5">
+          <div class="flex items-center justify-between">
+            <label class="block text-xs font-bold text-slate-700">Reseña / Descripción del Plato</label>
+            <span class="text-[10px] text-brand-600 font-semibold">Lo que leerán los comensales</span>
+          </div>
+          
+          <textarea id="adm-plato-desc" rows="3" placeholder="Describe los ingredientes, guarniciones y preparación especial del plato..." class="w-full text-xs p-3 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none leading-relaxed"></textarea>
+          
+          <!-- Frases y sugerencias de reseña rápida -->
+          <div class="flex flex-wrap gap-1 pt-1">
+            <span class="text-[10px] text-slate-400 font-bold self-center mr-1">Sugerencias:</span>
+            <button type="button" onclick="setQuickDescription('Pollo jugoso dorado a fuego lento acompañado de yuca sudada, plátano maduro al horno, arroz con coco y ensalada fresca.')" class="text-[10px] bg-slate-100 hover:bg-brand-50 hover:text-brand-700 text-slate-600 px-2 py-1 rounded-lg transition border border-slate-200">Pollo con Yuca</button>
+            <button type="button" onclick="setQuickDescription('Sancocho criollo tradicional con gallina, cerdo y res, mazorca tierna, plátano verde, yuca, arroz blanco y aguacate.')" class="text-[10px] bg-slate-100 hover:bg-brand-50 hover:text-brand-700 text-slate-600 px-2 py-1 rounded-lg transition border border-slate-200">Sancocho</button>
+            <button type="button" onclick="setQuickDescription('Frijoles cargamanto en salsa casera, chicharrón crocante, carne molida, huevo frito, tajadas de maduro, arepa y aguacate.')" class="text-[10px] bg-slate-100 hover:bg-brand-50 hover:text-brand-700 text-slate-600 px-2 py-1 rounded-lg transition border border-slate-200">Bandeja Paisa</button>
+            <button type="button" onclick="setQuickDescription('Mojarra dorada crocante con patacones de plátano verde, yuca frita, arroz con coco y ensalada mixta de la huerta.')" class="text-[10px] bg-slate-100 hover:bg-brand-50 hover:text-brand-700 text-slate-600 px-2 py-1 rounded-lg transition border border-slate-200">Pescado Frito</button>
+          </div>
         </div>
 
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-bold text-slate-700 mb-1">Precio Porción ($)</label>
-            <input type="number" id="adm-plato-precio" class="w-full text-xs p-3 rounded-xl border border-slate-200 outline-none font-bold">
+            <input type="number" id="adm-plato-precio" class="w-full text-xs p-3 rounded-xl border border-slate-200 focus:border-brand-500 outline-none font-bold text-slate-900">
           </div>
           <div>
             <label class="block text-xs font-bold text-slate-700 mb-1">Costo Domicilio ($)</label>
-            <input type="number" id="adm-domicilio-precio" class="w-full text-xs p-3 rounded-xl border border-slate-200 outline-none font-bold">
+            <input type="number" id="adm-domicilio-precio" class="w-full text-xs p-3 rounded-xl border border-slate-200 focus:border-brand-500 outline-none font-bold text-slate-900">
           </div>
-        </div>
-
-        <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">Descripción Corta del Plato</label>
-          <textarea id="adm-plato-desc" rows="2" class="w-full text-xs p-3 rounded-xl border border-slate-200 outline-none"></textarea>
         </div>
 
         <div>
@@ -840,7 +881,7 @@
           <input type="text" id="adm-banco-detalles" class="w-full text-xs p-3 rounded-xl border border-slate-200 outline-none">
         </div>
 
-        <button onclick="saveAdminConfig()" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-extrabold text-xs py-3.5 rounded-xl shadow-md transition flex items-center justify-center gap-2">
+        <button onclick="saveAdminConfig()" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-extrabold text-xs py-3.5 rounded-xl shadow-md transition flex items-center justify-center gap-2 cursor-pointer">
           <i data-lucide="check-circle" class="w-4 h-4"></i>
           <span>Guardar Cambios de Menú</span>
         </button>
@@ -953,20 +994,20 @@
   <script>
     // 1. CONFIGURACIÓN Y ESTADO DE LA APLICACIÓN
     const DEFAULT_CONFIG = {
-      nombrePlato: "Arroz con Pato Criollo",
-      precioPlato: 25000,
+      nombrePlato: "Pollo con Yuca y Plátano",
+      precioPlato: 22000,
       costoDomicilio: 3000,
-      descripcionPlato: "Delicioso arroz preparado con cerveza negra, cilantro fresco y presas de pato marinado en especias tradicionales. Acompañado de sarsa criolla de cebolla y ají amarillo.",
-      imagenPlato: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80",
+      descripcionPlato: "Pollo jugoso dorado a fuego lento acompañado de yuca sudada, plátano maduro al horno, arroz con coco y ensalada fresca casera.",
+      imagenPlato: "https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=800&q=80",
       numeroWhatsAppAdmin: "573001234567",
       numeroNequi: "300 123 4567",
-      titularCuenta: "Almuerzos del Barrio",
+      titularCuenta: "Sazón Lau - Almuerzos del Barrio",
       detallesBanco: "Bancolombia Ahorros N° 123-456789-00"
     };
 
     // Reseñas de ejemplo predeterminadas
     const DEFAULT_REVIEWS = [
-      { nombre: "Carlos M.", comentario: "Excelente sazón, el arroz con pato llegó bien calientito el domingo pasado.", fecha: "Hace 2 días" },
+      { nombre: "Carlos M.", comentario: "Excelente sazón, el pollo con yuca llegó bien calientito y el plátano delicioso.", fecha: "Hace 2 días" },
       { nombre: "Lucía P.", comentario: "Super recomendado para pedir con tiempo. La atención por WhatsApp muy rápida.", fecha: "Hace 5 días" }
     ];
 
@@ -978,13 +1019,13 @@
         cliente: "Doña Martha R.",
         telefono: "3001112233",
         diaEntrega: "Sábado, 8 de agosto",
-        plato: "Arroz con Pato Criollo",
+        plato: "Pollo con Yuca y Plátano",
         cantidad: 3,
         tipoEntrega: "Domicilio",
         direccion: "Cra 15 # 45-12 Apto 302",
         comprobanteBase64: null,
         estado: "confirmado",
-        total: 78000
+        total: 69000
       },
       {
         id: "RES-8902",
@@ -992,7 +1033,7 @@
         cliente: "Don Gonzalo P.",
         telefono: "3104445566",
         diaEntrega: "Sábado, 8 de agosto",
-        plato: "Arroz con Pato Criollo",
+        plato: "Pollo con Yuca y Plátano",
         cantidad: 2,
         tipoEntrega: "Recoger en sitio",
         direccion: "Punto Principal Barrio",
@@ -1707,13 +1748,14 @@
       showToast("Comprobante removido");
     }
 
-    // SELECCIÓN DE FOTO DE PLATO PREDETERMINADA (Pollo con Yuca, Empanadas, Frijoles, Sancocho, Pescado)
+    // SELECCIÓN DE FOTO DE PLATO PREDETERMINADA (Pollo con Yuca, Sancocho, Bandeja Paisa, Pescado, Empanadas, Carne Asada)
     const PRESET_DISH_IMAGES = {
       PolloYuca: "https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=800&q=80",
-      Empanadas: "https://images.unsplash.com/photo-1626700051175-6818013e1d4f?auto=format&fit=crop&w=800&q=80",
       Sancocho: "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=800&q=80",
       BandejaPaisa: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80",
-      Pescado: "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=800&q=80"
+      Pescado: "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=800&q=80",
+      Empanadas: "https://images.unsplash.com/photo-1626700051175-6818013e1d4f?auto=format&fit=crop&w=800&q=80",
+      CarneAsada: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=800&q=80"
     };
 
     function selectPresetDishImage(type) {
@@ -1723,32 +1765,69 @@
 
         const nombreInput = document.getElementById('adm-plato-nombre');
         const descInput = document.getElementById('adm-plato-desc');
+        const precioInput = document.getElementById('adm-plato-precio');
 
         if (type === 'PolloYuca') {
           if (nombreInput) { nombreInput.value = "Pollo con Yuca y Plátano"; config.nombrePlato = "Pollo con Yuca y Plátano"; }
-          if (descInput) { descInput.value = "Pollo dorado jugoso con yuca sudada, plátano maduro, arroz con coco y ensalada fresca."; config.descripcionPlato = descInput.value; }
-        } else if (type === 'Empanadas') {
-          if (nombreInput) { nombreInput.value = "Empanadas Especiales de la Casa"; config.nombrePlato = "Empanadas Especiales de la Casa"; }
-          if (descInput) { descInput.value = "Porción de 5 empanadas crocantes de carne desmechada y papa criolla con ají casero."; config.descripcionPlato = descInput.value; }
+          if (descInput) { descInput.value = "Pollo jugoso dorado a fuego lento acompañado de yuca sudada, plátano maduro al horno, arroz con coco y ensalada fresca."; config.descripcionPlato = descInput.value; }
+          if (precioInput && (!precioInput.value || Number(precioInput.value) <= 0)) { precioInput.value = "22000"; config.precioPlato = 22000; }
         } else if (type === 'Sancocho') {
-          if (nombreInput) { nombreInput.value = "Sancocho Trifásico Especial"; config.nombrePlato = "Sancocho Trifásico Especial"; }
-          if (descInput) { descInput.value = "Sancocho criollo con gallina, res y cerdo, acompañado de mazorca, plátano, yuca, arroz y aguacate."; config.descripcionPlato = descInput.value; }
+          if (nombreInput) { nombreInput.value = "Sancocho Trifásico Tradicional"; config.nombrePlato = "Sancocho Trifásico Tradicional"; }
+          if (descInput) { descInput.value = "Sancocho criollo tradicional con gallina, cerdo y res, mazorca tierna, plátano verde, yuca, arroz blanco y aguacate."; config.descripcionPlato = descInput.value; }
+          if (precioInput && (!precioInput.value || Number(precioInput.value) <= 0)) { precioInput.value = "25000"; config.precioPlato = 25000; }
         } else if (type === 'BandejaPaisa') {
           if (nombreInput) { nombreInput.value = "Bandeja Paisa con Frijoles"; config.nombrePlato = "Bandeja Paisa con Frijoles"; }
-          if (descInput) { descInput.value = "Frijoles cargamanto, chicharrón crocante, carne molida, huevo frito, tajada de plátano, arepa y aguacate."; config.descripcionPlato = descInput.value; }
+          if (descInput) { descInput.value = "Frijoles cargamanto en salsa casera, chicharrón crocante, carne molida, huevo frito, tajadas de maduro, arepa y aguacate."; config.descripcionPlato = descInput.value; }
+          if (precioInput && (!precioInput.value || Number(precioInput.value) <= 0)) { precioInput.value = "26000"; config.precioPlato = 26000; }
         } else if (type === 'Pescado') {
           if (nombreInput) { nombreInput.value = "Mojarra Frita con Patacón y Yuca"; config.nombrePlato = "Mojarra Frita con Patacón y Yuca"; }
-          if (descInput) { descInput.value = "Mojarra dorada crocante acompañada de patacones de plátano verde, yuca y ensalada mixta."; config.descripcionPlato = descInput.value; }
+          if (descInput) { descInput.value = "Mojarra dorada crocante con patacones de plátano verde, yuca frita, arroz con coco y ensalada mixta de la huerta."; config.descripcionPlato = descInput.value; }
+          if (precioInput && (!precioInput.value || Number(precioInput.value) <= 0)) { precioInput.value = "28000"; config.precioPlato = 28000; }
+        } else if (type === 'Empanadas') {
+          if (nombreInput) { nombreInput.value = "Combo de Empanadas Caseras (x5)"; config.nombrePlato = "Combo de Empanadas Caseras (x5)"; }
+          if (descInput) { descInput.value = "Porción de 5 empanadas crocantes recién fritas rellenas de carne desmechada y papa criolla con ají casero."; config.descripcionPlato = descInput.value; }
+          if (precioInput && (!precioInput.value || Number(precioInput.value) <= 0)) { precioInput.value = "15000"; config.precioPlato = 15000; }
+        } else if (type === 'CarneAsada') {
+          if (nombreInput) { nombreInput.value = "Carne Asada a la Brasa con Patacón"; config.nombrePlato = "Carne Asada a la Brasa con Patacón"; }
+          if (descInput) { descInput.value = "Jugoso corte de res asado al carbón con patacón pisao, papa salada, chimichurri casero, arroz y ensalada."; config.descripcionPlato = descInput.value; }
+          if (precioInput && (!precioInput.value || Number(precioInput.value) <= 0)) { precioInput.value = "25000"; config.precioPlato = 25000; }
         }
 
         const urlInput = document.getElementById('adm-plato-imagen');
         if (urlInput) urlInput.value = config.imagenPlato;
         const imgPreview = document.getElementById('adm-dish-preview-img');
         if (imgPreview) imgPreview.src = config.imagenPlato;
+        const badge = document.getElementById('adm-photo-type-badge');
+        if (badge) badge.innerText = "Plato sugerido seleccionado";
 
         saveAdminConfigQuietly();
-        showToast(`Plato de ${config.nombrePlato} seleccionado`);
+        showToast(`¡Plato de ${config.nombrePlato} seleccionado!`);
       }
+    }
+
+    function setQuickDescription(text) {
+      const descInput = document.getElementById('adm-plato-desc');
+      if (descInput) {
+        descInput.value = text;
+        config.descripcionPlato = text;
+        saveAdminConfigQuietly();
+        showToast("Reseña / descripción actualizada");
+      }
+    }
+
+    function resetAdminDishImage() {
+      adminUploadedDishImageBase64 = null;
+      const urlInput = document.getElementById('adm-plato-imagen');
+      if (urlInput) urlInput.value = '';
+      
+      config.imagenPlato = getBestDishImage(config.nombrePlato, null);
+      const imgPreview = document.getElementById('adm-dish-preview-img');
+      if (imgPreview) imgPreview.src = config.imagenPlato;
+      const badge = document.getElementById('adm-photo-type-badge');
+      if (badge) badge.innerText = "Foto por defecto restaurada";
+
+      saveAdminConfigQuietly();
+      showToast("Foto restaurada a la sugerencia predeterminada");
     }
 
     // PROCESO DE CARGA Y COMPRESIÓN DE FOTO DE PLATO DESDE EL ADMIN (Galería / Cámara)
@@ -1756,8 +1835,8 @@
       const file = event.target.files[0];
       if (!file) return;
 
-      if (file.size > 10 * 1024 * 1024) {
-        showToast("La foto del plato es muy pesada (Máximo 10MB)");
+      if (file.size > 12 * 1024 * 1024) {
+        showToast("La foto del plato es muy pesada (Máximo 12MB)");
         return;
       }
 
@@ -1767,7 +1846,7 @@
         rawImg.onload = function() {
           // Compresor canvas HTML5 para optimizar tamaño para URL y LocalStorage
           const canvas = document.createElement('canvas');
-          const maxDim = 500; // Ancho/Alto máximo ideal para web móvil
+          const maxDim = 600; // Ancho/Alto máximo ideal para web móvil
           let width = rawImg.width;
           let height = rawImg.height;
 
@@ -1788,8 +1867,8 @@
           const ctx = canvas.getContext('2d');
           ctx.drawImage(rawImg, 0, 0, width, height);
 
-          // Genera un JPEG super optimizado (~10-18KB base64)
-          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.65);
+          // Genera un JPEG super optimizado (~10-20KB base64)
+          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.70);
 
           adminUploadedDishImageBase64 = compressedBase64;
           config.imagenPlato = compressedBase64;
@@ -1798,10 +1877,12 @@
           if (imgPreview) imgPreview.src = compressedBase64;
           const urlInput = document.getElementById('adm-plato-imagen');
           if (urlInput) urlInput.value = '';
+          const badge = document.getElementById('adm-photo-type-badge');
+          if (badge) badge.innerText = "Foto personalizada cargada";
 
           // Guardado silencioso y actualización inmediata
           saveAdminConfigQuietly();
-          showToast("¡Foto cargada, optimizada y guardada en el menú!");
+          showToast("¡Foto cargada de tu galería y guardada en el menú!");
         };
         rawImg.onerror = function() {
           showToast("Error al procesar la foto seleccionada");
@@ -1834,7 +1915,7 @@
 
       saveConfigToLocalStorage();
       renderApp();
-      showToast("Menú, precio, foto y configuración actualizados correctamente");
+      showToast("¡Menú, foto y reseña guardados correctamente!");
     }
 
     // 8. EXPORTAR PEDIDOS EN FORMATO EXCEL / CSV
