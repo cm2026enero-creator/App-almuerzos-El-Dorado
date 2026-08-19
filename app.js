@@ -2,6 +2,18 @@
 // APP.JS - LÓGICA DEL CLIENTE (RESERVAS & SINCRONIZACIÓN FIREBASE)
 // ============================================================================
 
+// 1. Reset y depuración de almacenamiento previo obsoleto
+try {
+  const version = "v2.0";
+  const currentVer = localStorage.getItem("almuerzos_app_version");
+  if (currentVer !== version) {
+    localStorage.removeItem("almuerzos_admin_config");
+    localStorage.setItem("almuerzos_app_version", version);
+  }
+} catch (e) {
+  console.warn("Storage reset check bypassed:", e);
+}
+
 const state = {
   menu: {
     nombrePlato: "Pollo con Yuca y Plátano",
@@ -39,10 +51,7 @@ const state = {
         img: "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=800&q=80"
       }
     ],
-    numeroWhatsApp: "573001234567",
-    numeroNequi: "300 123 4567",
-    titularCuenta: "Sazón Lau - Almuerzos del Barrio",
-    detallesBanco: "Bancolombia Ahorros N° 123-456789-00"
+    numeroWhatsApp: "573001234567"
   },
   selectedPlatoId: "p1",
   cantidad: 1,
@@ -77,13 +86,6 @@ function loadMenuData() {
         calculateTotals();
       }
     });
-  } else {
-    try {
-      const saved = localStorage.getItem("almuerzos_admin_config");
-      if (saved) {
-        state.menu = { ...state.menu, ...JSON.parse(saved) };
-      }
-    } catch (e) {}
   }
 }
 
@@ -96,7 +98,12 @@ function renderClientMenu() {
   const heroPrice = document.getElementById("hero-dish-price");
   const heroDom = document.getElementById("hero-delivery-price");
 
-  if (heroImg) heroImg.src = current.img;
+  if (heroImg) {
+    heroImg.src = current.img;
+    heroImg.onerror = function() {
+      this.src = "https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=800&q=80";
+    };
+  }
   if (heroName) heroName.textContent = current.nombre;
   if (heroDesc) heroDesc.textContent = current.desc;
   if (heroPrice) heroPrice.textContent = formatCurrency(current.precio);
@@ -106,14 +113,19 @@ function renderClientMenu() {
   if (container && state.menu.platosDisponibles) {
     container.innerHTML = state.menu.platosDisponibles.map(dish => `
       <div onclick="selectPlato('${dish.id}')" 
-           class="dish-card-item cursor-pointer p-3 rounded-2xl border-2 flex items-center gap-3.5 transition ${state.selectedPlatoId === dish.id ? 'border-orange-500 bg-orange-50/80 ring-2 ring-orange-200' : 'border-slate-200 bg-white hover:border-slate-300'}">
-        <img src="${dish.img}" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=300&q=70';" class="w-16 h-16 rounded-xl object-cover shadow-sm shrink-0 border border-slate-100">
+           class="dish-card-item cursor-pointer p-3 rounded-2xl border-2 flex items-center gap-3 transition ${state.selectedPlatoId === dish.id ? 'border-orange-500 bg-orange-50/80 ring-2 ring-orange-200' : 'border-slate-200 bg-white hover:border-slate-300'}">
+        <div class="dish-thumbnail-box shrink-0">
+          <img src="${dish.img}" 
+               onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=300&q=70';" 
+               alt="${dish.nombre}"
+               loading="lazy">
+        </div>
         <div class="flex-1 min-w-0">
-          <div class="flex items-center justify-between">
-            <h4 class="font-extrabold text-sm text-slate-900 truncate">${dish.nombre}</h4>
-            <span class="text-xs font-black text-orange-600">${formatCurrency(dish.precio)}</span>
+          <div class="flex items-center justify-between gap-1">
+            <h4 class="font-extrabold text-xs sm:text-sm text-slate-900 truncate">${dish.nombre}</h4>
+            <span class="text-xs font-black text-orange-600 shrink-0">${formatCurrency(dish.precio)}</span>
           </div>
-          <p class="text-xs text-slate-500 line-clamp-2 mt-0.5">${dish.desc}</p>
+          <p class="text-[11px] text-slate-500 line-clamp-2 mt-0.5">${dish.desc}</p>
         </div>
         <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${state.selectedPlatoId === dish.id ? 'border-orange-600 bg-orange-600 text-white' : 'border-slate-300'}">
           ${state.selectedPlatoId === dish.id ? '<div class="w-2 h-2 rounded-full bg-white"></div>' : ''}
@@ -266,7 +278,7 @@ async function handleOrderSubmit(e) {
     console.error("Error al guardar en Firebase:", error);
   }
 
-  // 2. Preparar mensaje de WhatsApp
+  // 2. Mensaje estructurado de WhatsApp
   const mensajeWhatsApp = encodeURIComponent(
     `*¡HOLA! QUIERO CONFIRMAR MI RESERVA DE ALMUERZO*\n` +
     `----------------------------------------\n` +

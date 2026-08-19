@@ -3,6 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  
+  <!-- Directivas Anti-Caché para Navegadores Móviles (Xiaomi, Huawei/Honor, Samsung, Chrome Mobile) -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+
   <title>Sazón Lau - Almuerzos de Fin de Semana</title>
   
   <!-- Google Fonts -->
@@ -34,26 +40,78 @@
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
 
-  <!-- Estilos Embebidos (Resilientes a GitHub Pages y rutas relativas) -->
+  <!-- Normalización CSS Estricta y Resiliente para WebKit / Android -->
   <style>
     :root {
-      --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
       --font-serif: 'Playfair Display', Georgia, serif;
     }
-    * { box-sizing: border-box; }
-    body {
+    
+    *, *::before, *::after {
+      box-sizing: border-box !important;
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    html, body {
       font-family: var(--font-sans);
       background-color: #f8fafc;
       color: #1e293b;
       margin: 0;
       padding: 0;
+      width: 100%;
+      overflow-x: hidden;
       -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
-    .font-serif { font-family: var(--font-serif); }
-    img { max-width: 100%; height: auto; }
+
+    .font-serif {
+      font-family: var(--font-serif);
+    }
     
+    /* Control estricto de imágenes contra desbordamientos en navegadores móviles */
+    img {
+      max-width: 100% !important;
+      height: auto;
+      display: block;
+    }
+
+    .hero-img-container {
+      width: 100%;
+      height: 200px;
+      position: relative;
+      overflow: hidden;
+      border-radius: 1rem;
+      background-color: #e2e8f0;
+    }
+
+    .hero-img-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+
+    .dish-thumbnail-box {
+      width: 4rem;
+      height: 4rem;
+      min-width: 4rem;
+      min-height: 4rem;
+      border-radius: 0.75rem;
+      overflow: hidden;
+      background-color: #f1f5f9;
+      position: relative;
+    }
+
+    .dish-thumbnail-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Modal Emergente */
     .modal-overlay {
-      background-color: rgba(15, 23, 42, 0.7);
+      background-color: rgba(15, 23, 42, 0.75);
+      -webkit-backdrop-filter: blur(4px);
       backdrop-filter: blur(4px);
       position: fixed;
       inset: 0;
@@ -66,28 +124,33 @@
       pointer-events: none;
       transition: opacity 0.25s ease;
     }
+    
     .modal-overlay.active {
       opacity: 1;
       pointer-events: auto;
     }
+    
     .modal-card {
-      background: white;
+      background: #ffffff;
       width: 100%;
       max-width: 440px;
       border-radius: 1.5rem;
       padding: 1.5rem;
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
       transform: scale(0.95);
       transition: transform 0.25s ease;
     }
-    .modal-overlay.active .modal-card { transform: scale(1); }
+    
+    .modal-overlay.active .modal-card {
+      transform: scale(1);
+    }
   </style>
 
   <!-- Firebase Compat SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="firebase-config.js"></script>
+  <script src="firebase-config.js?v=2.0"></script>
 </head>
 <body class="bg-slate-50 min-h-screen text-slate-800 antialiased selection:bg-orange-500 selection:text-white pb-16">
 
@@ -130,11 +193,11 @@
 
     <!-- Plato Destacado / Visual Hero -->
     <section class="bg-white rounded-3xl p-4 sm:p-5 shadow-sm border border-slate-200 space-y-3.5">
-      <div class="relative rounded-2xl overflow-hidden aspect-video bg-slate-100 shadow-inner">
+      <div class="hero-img-container">
         <img id="hero-dish-img" 
              src="https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=800&q=80" 
-             alt="Plato del fin de semana" 
-             class="w-full h-full object-cover">
+             alt="Plato del fin de semana"
+             loading="eager">
         <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent flex items-end p-4">
           <div class="text-white">
             <span class="text-[10px] font-bold uppercase tracking-widest text-amber-300">Especial de la Casa</span>
@@ -181,11 +244,11 @@
           <span class="text-[11px] text-slate-500">¿Cuántos almuerzos deseas?</span>
         </div>
         <div class="flex items-center gap-3 bg-white px-2 py-1.5 rounded-xl border border-slate-200 shadow-sm">
-          <button type="button" id="btn-minus" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-orange-100 active:scale-95 flex items-center justify-center font-black text-slate-700 transition">
+          <button type="button" id="btn-minus" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-orange-100 active:scale-95 flex items-center justify-center font-black text-slate-700 transition cursor-pointer">
             <i data-lucide="minus" class="w-4 h-4"></i>
           </button>
           <span id="order-quantity" class="w-6 text-center font-black text-sm text-slate-900">1</span>
-          <button type="button" id="btn-plus" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-orange-100 active:scale-95 flex items-center justify-center font-black text-slate-700 transition">
+          <button type="button" id="btn-plus" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-orange-100 active:scale-95 flex items-center justify-center font-black text-slate-700 transition cursor-pointer">
             <i data-lucide="plus" class="w-4 h-4"></i>
           </button>
         </div>
@@ -337,6 +400,6 @@
     </div>
   </div>
 
-  <script src="app.js"></script>
+  <script src="app.js?v=2.0"></script>
 </body>
 </html>
