@@ -2,24 +2,12 @@
 // APP.JS - LÓGICA DEL CLIENTE (RESERVAS & SINCRONIZACIÓN FIREBASE)
 // ============================================================================
 
-// 1. Reset y depuración de almacenamiento previo obsoleto
-try {
-  const version = "v2.0";
-  const currentVer = localStorage.getItem("almuerzos_app_version");
-  if (currentVer !== version) {
-    localStorage.removeItem("almuerzos_admin_config");
-    localStorage.setItem("almuerzos_app_version", version);
-  }
-} catch (e) {
-  console.warn("Storage reset check bypassed:", e);
-}
-
 const state = {
   menu: {
     nombrePlato: "Pollo con Yuca y Plátano",
     precioPlato: 22000,
     costoDomicilio: 3000,
-    descripcionPlato: "Pollo dorado jugoso con yuca sudada, plátano maduro al horno, arroz con coco y ensalada fresca casera.",
+    descripcionPlato: "Pollo jugoso dorado a fuego lento acompañado de yuca sudada, plátano maduro al horno, arroz con coco y ensalada fresca.",
     imagenPlato: "https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=800&q=80",
     platosDisponibles: [
       {
@@ -55,7 +43,7 @@ const state = {
   },
   selectedPlatoId: "p1",
   cantidad: 1,
-  tipoEntrega: "domicilio", // 'domicilio' | 'recoger'
+  tipoEntrega: "domicilio",
   metodoPago: "nequi"
 };
 
@@ -64,16 +52,11 @@ function formatCurrency(val) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  if (window.initFirebaseApp) {
-    window.initFirebaseApp();
-  }
+  if (window.initFirebaseApp) window.initFirebaseApp();
   loadMenuData();
   bindClientEvents();
   renderClientMenu();
   calculateTotals();
-  if (window.lucide) {
-    window.lucide.createIcons();
-  }
 });
 
 function loadMenuData() {
@@ -112,24 +95,18 @@ function renderClientMenu() {
   const container = document.getElementById("dishes-selection-container");
   if (container && state.menu.platosDisponibles) {
     container.innerHTML = state.menu.platosDisponibles.map(dish => `
-      <div onclick="selectPlato('${dish.id}')" 
-           class="dish-card-item cursor-pointer p-3 rounded-2xl border-2 flex items-center gap-3 transition ${state.selectedPlatoId === dish.id ? 'border-orange-500 bg-orange-50/80 ring-2 ring-orange-200' : 'border-slate-200 bg-white hover:border-slate-300'}">
-        <div class="dish-thumbnail-box shrink-0">
-          <img src="${dish.img}" 
-               onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=300&q=70';" 
-               alt="${dish.nombre}"
-               loading="lazy">
+      <div onclick="selectPlato('${dish.id}')" class="dish-option ${state.selectedPlatoId === dish.id ? 'active' : ''}">
+        <div class="dish-thumb">
+          <img src="${dish.img}" onerror="this.src='https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=300&q=70';" alt="${dish.nombre}">
         </div>
-        <div class="flex-1 min-w-0">
-          <div class="flex items-center justify-between gap-1">
-            <h4 class="font-extrabold text-xs sm:text-sm text-slate-900 truncate">${dish.nombre}</h4>
-            <span class="text-xs font-black text-orange-600 shrink-0">${formatCurrency(dish.precio)}</span>
+        <div class="dish-info">
+          <div class="dish-name-price">
+            <span class="dish-name">${dish.nombre}</span>
+            <span class="dish-price">${formatCurrency(dish.precio)}</span>
           </div>
-          <p class="text-[11px] text-slate-500 line-clamp-2 mt-0.5">${dish.desc}</p>
+          <div class="dish-desc-small">${dish.desc}</div>
         </div>
-        <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${state.selectedPlatoId === dish.id ? 'border-orange-600 bg-orange-600 text-white' : 'border-slate-300'}">
-          ${state.selectedPlatoId === dish.id ? '<div class="w-2 h-2 rounded-full bg-white"></div>' : ''}
-        </div>
+        <div class="check-circle"></div>
       </div>
     `).join("");
   }
@@ -141,61 +118,39 @@ window.selectPlato = function(id) {
   calculateTotals();
 };
 
+window.setDeliveryType = function(type) {
+  state.tipoEntrega = type;
+  document.getElementById("btn-delivery-dom").classList.toggle("active", type === "domicilio");
+  document.getElementById("btn-delivery-rec").classList.toggle("active", type === "recoger");
+  document.getElementById("direccion-container").classList.toggle("hidden", type === "recoger");
+  calculateTotals();
+};
+
+window.setPaymentMethod = function(method) {
+  state.metodoPago = method;
+  document.getElementById("pay-nequi").classList.toggle("active", method === "nequi");
+  document.getElementById("pay-banco").classList.toggle("active", method === "bancolombia");
+  document.getElementById("pay-efectivo").classList.toggle("active", method === "efectivo");
+};
+
 function bindClientEvents() {
-  const btnMinus = document.getElementById("btn-minus");
-  const btnPlus = document.getElementById("btn-plus");
-  const inputQty = document.getElementById("order-quantity");
-
-  if (btnMinus) {
-    btnMinus.addEventListener("click", () => {
-      if (state.cantidad > 1) {
-        state.cantidad--;
-        if (inputQty) inputQty.textContent = state.cantidad;
-        calculateTotals();
-      }
-    });
-  }
-
-  if (btnPlus) {
-    btnPlus.addEventListener("click", () => {
-      if (state.cantidad < 50) {
-        state.cantidad++;
-        if (inputQty) inputQty.textContent = state.cantidad;
-        calculateTotals();
-      }
-    });
-  }
-
-  const radioDom = document.getElementById("entrega-domicilio");
-  const radioRec = document.getElementById("entrega-recoger");
-  const addressContainer = document.getElementById("direccion-container");
-
-  if (radioDom) {
-    radioDom.addEventListener("change", () => {
-      state.tipoEntrega = "domicilio";
-      if (addressContainer) addressContainer.classList.remove("hidden");
+  document.getElementById("btn-minus")?.addEventListener("click", () => {
+    if (state.cantidad > 1) {
+      state.cantidad--;
+      document.getElementById("order-quantity").textContent = state.cantidad;
       calculateTotals();
-    });
-  }
-
-  if (radioRec) {
-    radioRec.addEventListener("change", () => {
-      state.tipoEntrega = "recoger";
-      if (addressContainer) addressContainer.classList.add("hidden");
-      calculateTotals();
-    });
-  }
-
-  document.querySelectorAll('input[name="metodo-pago"]').forEach(elem => {
-    elem.addEventListener("change", (e) => {
-      state.metodoPago = e.target.value;
-    });
+    }
   });
 
-  const orderForm = document.getElementById("order-form");
-  if (orderForm) {
-    orderForm.addEventListener("submit", handleOrderSubmit);
-  }
+  document.getElementById("btn-plus")?.addEventListener("click", () => {
+    if (state.cantidad < 50) {
+      state.cantidad++;
+      document.getElementById("order-quantity").textContent = state.cantidad;
+      calculateTotals();
+    }
+  });
+
+  document.getElementById("order-form")?.addEventListener("submit", handleOrderSubmit);
 }
 
 function calculateTotals() {
@@ -204,15 +159,10 @@ function calculateTotals() {
   const envio = state.tipoEntrega === "domicilio" ? state.menu.costoDomicilio : 0;
   const total = subtotal + envio;
 
-  const subtotalEl = document.getElementById("summary-subtotal");
-  const envioEl = document.getElementById("summary-envio");
-  const totalEl = document.getElementById("summary-total");
-  const btnTotalEl = document.getElementById("btn-submit-total");
-
-  if (subtotalEl) subtotalEl.textContent = formatCurrency(subtotal);
-  if (envioEl) envioEl.textContent = envio === 0 ? "Gratis / En punto" : formatCurrency(envio);
-  if (totalEl) totalEl.textContent = formatCurrency(total);
-  if (btnTotalEl) btnTotalEl.textContent = formatCurrency(total);
+  document.getElementById("summary-subtotal").textContent = formatCurrency(subtotal);
+  document.getElementById("summary-envio").textContent = envio === 0 ? "Gratis" : formatCurrency(envio);
+  document.getElementById("summary-total").textContent = formatCurrency(total);
+  document.getElementById("btn-submit-total").textContent = formatCurrency(total);
 }
 
 async function handleOrderSubmit(e) {
@@ -221,16 +171,13 @@ async function handleOrderSubmit(e) {
   const nombre = document.getElementById("cliente-nombre").value.trim();
   const telefono = document.getElementById("cliente-telefono").value.trim();
   const diaEntrega = document.getElementById("cliente-dia").value;
-  const direccion = state.tipoEntrega === "domicilio" 
-    ? (document.getElementById("cliente-direccion") ? document.getElementById("cliente-direccion").value.trim() : "") 
-    : "Recoger en punto de venta";
-  const notas = document.getElementById("cliente-notas") ? document.getElementById("cliente-notas").value.trim() : "";
+  const direccion = state.tipoEntrega === "domicilio" ? document.getElementById("cliente-direccion").value.trim() : "Recoger en sitio";
+  const notas = document.getElementById("cliente-notas")?.value.trim() || "";
 
   if (!nombre || !telefono) {
-    alert("Por favor completa tu nombre y teléfono / WhatsApp");
+    alert("Por favor completa tu nombre y teléfono");
     return;
   }
-
   if (state.tipoEntrega === "domicilio" && !direccion) {
     alert("Por favor ingresa la dirección de entrega");
     return;
@@ -252,7 +199,7 @@ async function handleOrderSubmit(e) {
     tipoEntrega: state.tipoEntrega === "domicilio" ? "A Domicilio" : "Recoger en sitio",
     direccion: direccion,
     metodoPago: state.metodoPago.toUpperCase(),
-    notas: notas || "Sin notas adicionales",
+    notas: notas || "Sin notas",
     subtotal: subtotal,
     costoEnvio: costoEnvio,
     total: total,
@@ -261,76 +208,46 @@ async function handleOrderSubmit(e) {
     timestamp: Date.now()
   };
 
-  // 1. Guardar en Firebase Realtime Database (/pedidos)
-  try {
-    if (window.db && window.isFirebaseConfigured) {
+  // Guardar en Firebase Realtime Database
+  if (window.db && window.isFirebaseConfigured) {
+    try {
       await window.db.ref("pedidos/" + orderId).set(orderData);
-      console.log("✅ Pedido guardado en Firebase Realtime DB:", orderId);
-    } else {
-      let localOrders = [];
-      try {
-        localOrders = JSON.parse(localStorage.getItem("almuerzos_pedidos_locales") || "[]");
-      } catch (err) {}
-      localOrders.unshift(orderData);
-      localStorage.setItem("almuerzos_pedidos_locales", JSON.stringify(localOrders));
+    } catch (err) {
+      console.error(err);
     }
-  } catch (error) {
-    console.error("Error al guardar en Firebase:", error);
   }
 
-  // 2. Mensaje estructurado de WhatsApp
-  const mensajeWhatsApp = encodeURIComponent(
-    `*¡HOLA! QUIERO CONFIRMAR MI RESERVA DE ALMUERZO*\n` +
+  const msgWsp = encodeURIComponent(
+    `*¡HOLA! RESERVA DE ALMUERZO*\n` +
     `----------------------------------------\n` +
-    `📌 *Reserva N°:* ${orderId}\n` +
+    `📌 *Reserva:* ${orderId}\n` +
     `👤 *Cliente:* ${nombre}\n` +
-    `📱 *Teléfono:* ${telefono}\n` +
+    `📱 *Tel:* ${telefono}\n` +
     `📅 *Horario:* ${diaEntrega}\n` +
-    `🍲 *Plato:* ${currentDish.nombre}\n` +
-    `🔢 *Cantidad:* ${state.cantidad} porción(es)\n` +
+    `🍲 *Plato:* ${currentDish.nombre} (x${state.cantidad})\n` +
     `🛵 *Entrega:* ${orderData.tipoEntrega}\n` +
-    (state.tipoEntrega === "domicilio" ? `📍 *Dirección:* ${direccion}\n` : ``) +
+    (state.tipoEntrega === "domicilio" ? `📍 *Dir:* ${direccion}\n` : ``) +
     `💳 *Pago:* ${orderData.metodoPago}\n` +
     (notas ? `📝 *Notas:* ${notas}\n` : ``) +
     `----------------------------------------\n` +
-    `💰 *TOTAL A PAGAR: ${formatCurrency(total)}*\n` +
-    `----------------------------------------\n` +
-    `_Quedo atento(a) a la confirmación de mi pedido. ¡Gracias!_`
+    `💰 *TOTAL: ${formatCurrency(total)}*`
   );
 
-  const wspNumber = state.menu.numeroWhatsApp.replace(/\D/g, "") || "573001234567";
-  const wspUrl = `https://wa.me/${wspNumber}?text=${mensajeWhatsApp}`;
-
-  // 3. Modal de éxito y redirección
+  const wspUrl = `https://wa.me/${state.menu.numeroWhatsApp.replace(/\D/g,"")}?text=${msgWsp}`;
   showSuccessModal(orderData, wspUrl);
 }
 
 function showSuccessModal(order, wspUrl) {
-  const modal = document.getElementById("success-modal");
-  const modalOrderId = document.getElementById("modal-order-id");
-  const modalPlato = document.getElementById("modal-order-plato");
-  const modalTotal = document.getElementById("modal-order-total");
-  const btnWsp = document.getElementById("btn-send-whatsapp");
-
-  if (modalOrderId) modalOrderId.textContent = order.id;
-  if (modalPlato) modalPlato.textContent = `${order.cantidad}x ${order.plato}`;
-  if (modalTotal) modalTotal.textContent = formatCurrency(order.total);
-  if (btnWsp) {
-    btnWsp.onclick = () => window.open(wspUrl, "_blank");
-  }
-
-  if (modal) {
-    modal.classList.add("active");
-  }
+  document.getElementById("modal-order-id").textContent = order.id;
+  document.getElementById("modal-order-plato").textContent = `${order.cantidad}x ${order.plato} - ${formatCurrency(order.total)}`;
+  document.getElementById("btn-send-whatsapp").onclick = () => window.open(wspUrl, "_blank");
+  document.getElementById("success-modal").classList.add("active");
 }
 
 window.closeSuccessModal = function() {
-  const modal = document.getElementById("success-modal");
-  if (modal) modal.classList.remove("active");
-  const form = document.getElementById("order-form");
-  if (form) form.reset();
+  document.getElementById("success-modal").classList.remove("active");
+  document.getElementById("order-form").reset();
   state.cantidad = 1;
-  const inputQty = document.getElementById("order-quantity");
-  if (inputQty) inputQty.textContent = "1";
+  document.getElementById("order-quantity").textContent = "1";
   calculateTotals();
 };
