@@ -2,9 +2,14 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Sazón Lau - Almuerzos de Fin de Semana</title>
   
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -19,7 +24,6 @@
               500: '#f97316',
               600: '#ea580c',
               700: '#c2410c',
-              800: '#9a3412',
             }
           }
         }
@@ -30,155 +34,191 @@
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
 
-  <!-- Estilos Globales -->
-  <link rel="stylesheet" href="styles.css">
+  <!-- Estilos Embebidos (Resilientes a GitHub Pages y rutas relativas) -->
+  <style>
+    :root {
+      --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-serif: 'Playfair Display', Georgia, serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: var(--font-sans);
+      background-color: #f8fafc;
+      color: #1e293b;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+    .font-serif { font-family: var(--font-serif); }
+    img { max-width: 100%; height: auto; }
+    
+    .modal-overlay {
+      background-color: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(4px);
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .modal-card {
+      background: white;
+      width: 100%;
+      max-width: 440px;
+      border-radius: 1.5rem;
+      padding: 1.5rem;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+      transform: scale(0.95);
+      transition: transform 0.25s ease;
+    }
+    .modal-overlay.active .modal-card { transform: scale(1); }
+  </style>
 
-  <!-- Firebase App & Database Compat SDKs -->
+  <!-- Firebase Compat SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-
-  <!-- Configuración de Firebase -->
   <script src="firebase-config.js"></script>
 </head>
-<body class="bg-slate-50 min-h-screen text-slate-800 antialiased selection:bg-brand-500 selection:text-white pb-16">
+<body class="bg-slate-50 min-h-screen text-slate-800 antialiased selection:bg-orange-500 selection:text-white pb-16">
 
-  <!-- ENCABEZADO PRINCIPAL -->
-  <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-200">
+  <!-- Header Superior -->
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
     <div class="max-w-xl mx-auto px-4 py-3 flex items-center justify-between">
       <div class="flex items-center gap-2.5">
-        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-brand-600 to-amber-500 flex items-center justify-center text-white shadow-md shadow-brand-500/20">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-orange-600 to-amber-500 flex items-center justify-center text-white shadow-md shadow-orange-500/20">
           <i data-lucide="utensils-crossed" class="w-5 h-5"></i>
         </div>
         <div>
           <h1 class="font-extrabold text-base leading-tight text-slate-900 font-serif">Sazón Lau</h1>
-          <p class="text-[11px] font-bold text-brand-600 uppercase tracking-wider">Almuerzos de Fin de Semana</p>
+          <p class="text-[11px] font-bold text-orange-600 uppercase tracking-wider">Almuerzos de Fin de Semana</p>
         </div>
       </div>
-
-      <div class="flex items-center gap-2">
-        <a href="admin.html" class="inline-flex items-center gap-1 text-xs font-bold bg-slate-100 hover:bg-brand-50 hover:text-brand-700 text-slate-600 px-3 py-1.5 rounded-xl border border-slate-200 transition" title="Panel de Administrador">
-          <i data-lucide="shield-check" class="w-3.5 h-3.5 text-brand-600"></i>
-          <span>Admin</span>
-        </a>
-      </div>
+      <a href="admin.html" class="inline-flex items-center gap-1.5 text-xs font-bold bg-slate-100 hover:bg-orange-50 hover:text-orange-700 text-slate-700 px-3 py-1.5 rounded-xl border border-slate-200 transition">
+        <i data-lucide="shield-check" class="w-3.5 h-3.5 text-orange-600"></i>
+        <span>Admin</span>
+      </a>
     </div>
   </header>
 
-  <!-- CONTENEDOR PRINCIPAL (MOBILE-FIRST) -->
+  <!-- Contenido Principal -->
   <main class="max-w-xl mx-auto px-4 pt-4 space-y-4">
 
-    <!-- BANNER DE FIN DE SEMANA Y DISPONIBILIDAD -->
-    <div class="bg-gradient-to-r from-amber-500 via-brand-600 to-orange-600 rounded-3xl p-4 text-white shadow-lg shadow-brand-500/15 flex items-center justify-between">
-      <div class="space-y-0.5">
+    <!-- Banner de Bienvenida -->
+    <div class="bg-gradient-to-r from-amber-500 via-orange-600 to-orange-700 rounded-3xl p-4 text-white shadow-lg shadow-orange-500/15 flex items-center justify-between">
+      <div class="space-y-1">
         <div class="inline-flex items-center gap-1.5 bg-white/20 backdrop-blur-md px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider">
           <span class="w-2 h-2 rounded-full bg-emerald-300 animate-pulse"></span>
           <span>Reservas Abiertas</span>
         </div>
-        <h2 class="text-lg font-black leading-tight">¡Menú del Sábado y Domingo!</h2>
-        <p class="text-xs text-amber-100 font-medium">Pide con tiempo. Porciones limitadas.</p>
+        <h2 class="text-lg font-black leading-tight">¡Almuerzos Caseros al Gusto!</h2>
+        <p class="text-xs text-amber-100 font-medium">Porciones limitadas para Sábado y Domingo.</p>
       </div>
       <div class="w-12 h-12 rounded-2xl bg-white/15 backdrop-blur-md flex items-center justify-center text-white shrink-0">
         <i data-lucide="calendar-heart" class="w-6 h-6"></i>
       </div>
     </div>
 
-    <!-- TARJETA DEL PLATO PRINCIPAL DESTACADO -->
+    <!-- Plato Destacado / Visual Hero -->
     <section class="bg-white rounded-3xl p-4 sm:p-5 shadow-sm border border-slate-200 space-y-3.5">
-      <div class="relative rounded-2xl overflow-hidden aspect-video bg-slate-100 shadow-inner group">
+      <div class="relative rounded-2xl overflow-hidden aspect-video bg-slate-100 shadow-inner">
         <img id="hero-dish-img" 
              src="https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=800&q=80" 
-             alt="Plato del Fin de Semana" 
-             onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=800&q=80';"
-             class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-        
+             alt="Plato del fin de semana" 
+             class="w-full h-full object-cover">
         <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent flex items-end p-4">
           <div class="text-white">
-            <span class="text-[10px] font-bold uppercase tracking-widest text-amber-300">Especial Casero</span>
+            <span class="text-[10px] font-bold uppercase tracking-widest text-amber-300">Especial de la Casa</span>
             <h3 id="hero-dish-name" class="text-xl font-extrabold leading-tight drop-shadow-sm font-serif">Pollo con Yuca y Plátano</h3>
           </div>
         </div>
       </div>
+      
+      <p id="hero-dish-desc" class="text-xs text-slate-600 leading-relaxed">
+        Pollo jugoso dorado a fuego lento acompañado de yuca sudada, plátano maduro al horno, arroz con coco y ensalada fresca casera.
+      </p>
 
-      <!-- Reseña y Precios -->
-      <div class="space-y-2">
-        <p id="hero-dish-desc" class="text-xs text-slate-600 leading-relaxed">
-          Pollo jugoso dorado a fuego lento acompañado de yuca sudada, plátano maduro al horno, arroz con coco y ensalada fresca casera.
-        </p>
-
-        <div class="flex items-center justify-between pt-2 border-t border-slate-100 text-xs">
-          <div>
-            <span class="text-slate-400 block text-[10px] font-bold">PRECIO PORCIÓN</span>
-            <span id="hero-dish-price" class="text-lg font-black text-brand-600">$22.000</span>
-          </div>
-          <div class="text-right">
-            <span class="text-slate-400 block text-[10px] font-bold">COSTO DOMICILIO</span>
-            <span id="hero-delivery-price" class="text-sm font-extrabold text-slate-700">$3.000</span>
-          </div>
+      <div class="flex items-center justify-between pt-2 border-t border-slate-100 text-xs">
+        <div>
+          <span class="text-slate-400 block text-[10px] font-bold">PRECIO PORCIÓN</span>
+          <span id="hero-dish-price" class="text-lg font-black text-orange-600">$22.000</span>
+        </div>
+        <div class="text-right">
+          <span class="text-slate-400 block text-[10px] font-bold">COSTO DOMICILIO</span>
+          <span id="hero-delivery-price" class="text-sm font-extrabold text-slate-700">$3.000</span>
         </div>
       </div>
     </section>
 
-    <!-- FORMULARIO RÁPIDO DE RESERVA -->
+    <!-- Catálogo de Platos Disponibles -->
     <section class="bg-white rounded-3xl p-5 shadow-sm border border-slate-200 space-y-4">
-      <div class="flex items-center gap-2 pb-3 border-b border-slate-100">
-        <div class="w-8 h-8 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center font-black text-sm">
-          1
-        </div>
+      <div class="flex items-center gap-2 pb-2 border-b border-slate-100">
+        <div class="w-8 h-8 rounded-xl bg-orange-100 text-orange-700 flex items-center justify-center font-black text-sm">1</div>
         <div>
-          <h3 class="font-extrabold text-sm text-slate-900">Selecciona tu Plato & Cantidad</h3>
-          <p class="text-xs text-slate-400">Escoge tu almuerzo favorito</p>
+          <h3 class="font-extrabold text-sm text-slate-900">Selecciona tu Almuerzo</h3>
+          <p class="text-[11px] text-slate-500">Toca el plato que deseas ordenar</p>
         </div>
       </div>
 
-      <!-- Lista de platos disponibles -->
-      <div id="dishes-selection-container" class="space-y-2">
+      <!-- Lista de Platos Dinámica -->
+      <div id="dishes-selection-container" class="space-y-2.5">
         <!-- Renderizado dinámico desde app.js -->
       </div>
 
-      <!-- Selector de Cantidad -->
-      <div class="bg-slate-50 rounded-2xl p-3 border border-slate-200 flex items-center justify-between">
+      <!-- Selector de Porciones -->
+      <div class="bg-slate-50 rounded-2xl p-3.5 border border-slate-200 flex items-center justify-between mt-2">
         <div>
-          <span class="text-xs font-bold text-slate-700 block">Número de Porciones:</span>
-          <span class="text-[11px] text-slate-400">¿Cuántos almuerzos deseas?</span>
+          <span class="text-xs font-bold text-slate-800 block">Número de Porciones:</span>
+          <span class="text-[11px] text-slate-500">¿Cuántos almuerzos deseas?</span>
         </div>
         <div class="flex items-center gap-3 bg-white px-2 py-1.5 rounded-xl border border-slate-200 shadow-sm">
-          <button type="button" id="btn-minus" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-brand-50 hover:text-brand-600 flex items-center justify-center text-slate-700 font-black transition">
+          <button type="button" id="btn-minus" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-orange-100 active:scale-95 flex items-center justify-center font-black text-slate-700 transition">
             <i data-lucide="minus" class="w-4 h-4"></i>
           </button>
           <span id="order-quantity" class="w-6 text-center font-black text-sm text-slate-900">1</span>
-          <button type="button" id="btn-plus" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-brand-50 hover:text-brand-600 flex items-center justify-center text-slate-700 font-black transition">
+          <button type="button" id="btn-plus" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-orange-100 active:scale-95 flex items-center justify-center font-black text-slate-700 transition">
             <i data-lucide="plus" class="w-4 h-4"></i>
           </button>
         </div>
       </div>
+    </section>
 
-      <!-- DATOS DEL CLIENTE Y ENTREGA -->
-      <form id="order-form" class="space-y-4 pt-2">
-        <div class="flex items-center gap-2 pb-2 border-b border-slate-100">
-          <div class="w-8 h-8 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center font-black text-sm">
-            2
-          </div>
-          <div>
-            <h3 class="font-extrabold text-sm text-slate-900">Datos de Entrega y Contacto</h3>
-            <p class="text-xs text-slate-400">Sin necesidad de crear cuenta</p>
-          </div>
+    <!-- Formulario de Reserva -->
+    <section class="bg-white rounded-3xl p-5 shadow-sm border border-slate-200 space-y-4">
+      <div class="flex items-center gap-2 pb-2 border-b border-slate-100">
+        <div class="w-8 h-8 rounded-xl bg-orange-100 text-orange-700 flex items-center justify-center font-black text-sm">2</div>
+        <div>
+          <h3 class="font-extrabold text-sm text-slate-900">Datos de Entrega y Pago</h3>
+          <p class="text-[11px] text-slate-500">Completa tus datos para agendar tu pedido</p>
         </div>
+      </div>
 
+      <form id="order-form" class="space-y-4">
+        
+        <!-- Nombre y WhatsApp -->
         <div class="space-y-3">
           <div>
             <label class="block text-xs font-bold text-slate-700 mb-1">Nombre Completo *</label>
-            <input type="text" id="cliente-nombre" required placeholder="Ej. Doña Martha Ramírez" class="w-full text-xs p-3 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none font-semibold text-slate-800">
+            <input type="text" id="cliente-nombre" required placeholder="Ej. Doña Martha Ramírez" class="w-full text-xs p-3 rounded-xl border border-slate-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none font-semibold text-slate-800 transition">
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label class="block text-xs font-bold text-slate-700 mb-1">Teléfono / WhatsApp *</label>
-              <input type="tel" id="cliente-telefono" required placeholder="Ej. 300 123 4567" class="w-full text-xs p-3 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none font-semibold text-slate-800">
+              <input type="tel" id="cliente-telefono" required placeholder="Ej. 300 123 4567" class="w-full text-xs p-3 rounded-xl border border-slate-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none font-semibold text-slate-800 transition">
             </div>
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Día y Hora de Entrega *</label>
-              <select id="cliente-dia" class="w-full text-xs p-3 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none font-semibold text-slate-800 bg-white">
+              <label class="block text-xs font-bold text-slate-700 mb-1">Día y Horario de Entrega *</label>
+              <select id="cliente-dia" class="w-full text-xs p-3 rounded-xl border border-slate-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none font-semibold text-slate-800 bg-white transition">
                 <option value="Sábado - 12:00 PM a 1:30 PM">Sábado (12:00 PM - 1:30 PM)</option>
                 <option value="Sábado - 1:30 PM a 3:00 PM">Sábado (1:30 PM - 3:00 PM)</option>
                 <option value="Domingo - 12:00 PM a 1:30 PM">Domingo (12:00 PM - 1:30 PM)</option>
@@ -187,149 +227,116 @@
             </div>
           </div>
 
-          <!-- Tipo de Entrega (Domicilio vs Recoger) -->
+          <!-- Tipo de Entrega -->
           <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1.5">Método de Entrega</label>
+            <label class="block text-xs font-bold text-slate-700 mb-1.5">Modalidad de Entrega</label>
             <div class="grid grid-cols-2 gap-2">
               <div>
                 <input type="radio" name="tipo-entrega" id="entrega-domicilio" value="domicilio" checked class="hidden peer">
-                <label for="entrega-domicilio" class="flex flex-col items-center justify-center p-3 rounded-xl border-2 border-slate-200 peer-checked:border-brand-600 peer-checked:bg-brand-50 peer-checked:text-brand-900 cursor-pointer text-center transition">
-                  <i data-lucide="bike" class="w-5 h-5 text-brand-600 mb-1"></i>
-                  <span class="text-xs font-extrabold">A Domicilio</span>
-                  <span class="text-[10px] text-slate-500">+ Domicilio</span>
+                <label for="entrega-domicilio" class="flex flex-col items-center p-3 rounded-xl border-2 border-slate-200 peer-checked:border-orange-600 peer-checked:bg-orange-50/80 cursor-pointer text-center transition">
+                  <i data-lucide="bike" class="w-5 h-5 text-orange-600 mb-1"></i>
+                  <span class="text-xs font-extrabold text-slate-800">A Domicilio</span>
+                  <span class="text-[10px] text-slate-500">+$3.000</span>
                 </label>
               </div>
-
               <div>
                 <input type="radio" name="tipo-entrega" id="entrega-recoger" value="recoger" class="hidden peer">
-                <label for="entrega-recoger" class="flex flex-col items-center justify-center p-3 rounded-xl border-2 border-slate-200 peer-checked:border-brand-600 peer-checked:bg-brand-50 peer-checked:text-brand-900 cursor-pointer text-center transition">
-                  <i data-lucide="store" class="w-5 h-5 text-brand-600 mb-1"></i>
-                  <span class="text-xs font-extrabold">Recoger en Sitio</span>
-                  <span class="text-[10px] text-emerald-600 font-bold">Sin costo extra</span>
+                <label for="entrega-recoger" class="flex flex-col items-center p-3 rounded-xl border-2 border-slate-200 peer-checked:border-orange-600 peer-checked:bg-orange-50/80 cursor-pointer text-center transition">
+                  <i data-lucide="store" class="w-5 h-5 text-orange-600 mb-1"></i>
+                  <span class="text-xs font-extrabold text-slate-800">Recoger en Sitio</span>
+                  <span class="text-[10px] text-emerald-600 font-bold">Sin costo</span>
                 </label>
               </div>
             </div>
           </div>
 
-          <!-- Campo Dirección (se oculta si es recoger) -->
+          <!-- Dirección -->
           <div id="direccion-container">
-            <label class="block text-xs font-bold text-slate-700 mb-1">Dirección y Barrio *</label>
-            <input type="text" id="cliente-direccion" placeholder="Ej. Cra 15 # 45-12 Apto 302, Barrio San José" class="w-full text-xs p-3 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none font-semibold text-slate-800">
+            <label class="block text-xs font-bold text-slate-700 mb-1">Dirección y Barrio de Entrega *</label>
+            <input type="text" id="cliente-direccion" placeholder="Ej. Cra 15 # 45-12 Apto 302, Barrio Los Álamos" class="w-full text-xs p-3 rounded-xl border border-slate-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none font-semibold text-slate-800 transition">
           </div>
 
-          <!-- Métodos de Pago -->
+          <!-- Método de Pago -->
           <div>
             <label class="block text-xs font-bold text-slate-700 mb-1.5">Forma de Pago</label>
             <div class="grid grid-cols-3 gap-2">
-              <label class="flex flex-col items-center p-2.5 rounded-xl border-2 border-slate-200 has-[:checked]:border-brand-600 has-[:checked]:bg-brand-50 cursor-pointer text-center transition">
+              <label class="flex flex-col items-center p-2.5 rounded-xl border-2 border-slate-200 has-[:checked]:border-orange-600 has-[:checked]:bg-orange-50/80 cursor-pointer text-center transition">
                 <input type="radio" name="metodo-pago" value="nequi" checked class="hidden">
                 <span class="text-xs font-black text-slate-800">Nequi</span>
-                <span class="text-[10px] text-slate-400">Transferencia</span>
               </label>
-
-              <label class="flex flex-col items-center p-2.5 rounded-xl border-2 border-slate-200 has-[:checked]:border-brand-600 has-[:checked]:bg-brand-50 cursor-pointer text-center transition">
+              <label class="flex flex-col items-center p-2.5 rounded-xl border-2 border-slate-200 has-[:checked]:border-orange-600 has-[:checked]:bg-orange-50/80 cursor-pointer text-center transition">
                 <input type="radio" name="metodo-pago" value="bancolombia" class="hidden">
                 <span class="text-xs font-black text-slate-800">Bancolombia</span>
-                <span class="text-[10px] text-slate-400">Ahorros / QR</span>
               </label>
-
-              <label class="flex flex-col items-center p-2.5 rounded-xl border-2 border-slate-200 has-[:checked]:border-brand-600 has-[:checked]:bg-brand-50 cursor-pointer text-center transition">
+              <label class="flex flex-col items-center p-2.5 rounded-xl border-2 border-slate-200 has-[:checked]:border-orange-600 has-[:checked]:bg-orange-50/80 cursor-pointer text-center transition">
                 <input type="radio" name="metodo-pago" value="efectivo" class="hidden">
                 <span class="text-xs font-black text-slate-800">Efectivo</span>
-                <span class="text-[10px] text-slate-400">Contraentrega</span>
               </label>
             </div>
           </div>
 
-          <!-- Notas Adicionales -->
+          <!-- Notas -->
           <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">Notas o Acompañamientos Especiales</label>
-            <textarea id="cliente-notas" rows="2" placeholder="Ej. Sin cebolla en la ensalada, con ají picante extra, etc." class="w-full text-xs p-3 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none"></textarea>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Notas o Aclaraciones (Opcional)</label>
+            <textarea id="cliente-notas" rows="2" placeholder="Ej. Por favor sin cebolla, con ají extra picante..." class="w-full text-xs p-3 rounded-xl border border-slate-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none text-slate-800 transition"></textarea>
           </div>
         </div>
 
-        <!-- RESUMEN DE COMPRA Y BOTÓN DE CONFIRMACIÓN -->
-        <div class="bg-amber-50/70 border border-amber-200/80 rounded-2xl p-4 space-y-2">
+        <!-- Resumen de Costos -->
+        <div class="bg-amber-50/80 border border-amber-200 rounded-2xl p-4 space-y-2">
           <div class="flex justify-between text-xs text-slate-600">
-            <span>Subtotal de porciones:</span>
+            <span>Subtotal platos:</span>
             <span id="summary-subtotal" class="font-bold text-slate-800">$22.000</span>
           </div>
           <div class="flex justify-between text-xs text-slate-600">
-            <span>Costo de envío:</span>
+            <span>Servicio de Domicilio:</span>
             <span id="summary-envio" class="font-bold text-slate-800">$3.000</span>
           </div>
           <div class="flex justify-between text-sm font-black text-slate-900 pt-2 border-t border-amber-200">
             <span>Total a Pagar:</span>
-            <span id="summary-total" class="text-base text-brand-600 font-extrabold">$25.000</span>
+            <span id="summary-total" class="text-base text-orange-600 font-extrabold">$25.000</span>
           </div>
         </div>
 
-        <!-- Botón Principal -->
-        <button type="submit" class="w-full py-4 px-6 rounded-2xl bg-brand-600 hover:bg-brand-700 active:scale-[0.99] text-white font-extrabold text-sm flex items-center justify-center gap-2 shadow-lg shadow-brand-600/25 transition cursor-pointer">
+        <!-- Botón de Envío -->
+        <button type="submit" class="w-full py-4 px-6 rounded-2xl bg-orange-600 hover:bg-orange-700 active:scale-[0.99] text-white font-extrabold text-sm flex items-center justify-center gap-2 shadow-lg shadow-orange-600/25 transition cursor-pointer">
           <i data-lucide="check-circle-2" class="w-5 h-5"></i>
-          <span>Confirmar Reserva (<span id="btn-submit-total">$25.000</span>)</span>
+          <span>Confirmar y Enviar Reserva (<span id="btn-submit-total">$25.000</span>)</span>
         </button>
       </form>
     </section>
-
-    <!-- INFORMACIÓN DE CUENTAS BANCARIAS -->
-    <section class="bg-white rounded-3xl p-5 border border-slate-200 text-xs space-y-3">
-      <h4 class="font-extrabold text-slate-800 flex items-center gap-2">
-        <i data-lucide="wallet" class="w-4 h-4 text-brand-600"></i>
-        <span>Cuentas para Transferencias</span>
-      </h4>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
-        <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-          <span class="text-purple-700 font-bold block">Nequi:</span>
-          <strong id="info-nequi" class="text-slate-800 font-mono text-xs">300 123 4567</strong>
-        </div>
-        <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-          <span class="text-amber-700 font-bold block">Bancolombia:</span>
-          <strong id="info-banco" class="text-slate-800 font-mono text-xs">Ahorros N° 123-456789-00</strong>
-        </div>
-      </div>
-      <p class="text-[10px] text-slate-400 text-center">Titular: <span id="info-titular" class="font-bold text-slate-600">Sazón Lau - Almuerzos del Barrio</span></p>
-    </section>
   </main>
 
-  <!-- MODAL DE CONFIRMACIÓN DE RESERVA -->
+  <!-- Modal de Éxito & Redirección a WhatsApp -->
   <div id="success-modal" class="modal-overlay">
     <div class="modal-card text-center space-y-4">
       <div class="w-14 h-14 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto shadow-md">
         <i data-lucide="check" class="w-8 h-8"></i>
       </div>
-
       <div>
-        <span class="text-[11px] font-extrabold text-emerald-600 uppercase tracking-wider">¡Reserva Registrada con Éxito!</span>
-        <h3 class="text-lg font-black text-slate-900 mt-0.5">Número de Pedido: <span id="modal-order-id" class="text-brand-600 font-mono">ALM-0000</span></h3>
-        <p class="text-xs text-slate-500 mt-1">Tu reserva ya fue guardada en el sistema. Ahora solo falta enviar la confirmación a nuestro WhatsApp para coordinar la entrega.</p>
+        <span class="text-[11px] font-extrabold text-emerald-600 uppercase tracking-wider">¡Reserva Registrada en Firebase!</span>
+        <h3 class="text-lg font-black text-slate-900 mt-0.5">Pedido: <span id="modal-order-id" class="text-orange-600 font-mono">ALM-0000</span></h3>
+        <p id="modal-order-plato" class="text-xs font-bold text-slate-700 mt-1">1x Pollo con Yuca y Plátano</p>
+        <p class="text-xs text-slate-500 mt-1">Tu pedido ya está en cocina. Envía la confirmación por WhatsApp para seguimiento.</p>
       </div>
 
-      <div class="bg-slate-50 rounded-2xl p-3 border border-slate-200 text-left text-xs space-y-1.5">
-        <div class="flex justify-between">
-          <span class="text-slate-500">Plato:</span>
-          <strong id="modal-order-plato" class="text-slate-800 font-bold">1x Pollo con Yuca</strong>
-        </div>
-        <div class="flex justify-between">
-          <span class="text-slate-500">Total:</span>
-          <strong id="modal-order-total" class="text-brand-600 font-black text-sm">$25.000</strong>
-        </div>
+      <div class="bg-slate-50 p-3 rounded-xl text-xs flex justify-between items-center border border-slate-200">
+        <span class="text-slate-500 font-bold">Total a Pagar:</span>
+        <span id="modal-order-total" class="font-black text-sm text-slate-900">$25.000</span>
       </div>
 
       <div class="space-y-2 pt-2">
         <button id="btn-send-whatsapp" class="w-full py-3.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/25 transition cursor-pointer">
           <i data-lucide="send" class="w-4 h-4"></i>
-          <span>Enviar Confirmación por WhatsApp</span>
+          <span>Enviar Confirmación a WhatsApp</span>
         </button>
-
-        <button onclick="closeSuccessModal()" class="w-full py-2.5 text-slate-500 hover:text-slate-700 font-bold text-xs">
-          Cerrar
+        <button onclick="closeSuccessModal()" class="w-full py-2.5 text-slate-500 hover:text-slate-700 font-bold text-xs transition cursor-pointer">
+          Hacer otra reserva
         </button>
       </div>
     </div>
   </div>
 
-  <!-- Scripts de la Aplicación -->
   <script src="app.js"></script>
 </body>
 </html>

@@ -2,9 +2,14 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Panel de Administración - Sazón Lau</title>
   
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -19,7 +24,6 @@
               500: '#f97316',
               600: '#ea580c',
               700: '#c2410c',
-              800: '#9a3412',
             }
           }
         }
@@ -30,104 +34,114 @@
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
 
-  <!-- Estilos Globales -->
-  <link rel="stylesheet" href="styles.css">
+  <!-- Estilos Embebidos (Resilientes a GitHub Pages) -->
+  <style>
+    :root {
+      --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-serif: 'Playfair Display', Georgia, serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: var(--font-sans);
+      background-color: #f1f5f9;
+      color: #1e293b;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+    .font-serif { font-family: var(--font-serif); }
+    img { max-width: 100%; height: auto; }
+    
+    .badge-status {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.25rem 0.65rem;
+      border-radius: 9999px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .badge-pendiente { background-color: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+    .badge-preparacion { background-color: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
+    .badge-camino { background-color: #f3e8ff; color: #7e22ce; border: 1px solid #e9d5ff; }
+    .badge-entregado { background-color: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+    .badge-cancelado { background-color: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
+  </style>
 
-  <!-- Firebase App & Database Compat SDKs -->
+  <!-- Firebase Compat SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-
-  <!-- Configuración de Firebase -->
   <script src="firebase-config.js"></script>
 </head>
-<body class="bg-slate-100 min-h-screen text-slate-800 antialiased selection:bg-brand-500 selection:text-white pb-20">
+<body class="bg-slate-100 min-h-screen text-slate-800 antialiased selection:bg-orange-500 selection:text-white pb-20">
 
-  <!-- ========================================================================
-       VISTA 1: LOGIN ADMINISTRATIVO CON FIREBASE AUTH
-       ======================================================================== -->
+  <!-- SECCIÓN 1: LOGIN DE SEGURIDAD -->
   <section id="admin-login-section" class="min-h-screen flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-xl border border-slate-200 space-y-6">
+      
       <div class="text-center space-y-2">
-        <div class="w-14 h-14 rounded-2xl bg-brand-600 text-white flex items-center justify-center mx-auto shadow-lg shadow-brand-600/30">
-          <i data-lucide="lock" class="w-7 h-7"></i>
+        <div class="w-14 h-14 rounded-2xl bg-orange-600 text-white flex items-center justify-center mx-auto shadow-lg shadow-orange-600/25">
+          <i data-lucide="shield-check" class="w-7 h-7"></i>
         </div>
-        <h2 class="text-xl font-black text-slate-900 font-serif">Panel de Control</h2>
-        <p class="text-xs text-slate-500">Ingreso exclusivo para administración de pedidos y menú</p>
+        <h2 class="text-2xl font-black text-slate-900 font-serif">Sazón Lau</h2>
+        <p class="text-xs text-slate-500 font-medium">Panel Administrativo de Almuerzos</p>
       </div>
 
-      <!-- Alerta de error -->
       <div id="login-error" class="hidden bg-rose-50 border border-rose-200 text-rose-700 text-xs p-3 rounded-xl font-semibold"></div>
 
       <form onsubmit="handleAdminLogin(event)" class="space-y-4">
         <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">Correo Electrónico (Firebase)</label>
-          <div class="relative">
-            <i data-lucide="mail" class="w-4 h-4 text-slate-400 absolute left-3 top-3.5"></i>
-            <input type="email" id="admin-email" value="admin@sazonlau.com" required placeholder="admin@tudominio.com" class="w-full text-xs pl-9 p-3 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none font-semibold">
-          </div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Correo Electrónico Administrador</label>
+          <input type="email" id="admin-email" value="admin@sazonlau.com" required placeholder="admin@sazonlau.com" class="w-full text-xs p-3 rounded-xl border border-slate-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none font-semibold transition">
         </div>
 
         <div>
           <label class="block text-xs font-bold text-slate-700 mb-1">Contraseña</label>
-          <div class="relative">
-            <i data-lucide="key" class="w-4 h-4 text-slate-400 absolute left-3 top-3.5"></i>
-            <input type="password" id="admin-password" value="admin123" required placeholder="••••••••" class="w-full text-xs pl-9 p-3 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none font-semibold">
-          </div>
+          <input type="password" id="admin-password" value="admin123" required placeholder="••••••••" class="w-full text-xs p-3 rounded-xl border border-slate-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none font-semibold transition">
         </div>
 
-        <button type="submit" class="w-full py-3.5 px-4 rounded-xl bg-brand-600 hover:bg-brand-700 active:scale-[0.99] text-white font-extrabold text-xs shadow-lg shadow-brand-600/25 transition flex items-center justify-center gap-2 cursor-pointer">
-          <i data-lucide="log-in" class="w-4 h-4"></i>
-          <span>Ingresar al Sistema</span>
+        <button type="submit" class="w-full py-3.5 rounded-xl bg-orange-600 hover:bg-orange-700 active:scale-[0.99] text-white font-extrabold text-xs shadow-lg shadow-orange-600/25 transition cursor-pointer">
+          Ingresar al Panel
         </button>
       </form>
 
-      <div class="pt-4 border-t border-slate-100 flex items-center justify-between text-xs">
-        <a href="index.html" class="text-slate-500 hover:text-brand-600 font-bold flex items-center gap-1">
+      <div class="text-center pt-2">
+        <a href="index.html" class="inline-flex items-center gap-1 text-xs text-slate-500 hover:text-orange-600 font-bold transition">
           <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
-          <span>Volver al Menú Público</span>
+          <span>Volver al Menú de Clientes</span>
         </a>
       </div>
     </div>
   </section>
 
-  <!-- ========================================================================
-       VISTA 2: DASHBOARD ADMINISTRATIVO EN TIEMPO REAL
-       ======================================================================== -->
+  <!-- SECCIÓN 2: DASHBOARD EN TIEMPO REAL -->
   <section id="admin-dashboard-section" class="hidden">
-    <!-- Navbar superior -->
+    
+    <!-- Barra Superior -->
     <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
       <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-2xl bg-brand-600 flex items-center justify-center text-white shadow-md shadow-brand-600/20">
+          <div class="w-10 h-10 rounded-2xl bg-orange-600 flex items-center justify-center text-white shadow-md shadow-orange-600/20">
             <i data-lucide="utensils" class="w-5 h-5"></i>
           </div>
           <div>
             <h1 class="font-extrabold text-sm text-slate-900 leading-tight">Sazón Lau - Admin</h1>
             <div class="flex items-center gap-1.5 text-[11px] text-emerald-600 font-bold">
               <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              <span>En vivo (Realtime)</span>
+              <span>Firebase Realtime Database Activo</span>
             </div>
           </div>
         </div>
 
         <div class="flex items-center gap-2">
-          <!-- Botón de sonido -->
-          <button id="toggle-sound-btn" class="text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-xl border border-slate-200 flex items-center gap-1.5 transition">
-            <i data-lucide="volume-2" class="w-4 h-4 text-emerald-600"></i>
-            <span>Sonido Activo</span>
-          </button>
-
-          <!-- Ver menú público -->
-          <a href="index.html" target="_blank" class="hidden sm:inline-flex items-center gap-1 text-xs font-bold bg-slate-100 hover:bg-brand-50 hover:text-brand-700 text-slate-700 px-3 py-1.5 rounded-xl border border-slate-200 transition">
+          <a href="index.html" target="_blank" class="hidden sm:inline-flex items-center gap-1 text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-xl border border-slate-200 transition">
             <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
-            <span>Ver Menú</span>
+            <span>Ver Menú Cliente</span>
           </a>
-
-          <!-- Cerrar sesión -->
-          <button onclick="handleAdminLogout()" class="text-xs font-bold bg-rose-50 hover:bg-rose-100 text-rose-700 px-3 py-1.5 rounded-xl border border-rose-200 flex items-center gap-1 transition">
-            <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
-            <span class="hidden sm:inline">Cerrar Sesión</span>
+          <button onclick="handleAdminLogout()" class="text-xs font-bold bg-rose-50 hover:bg-rose-100 text-rose-700 px-3 py-1.5 rounded-xl border border-rose-200 transition cursor-pointer">
+            Cerrar Sesión
           </button>
         </div>
       </div>
@@ -135,163 +149,120 @@
 
     <main class="max-w-6xl mx-auto px-4 pt-6 space-y-6">
 
-      <!-- TARJETAS DE ESTADÍSTICAS RÁPIDAS -->
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <!-- Métricas Clave -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
         <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm">
-          <span class="text-[11px] font-bold text-slate-400 block uppercase">Total Pedidos</span>
-          <span id="stat-total-orders" class="text-2xl font-black text-slate-900 font-mono">0</span>
+          <span class="text-[11px] font-bold text-slate-400 block uppercase tracking-wider">Total Reservas</span>
+          <span id="stat-total-orders" class="text-2xl font-black text-slate-900">0</span>
         </div>
 
-        <div class="bg-white rounded-2xl p-4 border border-amber-200 bg-amber-50/30 shadow-sm">
-          <span class="text-[11px] font-bold text-amber-700 block uppercase">Pendientes</span>
-          <span id="stat-pending-orders" class="text-2xl font-black text-amber-600 font-mono">0</span>
+        <div class="bg-white rounded-2xl p-4 border border-amber-200 bg-amber-50/40 shadow-sm">
+          <span class="text-[11px] font-bold text-amber-700 block uppercase tracking-wider">Pendientes</span>
+          <span id="stat-pending-orders" class="text-2xl font-black text-amber-600">0</span>
         </div>
 
-        <div class="bg-white rounded-2xl p-4 border border-sky-200 bg-sky-50/30 shadow-sm">
-          <span class="text-[11px] font-bold text-sky-700 block uppercase">En Proceso / Camino</span>
-          <span id="stat-prep-orders" class="text-2xl font-black text-sky-600 font-mono">0</span>
+        <div class="bg-white rounded-2xl p-4 border border-sky-200 bg-sky-50/40 shadow-sm">
+          <span class="text-[11px] font-bold text-sky-700 block uppercase tracking-wider">En Preparación</span>
+          <span id="stat-prep-orders" class="text-2xl font-black text-sky-600">0</span>
         </div>
 
-        <div class="bg-white rounded-2xl p-4 border border-emerald-200 bg-emerald-50/30 shadow-sm">
-          <span class="text-[11px] font-bold text-emerald-700 block uppercase">Ventas Estimadas</span>
-          <span id="stat-total-revenue" class="text-xl font-black text-emerald-600 font-mono">$0</span>
+        <div class="bg-white rounded-2xl p-4 border border-emerald-200 bg-emerald-50/40 shadow-sm">
+          <span class="text-[11px] font-bold text-emerald-700 block uppercase tracking-wider">Ventas Estimadas</span>
+          <span id="stat-total-revenue" class="text-xl font-black text-emerald-600">$0</span>
         </div>
       </div>
 
+      <!-- Contenedor Principal: Lista de Pedidos + Gestor de Menú -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-        <!-- COLUMNA IZQUIERDA Y CENTRAL: LISTA DE PEDIDOS EN TIEMPO REAL (2 COLUMNAS EN LG) -->
+        <!-- Columna de Pedidos (2/3) -->
         <div class="lg:col-span-2 space-y-4">
           
-          <!-- Barra de Controles y Filtros -->
           <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm space-y-3">
-            <div class="flex flex-wrap items-center justify-between gap-3">
-              <div class="flex items-center gap-2">
-                <i data-lucide="clipboard-list" class="w-5 h-5 text-brand-600"></i>
-                <h3 class="font-extrabold text-sm text-slate-900">Recepción de Pedidos en Vivo</h3>
-              </div>
-
-              <!-- Exportar a CSV -->
-              <button onclick="exportOrdersToCSV()" class="text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-xl border border-slate-200 flex items-center gap-1.5 transition">
-                <i data-lucide="download" class="w-3.5 h-3.5 text-slate-600"></i>
-                <span>Descargar Excel (CSV)</span>
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <h3 class="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+                <i data-lucide="bell" class="w-4 h-4 text-orange-600"></i>
+                <span>Recepción de Pedidos (/pedidos)</span>
+              </h3>
+              <button onclick="exportOrdersToCSV()" class="inline-flex items-center gap-1 text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-xl border border-slate-200 transition cursor-pointer">
+                <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                <span>Exportar CSV</span>
               </button>
             </div>
 
-            <!-- Buscador -->
-            <div class="relative">
-              <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-3"></i>
-              <input type="text" id="admin-search-input" placeholder="Buscar por nombre, teléfono, código de pedido..." class="w-full text-xs pl-9 p-2.5 rounded-xl border border-slate-200 focus:border-brand-500 outline-none bg-slate-50">
-            </div>
-
-            <!-- Píldoras de Filtro por Estado -->
-            <div class="flex flex-wrap gap-1.5 pt-1">
-              <button class="filter-status-btn px-3 py-1 rounded-xl text-xs font-bold bg-brand-600 text-white transition" data-status="todos">Todos</button>
-              <button class="filter-status-btn px-3 py-1 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition" data-status="pendiente">Pendientes</button>
-              <button class="filter-status-btn px-3 py-1 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition" data-status="preparacion">En Preparación</button>
-              <button class="filter-status-btn px-3 py-1 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition" data-status="camino">En Camino</button>
-              <button class="filter-status-btn px-3 py-1 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition" data-status="entregado">Entregados</button>
-              <button class="filter-status-btn px-3 py-1 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition" data-status="cancelado">Cancelados</button>
+            <!-- Buscador y Filtros -->
+            <div class="space-y-2">
+              <input type="text" id="admin-search-input" placeholder="Buscar por cliente, teléfono o plato..." class="w-full text-xs p-2.5 rounded-xl border border-slate-200 focus:border-orange-500 outline-none">
+              
+              <div class="flex flex-wrap gap-1.5 pt-1">
+                <button class="filter-status-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-orange-600 text-white transition cursor-pointer" data-status="todos">Todos</button>
+                <button class="filter-status-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 transition cursor-pointer" data-status="pendiente">Pendientes</button>
+                <button class="filter-status-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 transition cursor-pointer" data-status="preparacion">En Prep.</button>
+                <button class="filter-status-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 transition cursor-pointer" data-status="camino">En Camino</button>
+                <button class="filter-status-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 transition cursor-pointer" data-status="entregado">Entregados</button>
+              </div>
             </div>
           </div>
 
-          <!-- Contenedor dinámico de pedidos -->
+          <!-- Lista de Pedidos -->
           <div id="admin-orders-list" class="space-y-3">
-            <!-- Renderizado dinámico desde admin.js -->
+            <!-- Pedidos renderizados en tiempo real mediante admin.js -->
           </div>
         </div>
 
-        <!-- COLUMNA DERECHA: GESTOR DE MENÚ DEL FIN DE SEMANA -->
+        <!-- Columna de Configuración de Menú (1/3) -->
         <div class="space-y-4">
           <div class="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm space-y-4 sticky top-20">
-            <div class="flex items-center justify-between pb-2 border-b border-slate-100">
-              <h3 class="font-extrabold text-sm text-slate-900 flex items-center gap-2">
-                <i data-lucide="edit-3" class="w-4 h-4 text-brand-600"></i>
-                <span>Gestor de Menú en Vivo</span>
-              </h3>
-              <span class="text-[10px] bg-brand-50 text-brand-700 font-extrabold px-2 py-0.5 rounded-full border border-brand-100">Sincronización</span>
-            </div>
-
-            <!-- Selector de platos típicos preconfigurados (1 clic) -->
-            <div class="space-y-1.5">
-              <span class="text-[11px] font-bold text-slate-600 block">Cargar Plato Preconfigurado:</span>
-              <div class="grid grid-cols-3 gap-1.5">
-                <button type="button" onclick="selectPresetDish('PolloYuca')" class="p-1.5 rounded-xl border border-slate-200 hover:border-brand-500 hover:bg-brand-50 text-center transition">
-                  <span class="text-[10px] font-bold text-slate-800 block truncate">Pollo & Yuca</span>
-                </button>
-                <button type="button" onclick="selectPresetDish('Sancocho')" class="p-1.5 rounded-xl border border-slate-200 hover:border-brand-500 hover:bg-brand-50 text-center transition">
-                  <span class="text-[10px] font-bold text-slate-800 block truncate">Sancocho</span>
-                </button>
-                <button type="button" onclick="selectPresetDish('BandejaPaisa')" class="p-1.5 rounded-xl border border-slate-200 hover:border-brand-500 hover:bg-brand-50 text-center transition">
-                  <span class="text-[10px] font-bold text-slate-800 block truncate">Bandeja Paisa</span>
-                </button>
-                <button type="button" onclick="selectPresetDish('Pescado')" class="p-1.5 rounded-xl border border-slate-200 hover:border-brand-500 hover:bg-brand-50 text-center transition">
-                  <span class="text-[10px] font-bold text-slate-800 block truncate">Pescado Frito</span>
-                </button>
-                <button type="button" onclick="selectPresetDish('Empanadas')" class="p-1.5 rounded-xl border border-slate-200 hover:border-brand-500 hover:bg-brand-50 text-center transition">
-                  <span class="text-[10px] font-bold text-slate-800 block truncate">Empanadas</span>
-                </button>
-                <button type="button" onclick="selectPresetDish('CarneAsada')" class="p-1.5 rounded-xl border border-slate-200 hover:border-brand-500 hover:bg-brand-50 text-center transition">
-                  <span class="text-[10px] font-bold text-slate-800 block truncate">Carne Asada</span>
-                </button>
+            <div class="flex items-center gap-2 pb-2 border-b border-slate-100">
+              <div class="w-8 h-8 rounded-xl bg-orange-100 text-orange-700 flex items-center justify-center font-black">
+                <i data-lucide="edit-3" class="w-4 h-4"></i>
+              </div>
+              <div>
+                <h3 class="font-extrabold text-sm text-slate-900">Gestor de Menú en Vivo</h3>
+                <p class="text-[11px] text-slate-500">Actualiza platos y precios al instante</p>
               </div>
             </div>
 
-            <!-- Formulario de Configuración del Plato -->
             <div class="space-y-3">
               <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Nombre del Plato Principal</label>
-                <input type="text" id="adm-plato-nombre" class="w-full text-xs p-2.5 rounded-xl border border-slate-200 focus:border-brand-500 outline-none font-bold text-slate-900">
-              </div>
-
-              <!-- Vista previa de foto y selector de archivo -->
-              <div class="space-y-1.5">
-                <label class="block text-xs font-bold text-slate-700">Foto del Plato</label>
-                <div class="relative rounded-xl overflow-hidden aspect-video bg-slate-100 border border-slate-200 shadow-inner">
-                  <img id="adm-dish-preview-img" src="" alt="Vista previa" class="w-full h-full object-cover">
-                </div>
-
-                <input type="file" id="adm-plato-file-input" accept="image/*" class="hidden" onchange="handleAdminDishImageUpload(event)">
-                <button type="button" onclick="document.getElementById('adm-plato-file-input').click()" class="w-full py-2 px-3 rounded-xl border-2 border-dashed border-brand-300 bg-brand-50 hover:bg-brand-100 text-brand-700 font-extrabold text-xs flex items-center justify-center gap-1.5 transition">
-                  <i data-lucide="image-plus" class="w-4 h-4"></i>
-                  <span>Subir Foto de Galería</span>
-                </button>
-                <input type="text" id="adm-plato-imagen" placeholder="O pega URL de foto https://..." class="w-full text-[11px] p-2 rounded-lg border border-slate-200 outline-none font-mono">
+                <label class="block text-xs font-bold text-slate-700 mb-1">Nombre del Plato Destacado</label>
+                <input type="text" id="adm-plato-nombre" class="w-full text-xs p-2.5 rounded-xl border border-slate-200 font-bold focus:border-orange-500 outline-none">
               </div>
 
               <div class="grid grid-cols-2 gap-2">
                 <div>
                   <label class="block text-xs font-bold text-slate-700 mb-1">Precio Plato ($)</label>
-                  <input type="number" id="adm-plato-precio" class="w-full text-xs p-2.5 rounded-xl border border-slate-200 focus:border-brand-500 outline-none font-bold text-slate-900">
+                  <input type="number" id="adm-plato-precio" class="w-full text-xs p-2.5 rounded-xl border border-slate-200 focus:border-orange-500 outline-none font-bold">
                 </div>
                 <div>
-                  <label class="block text-xs font-bold text-slate-700 mb-1">Costo Domicilio ($)</label>
-                  <input type="number" id="adm-domicilio-precio" class="w-full text-xs p-2.5 rounded-xl border border-slate-200 focus:border-brand-500 outline-none font-bold text-slate-900">
+                  <label class="block text-xs font-bold text-slate-700 mb-1">Domicilio ($)</label>
+                  <input type="number" id="adm-domicilio-precio" class="w-full text-xs p-2.5 rounded-xl border border-slate-200 focus:border-orange-500 outline-none font-bold">
                 </div>
               </div>
 
               <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Reseña / Descripción</label>
-                <textarea id="adm-plato-desc" rows="3" class="w-full text-xs p-2.5 rounded-xl border border-slate-200 focus:border-brand-500 outline-none leading-relaxed"></textarea>
+                <label class="block text-xs font-bold text-slate-700 mb-1">URL de Imagen del Plato</label>
+                <input type="url" id="adm-plato-imagen" class="w-full text-xs p-2.5 rounded-xl border border-slate-200 focus:border-orange-500 outline-none">
               </div>
 
               <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">WhatsApp de Recepción</label>
-                <input type="text" id="adm-wsp-admin" placeholder="573001234567" class="w-full text-xs p-2.5 rounded-xl border border-slate-200 focus:border-brand-500 outline-none font-mono">
+                <label class="block text-xs font-bold text-slate-700 mb-1">Descripción de Preparación</label>
+                <textarea id="adm-plato-desc" rows="3" class="w-full text-xs p-2.5 rounded-xl border border-slate-200 focus:border-orange-500 outline-none text-slate-700"></textarea>
               </div>
 
-              <button type="button" onclick="saveMenuConfig()" class="w-full py-3 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-extrabold text-xs shadow-md transition flex items-center justify-center gap-2 cursor-pointer">
-                <i data-lucide="check" class="w-4 h-4"></i>
-                <span>Guardar Cambios de Menú</span>
+              <button onclick="saveMenuConfig()" class="w-full py-3 px-4 rounded-xl bg-orange-600 hover:bg-orange-700 text-white font-extrabold text-xs shadow-md shadow-orange-600/20 transition cursor-pointer flex items-center justify-center gap-2">
+                <i data-lucide="save" class="w-4 h-4"></i>
+                <span>Guardar Cambios en Firebase</span>
               </button>
             </div>
           </div>
         </div>
+
       </div>
+
     </main>
   </section>
 
-  <!-- Scripts del Panel de Administración -->
   <script src="admin.js"></script>
 </body>
 </html>

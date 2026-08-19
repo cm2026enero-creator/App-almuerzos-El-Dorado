@@ -1,12 +1,5 @@
 // ============================================================================
-// CONFIGURACIÓN DE FIREBASE (Realtime Database & Authentication)
-// ============================================================================
-// Para producción en GitHub Pages:
-// 1. Ve a https://console.firebase.google.com/
-// 2. Crea un proyecto ("Almuerzos-Fin-De-Semana")
-// 3. Registra una aplicación Web y copia tus credenciales aquí abajo.
-// 4. Habilita 'Authentication' (Método: Correo electrónico / Contraseña)
-// 5. Habilita 'Realtime Database' (o Firestore) con reglas de lectura pública y escritura para pedidos.
+// FIREBASE-CONFIG.JS - CONEXIÓN A REALTIME DATABASE & AUTH
 // ============================================================================
 
 const firebaseConfig = {
@@ -20,24 +13,22 @@ const firebaseConfig = {
   measurementId: "G-BER65WSV1G"
 };
 
-// Variable global de estado de Firebase
 let isFirebaseConfigured = false;
 let db = null;
 let auth = null;
 
-// Inicialización de Firebase con fallback automático a LocalStorage (Demo Mode)
 function initFirebaseApp() {
   try {
-    if (typeof firebase !== 'undefined' && firebaseConfig.apiKey !== "TU_API_KEY_AQUI" && !firebaseConfig.apiKey.includes("TU_API_KEY")) {
-      if (!firebase.apps.length) {
+    if (typeof firebase !== 'undefined' && firebaseConfig.apiKey) {
+      if (!firebase.apps || !firebase.apps.length) {
         firebase.initializeApp(firebaseConfig);
       }
       db = firebase.database();
       auth = firebase.auth();
       isFirebaseConfigured = true;
-      console.log("✅ Firebase inicializado correctamente en tiempo real.");
+      console.log("✅ Firebase inicializado correctamente en Realtime Database:", firebaseConfig.databaseURL);
     } else {
-      console.warn("⚠️ Firebase no configurado con credenciales reales. Usando motor local reactivo (LocalStorage Fallback).");
+      console.warn("⚠️ SDK de Firebase no cargado aún. Activando modo local reactivo.");
       isFirebaseConfigured = false;
     }
   } catch (error) {
@@ -46,9 +37,10 @@ function initFirebaseApp() {
   }
 }
 
-// Inicializar inmediatamente
+// Inicialización automática
 if (typeof window !== 'undefined') {
   window.firebaseConfig = firebaseConfig;
   window.isFirebaseConfigured = isFirebaseConfigured;
   window.initFirebaseApp = initFirebaseApp;
+  initFirebaseApp();
 }
