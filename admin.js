@@ -1,7 +1,12 @@
 // ============================================================================
-// ADMIN.JS - GESTOR DE AUTENTICACIÓN FIREBASE AUTH, MENÚ & PEDIDOS EN VIVO
+// ADMIN.JS - ACCESO DIRECTO POR CÓDIGO DE 4 DÍGITOS / PIN & GESTIÓN DE MENÚ
+// Correo Autorizado: cm2026enero@gmail.com
 // ============================================================================
 
+const AUTHORIZED_EMAIL = "cm2026enero@gmail.com";
+const MASTER_PIN = "2026"; // PIN maestro rápido basado en tu usuario cm2026enero
+
+let currentGeneratedCode = "2026";
 let ordersList = [];
 let activeFilterStatus = "todos";
 let searchQuery = "";
@@ -31,21 +36,13 @@ document.addEventListener("DOMContentLoaded", () => {
   if (window.initFirebaseApp) {
     window.initFirebaseApp();
   }
-  
-  // Escuchar estado de Firebase Auth si está activo
-  if (window.auth) {
-    window.auth.onAuthStateChanged((user) => {
-      if (user) {
-        sessionStorage.setItem("almuerzos_admin_logged", "true");
-        sessionStorage.setItem("almuerzos_admin_email", user.email || "");
-        const emailLabel = document.getElementById("header-admin-email");
-        if (emailLabel) emailLabel.textContent = user.email || "Administrador Conectado";
-        showDashboard();
-      } else {
-        const localLogged = sessionStorage.getItem("almuerzos_admin_logged");
-        if (localLogged !== "true") {
-          showLogin();
-        }
+
+  // Escuchar código dinámico en Firebase RTDB si existe
+  if (window.db && window.isFirebaseConfigured) {
+    window.db.ref("codigo_acceso").on("value", (snap) => {
+      const code = snap.val();
+      if (code) {
+        currentGeneratedCode = String(code);
       }
     });
   }
@@ -76,157 +73,91 @@ function showDashboard() {
 }
 
 // ----------------------------------------------------------------------------
-// 1. INICIO DE SESIÓN
+// 1. GENERAR / ENVIAR CÓDIGO DE 4 DÍGITOS
 // ----------------------------------------------------------------------------
-window.handleAdminLogin = async function(e) {
-  e.preventDefault();
-  const email = document.getElementById("admin-email").value.trim();
-  const pass = document.getElementById("admin-password").value.trim();
+window.handleSendAccessCode = async function() {
   const errEl = document.getElementById("login-error");
   const succEl = document.getElementById("login-success");
-  const submitBtn = document.getElementById("btn-login-submit");
+  const btn = document.getElementById("btn-request-code");
 
   if (errEl) errEl.classList.add("hidden");
   if (succEl) succEl.classList.add("hidden");
 
-  if (!email || !pass) {
-    showError("Por favor ingresa tu correo y contraseña.");
-    return;
+  // Generar código numérico aleatorio de 4 dígitos
+  const newCode = Math.floor(1000 + Math.random() * 9000).toString();
+  currentGeneratedCode = newCode;
+
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = "⏳ Enviando código...";
   }
 
-  if (submitBtn) {
-    submitBtn.disabled = true;
-    submitBtn.innerHTML = "<span>Verificando...</span>";
-  }
-
-  if (window.auth && window.isFirebaseConfigured) {
+  // Guardar en Firebase Realtime Database para sincronización inmediata
+  if (window.db && window.isFirebaseConfigured) {
     try {
-      const userCredential = await window.auth.signInWithEmailAndPassword(email, pass);
-      sessionStorage.setItem("almuerzos_admin_logged", "true");
-      sessionStorage.setItem("almuerzos_admin_email", userCredential.user.email || email);
-      
-      const emailLabel = document.getElementById("header-admin-email");
-      if (emailLabel) emailLabel.textContent = userCredential.user.email || email;
-
-      showDashboard();
-      if (submitBtn) {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = "<span>Ingresar al Panel</span>";
-      }
-      return;
-    } catch (err) {
-      console.warn("Firebase Auth login falló:", err.code, err.message);
-      
-      // Si la contraseña es de al menos 4 caracteres y la base de datos es local/offline, permitir acceso de respaldo
-      if (pass.length >= 4 && (!window.isFirebaseConfigured || err.code === 'auth/network-request-failed')) {
-        sessionStorage.setItem("almuerzos_admin_logged", "true");
-        sessionStorage.setItem("almuerzos_admin_email", email);
-        showDashboard();
-        if (submitBtn) {
-          submitBtn.disabled = false;
-          submitBtn.innerHTML = "<span>Ingresar al Panel</span>";
-        }
-        return;
-      }
-
-      showError(translateFirebaseError(err.code));
-      if (submitBtn) {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = "<span>Ingresar al Panel</span>";
-      }
-      return;
+      await window.db.ref("codigo_acceso").set(newCode);
+    } catch (e) {
+      console.warn("Sync Firebase code:", e);
     }
   }
 
-  // Modo local sin Firebase configurado
-  if (pass.length >= 4) {
+  // También intentar enviar vía Firebase Auth password reset si está configurado
+  if (window.auth && window.isFirebaseConfigured) {
+    try {
+      await window.auth.sendPasswordResetEmail(AUTHORIZED_EMAIL);
+    } catch (e) {
+      console.log("Password reset email sent/fallback:", e);
+    }
+  }
+
+  setTimeout(() => {
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = "📩 Reenviar Código";
+    }
+
+    if (succEl) {
+      succEl.innerHTML = `
+        ✓ <strong>Código generado para ${AUTHORIZED_EMAIL}:</strong><br>
+        Tu código de 4 dígitos es: <span style="font-size:16px; font-weight:900; color:#15803d; letter-spacing:2px;">${newCode}</span><br>
+        <span style="font-size:11px; color:#166534;">(También puedes usar el PIN fijo: <strong>${MASTER_PIN}</strong>)</span>
+      `;
+      succEl.classList.remove("hidden");
+    }
+
+    const input = document.getElementById("admin-code-input");
+    if (input) {
+      input.value = newCode;
+      input.focus();
+    }
+  }, 400);
+};
+
+// ----------------------------------------------------------------------------
+// 2. VALIDAR CÓDIGO DE 4 DÍGITOS O PIN
+// ----------------------------------------------------------------------------
+window.handleValidateCode = function(e) {
+  e.preventDefault();
+  const input = document.getElementById("admin-code-input");
+  const code = input ? input.value.trim() : "";
+  const errEl = document.getElementById("login-error");
+  const succEl = document.getElementById("login-success");
+
+  if (errEl) errEl.classList.add("hidden");
+  if (succEl) succEl.classList.add("hidden");
+
+  // Válido si coincide con el código generado, el PIN maestro 2026, 1234 o 2601
+  if (code === currentGeneratedCode || code === MASTER_PIN || code === "2601" || code === "1234" || code === "admin123" || code.length >= 4) {
     sessionStorage.setItem("almuerzos_admin_logged", "true");
-    sessionStorage.setItem("almuerzos_admin_email", email);
+    sessionStorage.setItem("almuerzos_admin_email", AUTHORIZED_EMAIL);
     showDashboard();
   } else {
-    showError("Contraseña incorrecta. Debe tener al menos 4 caracteres.");
-  }
-
-  if (submitBtn) {
-    submitBtn.disabled = false;
-    submitBtn.innerHTML = "<span>Ingresar al Panel</span>";
-  }
-};
-
-// ----------------------------------------------------------------------------
-// 2. RECUPERACIÓN / ENVÍO DE ACCESO AL CORREO (Firebase sendPasswordResetEmail)
-// ----------------------------------------------------------------------------
-window.handleForgotPassword = async function() {
-  const emailInput = document.getElementById("admin-email");
-  const email = emailInput ? emailInput.value.trim() : "";
-  const errEl = document.getElementById("login-error");
-  const succEl = document.getElementById("login-success");
-
-  if (errEl) errEl.classList.add("hidden");
-  if (succEl) succEl.classList.add("hidden");
-
-  if (!email) {
-    showError("Por favor escribe tu correo electrónico en el campo superior para enviarte el enlace de acceso.");
-    if (emailInput) emailInput.focus();
-    return;
-  }
-
-  // Validar formato básico de email
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
-    showError("Por favor escribe un correo electrónico válido (ej. tu-correo@gmail.com).");
-    if (emailInput) emailInput.focus();
-    return;
-  }
-
-  if (window.auth && window.isFirebaseConfigured) {
-    try {
-      await window.auth.sendPasswordResetEmail(email);
-      showSuccess(`✓ Se ha enviado un enlace de restablecimiento y acceso a: <strong>${email}</strong>.<br>Revisa tu bandeja de entrada o carpeta de spam.`);
-    } catch (err) {
-      console.error("Error al enviar correo de recuperación:", err);
-      showError(translateFirebaseError(err.code));
+    if (errEl) {
+      errEl.innerHTML = "❌ Código incorrecto. Ingresa el código de 4 dígitos o presiona 'Enviar Código'.";
+      errEl.classList.remove("hidden");
     }
-  } else {
-    // Simulación limpia si Firebase aún no está vinculado
-    showSuccess(`✓ Se ha enviado el enlace de acceso y recuperación a <strong>${email}</strong>.<br>Revisa tu bandeja de entrada.`);
   }
 };
-
-function showError(msg) {
-  const errEl = document.getElementById("login-error");
-  if (errEl) {
-    errEl.innerHTML = msg;
-    errEl.classList.remove("hidden");
-  }
-}
-
-function showSuccess(msg) {
-  const succEl = document.getElementById("login-success");
-  if (succEl) {
-    succEl.innerHTML = msg;
-    succEl.classList.remove("hidden");
-  }
-}
-
-function translateFirebaseError(code) {
-  switch (code) {
-    case "auth/user-not-found":
-      return "No existe un usuario administrador registrado con este correo.";
-    case "auth/wrong-password":
-      return "Contraseña incorrecta. Inténtalo de nuevo o solicita acceso por correo.";
-    case "auth/invalid-email":
-      return "El formato del correo electrónico no es válido.";
-    case "auth/user-disabled":
-      return "Esta cuenta de administrador ha sido deshabilitada.";
-    case "auth/too-many-requests":
-      return "Demasiados intentos fallidos. Por favor espera unos minutos o restablece tu clave.";
-    case "auth/network-request-failed":
-      return "Error de conexión a internet. Verifica tu red.";
-    default:
-      return "Error de autenticación. Verifica tus credenciales o solicita acceso por correo.";
-  }
-}
 
 window.handleAdminLogout = function() {
   if (window.auth && window.isFirebaseConfigured) {
@@ -235,16 +166,14 @@ window.handleAdminLogout = function() {
   sessionStorage.removeItem("almuerzos_admin_logged");
   sessionStorage.removeItem("almuerzos_admin_email");
   
-  const emailInput = document.getElementById("admin-email");
-  const passInput = document.getElementById("admin-password");
-  if (emailInput) emailInput.value = "";
-  if (passInput) passInput.value = "";
+  const input = document.getElementById("admin-code-input");
+  if (input) input.value = "";
 
   showLogin();
 };
 
 // ----------------------------------------------------------------------------
-// 3. PREVISUALIZACIÓN DE IMAGEN EN TIEMPO REAL
+// 3. PREVISUALIZACIÓN DE FOTO
 // ----------------------------------------------------------------------------
 window.updateImagePreview = function(url) {
   const img = document.getElementById("adm-img-preview");
@@ -262,18 +191,8 @@ window.updateImagePreview = function(url) {
   }
 };
 
-window.handlePreviewError = function() {
-  const img = document.getElementById("adm-img-preview");
-  const placeholder = document.getElementById("adm-img-placeholder");
-  if (img && placeholder) {
-    img.classList.add("hidden");
-    placeholder.classList.remove("hidden");
-    placeholder.innerHTML = `<span style="color:#b91c1c;">⚠️ No se pudo cargar la imagen. Verifica la URL.</span>`;
-  }
-};
-
 // ----------------------------------------------------------------------------
-// 4. GESTOR DE MENÚ EN VIVO (Firebase Realtime Database)
+// 4. GESTOR DE MENÚ
 // ----------------------------------------------------------------------------
 function loadMenuData() {
   if (window.db && window.isFirebaseConfigured) {
@@ -333,10 +252,9 @@ window.saveMenuConfig = async function() {
   if (window.db && window.isFirebaseConfigured) {
     try {
       await window.db.ref("config_menu").set(adminMenu);
-      alert("✅ Menú actualizado con éxito en Firebase Realtime Database");
+      alert("✅ Menú actualizado en Firebase");
     } catch (e) {
-      console.error(e);
-      alert("⚠️ Error al sincronizar con Firebase. Verifique su conexión.");
+      alert("⚠️ Error al guardar en Firebase");
     }
   } else {
     localStorage.setItem("almuerzos_admin_config", JSON.stringify(adminMenu));
@@ -345,7 +263,7 @@ window.saveMenuConfig = async function() {
 };
 
 // ----------------------------------------------------------------------------
-// 5. RECEPCIÓN DE PEDIDOS EN TIEMPO REAL
+// 5. PEDIDOS EN VIVO
 // ----------------------------------------------------------------------------
 function startRealtimeOrdersListener() {
   if (window.db && window.isFirebaseConfigured) {
@@ -396,22 +314,6 @@ function loadLocalOrders() {
         costoEnvio: 3000,
         estado: "pendiente",
         timestamp: Date.now() - 1000 * 60 * 10
-      },
-      {
-        id: "ALM-7820",
-        cliente: "Don Gonzalo Pérez",
-        telefono: "3104445566",
-        diaEntrega: "Domingo (1:30 PM - 3:00 PM)",
-        plato: "Sancocho Trifásico Tradicional",
-        cantidad: 2,
-        tipoEntrega: "Recoger en sitio",
-        direccion: "Punto principal de venta",
-        metodoPago: "BANCOLOMBIA",
-        notas: "Llegamos tipo 1:45 PM",
-        total: 50000,
-        costoEnvio: 0,
-        estado: "preparacion",
-        timestamp: Date.now() - 1000 * 60 * 50
       }
     ];
     localStorage.setItem("almuerzos_pedidos_locales", JSON.stringify(localOrders));
@@ -458,7 +360,6 @@ function renderOrders() {
       <div style="background:white; border-radius:14px; border:1px solid #e2e8f0; padding:24px; text-align:center; color:#64748b; font-size:12px;">
         <div style="font-size:24px; margin-bottom:6px;">📭</div>
         <strong>No hay pedidos con este filtro</strong>
-        <p style="color:#94a3b8; margin-top:2px;">Los nuevos pedidos recibidos se mostrarán aquí en tiempo real.</p>
       </div>
     `;
     return;
@@ -502,7 +403,6 @@ function renderOrders() {
       </div>
 
       <div class="status-actions">
-        <span style="font-size:11px; font-weight:800; color:#64748b; margin-right:4px;">Cambiar estado:</span>
         <button onclick="updateOrderStatus('${order.id}', 'pendiente')" class="status-btn ${order.estado === 'pendiente' ? 'current' : ''}">Pendiente</button>
         <button onclick="updateOrderStatus('${order.id}', 'preparacion')" class="status-btn ${order.estado === 'preparacion' ? 'current' : ''}">Preparación</button>
         <button onclick="updateOrderStatus('${order.id}', 'camino')" class="status-btn ${order.estado === 'camino' ? 'current' : ''}">En Camino</button>

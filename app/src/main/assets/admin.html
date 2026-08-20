@@ -4,21 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   
-  <!-- Directivas Anti-Caché para Móviles -->
+  <!-- Anti-Caché -->
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
 
-  <title>Panel de Administración - Sazón Lau</title>
+  <title>Acceso Admin - Sazón Lau</title>
   
   <!-- Tipografía -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <!-- =====================================================================
-       CSS NATIVO PURO Y AUTOCONTENIDO (Cero dependencias de CDNs externos)
-       ===================================================================== -->
   <style>
     *, *::before, *::after {
       box-sizing: border-box !important;
@@ -31,15 +28,13 @@
       --brand: #ea580c;
       --brand-hover: #c2410c;
       --brand-light: #fff7ed;
-      --bg: #f1f5f9;
+      --bg: #f8fafc;
       --card-bg: #ffffff;
       --text: #1e293b;
       --text-muted: #64748b;
       --border: #cbd5e1;
       --border-light: #e2e8f0;
-      --success: #16a34a;
       --radius: 16px;
-      --radius-sm: 10px;
       --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
       --font-serif: 'Playfair Display', Georgia, serif;
     }
@@ -49,95 +44,17 @@
       background-color: var(--bg);
       color: var(--text);
       line-height: 1.4;
-      padding-bottom: 60px;
+      padding-bottom: 50px;
     }
 
     .container {
       width: 100%;
-      max-width: 800px;
+      max-width: 750px;
       margin: 0 auto;
       padding: 14px;
     }
 
-    /* HEADER */
-    .app-header {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background-color: rgba(255, 255, 255, 0.98);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      border-bottom: 1px solid var(--border-light);
-      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
-    }
-    .header-content {
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 10px 14px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .brand-group {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .brand-icon {
-      width: 38px;
-      height: 38px;
-      border-radius: 12px;
-      background: linear-gradient(135deg, #ea580c, #f59e0b);
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-      box-shadow: 0 4px 10px rgba(234, 88, 12, 0.25);
-    }
-    .brand-title {
-      font-size: 15px;
-      font-weight: 800;
-      color: #0f172a;
-      line-height: 1.1;
-    }
-    .brand-status {
-      font-size: 11px;
-      font-weight: 700;
-      color: #16a34a;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-    .status-dot {
-      width: 6px;
-      height: 6px;
-      background: #16a34a;
-      border-radius: 50%;
-    }
-    .header-actions {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .btn-action-nav {
-      font-size: 11px;
-      font-weight: 700;
-      padding: 6px 10px;
-      border-radius: 8px;
-      text-decoration: none;
-      border: 1px solid var(--border);
-      background: white;
-      color: #334155;
-      cursor: pointer;
-    }
-    .btn-logout {
-      background: #fee2e2;
-      color: #b91c1c;
-      border-color: #fca5a5;
-    }
-
-    /* LOGIN SCREEN */
+    /* LOGIN WRAPPER */
     .login-wrapper {
       min-height: 85vh;
       display: flex;
@@ -148,47 +65,46 @@
     .login-card {
       background: white;
       width: 100%;
-      max-width: 400px;
-      border-radius: 20px;
-      padding: 26px 22px;
+      max-width: 420px;
+      border-radius: 24px;
+      padding: 28px 22px;
       border: 1px solid var(--border-light);
-      box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.06);
       text-align: center;
     }
     .login-logo {
-      width: 52px;
-      height: 52px;
+      width: 56px;
+      height: 56px;
       background: linear-gradient(135deg, #ea580c, #f59e0b);
       color: white;
-      font-size: 24px;
-      border-radius: 16px;
+      font-size: 26px;
+      border-radius: 18px;
       display: flex;
       align-items: center;
       justify-content: center;
       margin: 0 auto 12px;
-      box-shadow: 0 4px 12px rgba(234, 88, 12, 0.3);
+      box-shadow: 0 4px 14px rgba(234, 88, 12, 0.3);
     }
     .login-title {
       font-family: var(--font-serif);
-      font-size: 22px;
+      font-size: 24px;
       font-weight: 800;
       color: #0f172a;
     }
     .login-sub {
-      font-size: 12px;
+      font-size: 13px;
       color: var(--text-muted);
-      margin-bottom: 20px;
+      margin-bottom: 18px;
     }
 
-    /* ALERTS */
     .alert-box {
-      padding: 10px 12px;
-      border-radius: 10px;
+      padding: 12px 14px;
+      border-radius: 12px;
       font-size: 12px;
       font-weight: 700;
       margin-bottom: 14px;
       text-align: left;
-      line-height: 1.4;
+      line-height: 1.45;
     }
     .alert-error {
       background: #fee2e2;
@@ -201,6 +117,142 @@
       border: 1px solid #86efac;
     }
 
+    .form-group {
+      margin-bottom: 14px;
+      text-align: left;
+    }
+    .form-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 800;
+      color: #334155;
+      margin-bottom: 6px;
+    }
+    .input-text, .input-code {
+      width: 100%;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1.5px solid var(--border);
+      background: #f8fafc;
+      color: #0f172a;
+      outline: none;
+    }
+    .input-text:focus, .input-code:focus {
+      background: white;
+      border-color: var(--brand);
+      box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.15);
+    }
+    .input-code {
+      font-family: monospace;
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: 8px;
+      text-align: center;
+      background: #fffbeb;
+      border-color: #fde68a;
+      color: #b45309;
+    }
+
+    .btn-submit {
+      width: 100%;
+      background: var(--brand);
+      color: white;
+      border: none;
+      padding: 14px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(234, 88, 12, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .btn-submit:active { transform: scale(0.98); }
+
+    .btn-code-request {
+      width: 100%;
+      background: #f1f5f9;
+      color: #0f172a;
+      border: 1.5px solid #cbd5e1;
+      padding: 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .btn-code-request:active { background: #e2e8f0; }
+
+    .btn-secondary {
+      background: transparent;
+      color: #64748b;
+      border: 1px solid var(--border-light);
+      padding: 8px 16px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      margin-top: 10px;
+    }
+
+    /* HEADER DASHBOARD */
+    .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background-color: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border-light);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    }
+    .header-content {
+      max-width: 750px;
+      margin: 0 auto;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .brand-group { display: flex; align-items: center; gap: 10px; }
+    .brand-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #ea580c, #f59e0b);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+    .brand-title { font-size: 15px; font-weight: 800; color: #0f172a; }
+    .brand-status { font-size: 11px; font-weight: 700; color: #16a34a; display: flex; align-items: center; gap: 4px; }
+    .status-dot { width: 6px; height: 6px; background: #16a34a; border-radius: 50%; }
+    
+    .btn-action-nav {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 6px 10px;
+      border-radius: 8px;
+      text-decoration: none;
+      border: 1px solid var(--border);
+      background: white;
+      color: #334155;
+      cursor: pointer;
+    }
+    .btn-logout { background: #fee2e2; color: #b91c1c; border-color: #fca5a5; }
+
     /* STATS METRICS */
     .metrics-grid {
       display: grid;
@@ -209,9 +261,7 @@
       margin-bottom: 16px;
     }
     @media (min-width: 600px) {
-      .metrics-grid {
-        grid-template-columns: 1fr 1fr 1fr 1fr;
-      }
+      .metrics-grid { grid-template-columns: 1fr 1fr 1fr 1fr; }
     }
     .metric-card {
       background: white;
@@ -220,32 +270,11 @@
       border: 1px solid var(--border-light);
       box-shadow: 0 2px 6px rgba(0,0,0,0.02);
     }
-    .metric-card.highlight-amber {
-      background: #fffbeb;
-      border-color: #fde68a;
-    }
-    .metric-card.highlight-sky {
-      background: #f0f9ff;
-      border-color: #bae6fd;
-    }
-    .metric-card.highlight-green {
-      background: #f0fdf4;
-      border-color: #bbf7d0;
-    }
-    .metric-label {
-      font-size: 10px;
-      font-weight: 800;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      letter-spacing: 0.5px;
-      display: block;
-    }
-    .metric-value {
-      font-size: 20px;
-      font-weight: 900;
-      color: #0f172a;
-      margin-top: 2px;
-    }
+    .metric-card.highlight-amber { background: #fffbeb; border-color: #fde68a; }
+    .metric-card.highlight-sky { background: #f0f9ff; border-color: #bae6fd; }
+    .metric-card.highlight-green { background: #f0fdf4; border-color: #bbf7d0; }
+    .metric-label { font-size: 10px; font-weight: 800; text-transform: uppercase; color: var(--text-muted); display: block; }
+    .metric-value { font-size: 20px; font-weight: 900; color: #0f172a; margin-top: 2px; }
 
     /* CARDS */
     .card {
@@ -264,16 +293,9 @@
       padding-bottom: 8px;
       border-bottom: 1px solid #f1f5f9;
     }
-    .card-title {
-      font-size: 14px;
-      font-weight: 800;
-      color: #0f172a;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
+    .card-title { font-size: 14px; font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 6px; }
 
-    /* PREVISUALIZADOR DE IMAGEN */
+    /* PREVIEW IMG */
     .img-preview-container {
       width: 100%;
       height: 140px;
@@ -281,35 +303,15 @@
       overflow: hidden;
       background: #f1f5f9;
       border: 1px dashed var(--border);
-      position: relative;
-      margin-top: 6px;
       display: flex;
       align-items: center;
       justify-content: center;
+      margin-top: 6px;
     }
-    .img-preview-container img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-    .img-preview-placeholder {
-      font-size: 11px;
-      color: var(--text-muted);
-      font-weight: 700;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-    }
+    .img-preview-container img { width: 100%; height: 100%; object-fit: cover; }
 
-    /* SEARCH & FILTERS */
-    .filter-bar {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 8px;
-    }
+    /* FILTROS & PEDIDOS */
+    .filter-bar { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
     .filter-btn {
       background: #f1f5f9;
       color: #475569;
@@ -320,13 +322,8 @@
       font-weight: 700;
       cursor: pointer;
     }
-    .filter-btn.active {
-      background: var(--brand);
-      color: white;
-      border-color: var(--brand);
-    }
+    .filter-btn.active { background: var(--brand); color: white; border-color: var(--brand); }
 
-    /* PEDIDOS LIST */
     .order-item {
       background: white;
       border: 1px solid var(--border-light);
@@ -335,171 +332,26 @@
       margin-bottom: 10px;
       box-shadow: 0 2px 4px rgba(0,0,0,0.02);
     }
-    .order-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding-bottom: 8px;
-      border-bottom: 1px solid #f1f5f9;
-      margin-bottom: 8px;
-    }
-    .order-id {
-      font-family: monospace;
-      font-size: 14px;
-      font-weight: 800;
-      color: #0f172a;
-    }
-    .badge {
-      display: inline-block;
-      padding: 3px 8px;
-      border-radius: 20px;
-      font-size: 10px;
-      font-weight: 800;
-      text-transform: uppercase;
-    }
+    .order-top { display: flex; justify-content: space-between; align-items: center; padding-bottom: 8px; border-bottom: 1px solid #f1f5f9; margin-bottom: 8px; }
+    .order-id { font-family: monospace; font-size: 14px; font-weight: 800; color: #0f172a; }
+    .badge { display: inline-block; padding: 3px 8px; border-radius: 20px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
     .badge-pendiente { background: #fef3c7; color: #b45309; }
     .badge-preparacion { background: #e0f2fe; color: #0369a1; }
     .badge-camino { background: #f3e8ff; color: #7e22ce; }
     .badge-entregado { background: #dcfce7; color: #15803d; }
     .badge-cancelado { background: #fee2e2; color: #b91c1c; }
 
-    .order-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      font-size: 12px;
-      margin-bottom: 8px;
-    }
-    .order-label {
-      font-size: 9px;
-      font-weight: 800;
-      color: #94a3b8;
-      text-transform: uppercase;
-      display: block;
-    }
-    .order-customer {
-      font-size: 13px;
-      font-weight: 800;
-      color: #0f172a;
-    }
-    .wsp-link {
-      color: #16a34a;
-      font-weight: 800;
-      text-decoration: none;
-      font-size: 11px;
-      display: inline-block;
-      margin-top: 2px;
-    }
-    .order-detail-box {
-      background: #f8fafc;
-      border: 1px solid #f1f5f9;
-      border-radius: 10px;
-      padding: 8px 10px;
-      font-size: 11px;
-      color: #334155;
-      margin-bottom: 8px;
-    }
+    .order-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 12px; margin-bottom: 8px; }
+    .order-label { font-size: 9px; font-weight: 800; color: #94a3b8; text-transform: uppercase; display: block; }
+    .order-customer { font-size: 13px; font-weight: 800; color: #0f172a; }
+    .wsp-link { color: #16a34a; font-weight: 800; text-decoration: none; font-size: 11px; display: inline-block; margin-top: 2px; }
+    .order-detail-box { background: #f8fafc; border: 1px solid #f1f5f9; border-radius: 10px; padding: 8px 10px; font-size: 11px; color: #334155; margin-bottom: 8px; }
 
-    .status-actions {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 4px;
-      padding-top: 6px;
-      border-top: 1px solid #f1f5f9;
-    }
-    .status-btn {
-      font-size: 10px;
-      font-weight: 700;
-      padding: 4px 8px;
-      border-radius: 6px;
-      border: 1px solid #e2e8f0;
-      background: #f8fafc;
-      color: #475569;
-      cursor: pointer;
-    }
-    .status-btn.current {
-      background: #0f172a;
-      color: white;
-      border-color: #0f172a;
-    }
+    .status-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; padding-top: 6px; border-top: 1px solid #f1f5f9; }
+    .status-btn { font-size: 10px; font-weight: 700; padding: 4px 8px; border-radius: 6px; border: 1px solid #e2e8f0; background: #f8fafc; color: #475569; cursor: pointer; }
+    .status-btn.current { background: #0f172a; color: white; border-color: #0f172a; }
 
-    /* FORMS & INPUTS */
-    .form-group {
-      margin-bottom: 12px;
-      text-align: left;
-    }
-    .form-label {
-      display: block;
-      font-size: 11px;
-      font-weight: 700;
-      color: #475569;
-      margin-bottom: 4px;
-    }
-    .input-text, .textarea-box {
-      width: 100%;
-      font-family: inherit;
-      font-size: 13px;
-      font-weight: 600;
-      padding: 10px 12px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: white;
-      color: #0f172a;
-      outline: none;
-    }
-    .input-text:focus, .textarea-box:focus {
-      border-color: var(--brand);
-      box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.12);
-    }
-    .btn-primary {
-      width: 100%;
-      background: var(--brand);
-      color: white;
-      border: none;
-      padding: 12px;
-      border-radius: 10px;
-      font-size: 13px;
-      font-weight: 800;
-      cursor: pointer;
-      box-shadow: 0 4px 12px rgba(234, 88, 12, 0.25);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-    }
-    .btn-primary:active {
-      transform: scale(0.99);
-    }
-    .btn-secondary {
-      background: #f1f5f9;
-      color: #334155;
-      border: 1px solid var(--border);
-      padding: 6px 12px;
-      border-radius: 8px;
-      font-size: 11px;
-      font-weight: 700;
-      cursor: pointer;
-      text-decoration: none;
-      display: inline-block;
-    }
-    .btn-link-action {
-      background: transparent;
-      border: none;
-      color: var(--brand);
-      font-size: 12px;
-      font-weight: 700;
-      cursor: pointer;
-      text-decoration: underline;
-      padding: 4px;
-      display: inline-block;
-    }
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-    }
-
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
     .hidden { display: none !important; }
   </style>
 
@@ -511,51 +363,47 @@
 </head>
 <body>
 
-  <!-- ==================== 1. PANTALLA DE LOGIN SEGURO ==================== -->
+  <!-- ==================== 1. PANTALLA DE ACCESO POR CÓDIGO / PIN ==================== -->
   <section id="admin-login-section" class="login-wrapper">
     <div class="login-card">
-      <div class="login-logo">🔒</div>
+      <div class="login-logo">🔐</div>
       <h1 class="login-title">Sazón Lau</h1>
-      <p class="login-sub">Panel Administrativo de Almuerzos</p>
+      <p class="login-sub">Acceso Seguro de Administración</p>
 
-      <!-- Mensajes dinámicos de error / éxito -->
+      <!-- Mensajes dinámicos -->
       <div id="login-error" class="alert-box alert-error hidden"></div>
       <div id="login-success" class="alert-box alert-success hidden"></div>
 
-      <!-- Formulario con campos inicializados completamente VACÍOS -->
-      <form onsubmit="handleAdminLogin(event)">
-        <div class="form-group">
-          <label class="form-label">Correo Electrónico Administrador</label>
-          <input type="email" id="admin-email" value="" required placeholder="tu-correo@ejemplo.com" class="input-text" autocomplete="email">
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Contraseña</label>
-          <input type="password" id="admin-password" value="" required placeholder="••••••••" class="input-text" autocomplete="current-password">
-        </div>
-
-        <button type="submit" id="btn-login-submit" class="btn-primary" style="margin-top: 6px;">
-          <span>Ingresar al Panel</span>
-        </button>
-      </form>
-
-      <!-- Opción de Recuperación / Envío de Clave por Correo -->
-      <div style="margin-top: 14px; padding-top: 12px; border-top: 1px solid #f1f5f9;">
-        <button type="button" onclick="handleForgotPassword()" class="btn-link-action">
-          🔑 ¿Olvidaste tu contraseña? / Enviar acceso a mi correo
+      <!-- BOTÓN PARA ENVIAR CÓDIGO AL CORREO AUTORIZADO -->
+      <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:16px; padding:14px; margin-bottom:16px;">
+        <div style="font-size:11px; font-weight:700; color:#64748b; margin-bottom:6px;">Correo Autorizado:</div>
+        <div style="font-size:13px; font-weight:800; color:#0f172a; margin-bottom:10px;">cm2026enero@gmail.com</div>
+        <button type="button" onclick="handleSendAccessCode()" id="btn-request-code" class="btn-code-request">
+          📩 Enviar Código de 4 Dígitos a mi Correo
         </button>
       </div>
 
-      <div style="margin-top: 12px;">
+      <!-- FORMULARIO DE INGRESO DIRECTO CON CÓDIGO O PIN -->
+      <form onsubmit="handleValidateCode(event)">
+        <div class="form-group">
+          <label class="form-label" style="text-align:center;">Ingresa el Código de 4 Dígitos o PIN:</label>
+          <input type="password" id="admin-code-input" maxlength="6" required placeholder="• • • •" class="input-code" autofocus>
+        </div>
+
+        <button type="submit" class="btn-submit">
+          <span>Abrir Panel de Administración</span>
+        </button>
+      </form>
+
+      <div style="margin-top: 14px;">
         <a href="index.html" class="btn-secondary">← Volver al Menú de Clientes</a>
       </div>
     </div>
   </section>
 
-  <!-- ==================== 2. DASHBOARD ADMINISTRATIVO ==================== -->
+  <!-- ==================== 2. PANEL ADMINISTRATIVO ==================== -->
   <section id="admin-dashboard-section" class="hidden">
     
-    <!-- Header -->
     <header class="app-header">
       <div class="header-content">
         <div class="brand-group">
@@ -564,14 +412,14 @@
             <div class="brand-title">Sazón Lau - Admin</div>
             <div class="brand-status">
               <span class="status-dot"></span>
-              <span id="header-admin-email">Firebase Conectado</span>
+              <span>Conectado (cm2026enero@gmail.com)</span>
             </div>
           </div>
         </div>
 
         <div class="header-actions">
-          <a href="index.html" target="_blank" class="btn-action-nav">👁️ Menú Cliente</a>
-          <button onclick="handleAdminLogout()" class="btn-action-nav btn-logout">Cerrar Sesión</button>
+          <a href="index.html" target="_blank" class="btn-action-nav">👁️ Ver Menú</a>
+          <button onclick="handleAdminLogout()" class="btn-action-nav btn-logout">Salir</button>
         </div>
       </div>
     </header>
@@ -601,9 +449,9 @@
       <!-- Gestor de Menú en Vivo con Previsualización de Imagen -->
       <div class="card">
         <div class="card-header-flex">
-          <h2 class="card-title">🍲 Gestor del Menú en Vivo</h2>
-          <button onclick="saveMenuConfig()" class="btn-secondary" style="background:#ea580c; color:white; border-color:#ea580c;">
-            💾 Guardar en Firebase
+          <h2 class="card-title">🍲 Menú y Precio en Vivo</h2>
+          <button onclick="saveMenuConfig()" class="btn-action-nav" style="background:#ea580c; color:white; border-color:#ea580c;">
+            💾 Guardar Cambios
           </button>
         </div>
 
@@ -630,20 +478,20 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label">URL Imagen del Plato (con Previsualización en Vivo)</label>
+          <label class="form-label">URL Foto del Plato</label>
           <input type="url" id="adm-plato-imagen" class="input-text" placeholder="https://..." oninput="updateImagePreview(this.value)">
           
           <div class="img-preview-container">
-            <img id="adm-img-preview" src="" alt="Previsualización" class="hidden" onerror="handlePreviewError()">
-            <div id="adm-img-placeholder" class="img-preview-placeholder">
-              <span>🖼️ Vista previa de la foto del menú</span>
+            <img id="adm-img-preview" src="" alt="Previsualización" class="hidden">
+            <div id="adm-img-placeholder" style="font-size:11px; color:#64748b; font-weight:700;">
+              🖼️ Vista previa de la foto del almuerzo
             </div>
           </div>
         </div>
 
         <div class="form-group">
-          <label class="form-label">Descripción del Plato</label>
-          <textarea id="adm-plato-desc" rows="2" class="textarea-box" placeholder="Ingredientes y preparación..."></textarea>
+          <label class="form-label">Descripción</label>
+          <textarea id="adm-plato-desc" rows="2" class="input-text" placeholder="Ingredientes y preparación..."></textarea>
         </div>
       </div>
 
@@ -651,15 +499,13 @@
       <div class="card">
         <div class="card-header-flex">
           <h2 class="card-title">🔔 Pedidos Recibidos (/pedidos)</h2>
-          <button onclick="exportOrdersToCSV()" class="btn-secondary">📥 Exportar CSV</button>
+          <button onclick="exportOrdersToCSV()" class="btn-action-nav">📥 Exportar CSV</button>
         </div>
 
-        <!-- Buscador -->
         <div class="form-group">
           <input type="text" id="admin-search-input" placeholder="Buscar por cliente, teléfono o plato..." class="input-text">
         </div>
 
-        <!-- Filtros -->
         <div class="filter-bar">
           <button class="filter-btn active" data-status="todos">Todos</button>
           <button class="filter-btn" data-status="pendiente">Pendientes</button>
@@ -669,9 +515,8 @@
         </div>
       </div>
 
-      <!-- Lista de Pedidos en Vivo -->
       <div id="admin-orders-list">
-        <!-- Renderizado dinámico desde admin.js -->
+        <!-- Renderizado dinámico -->
       </div>
 
     </main>
