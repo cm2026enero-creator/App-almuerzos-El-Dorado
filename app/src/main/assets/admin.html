@@ -37,6 +37,7 @@
       --text-muted: #64748b;
       --border: #cbd5e1;
       --border-light: #e2e8f0;
+      --success: #16a34a;
       --radius: 16px;
       --radius-sm: 10px;
       --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
@@ -149,7 +150,7 @@
       width: 100%;
       max-width: 400px;
       border-radius: 20px;
-      padding: 24px;
+      padding: 26px 22px;
       border: 1px solid var(--border-light);
       box-shadow: 0 10px 25px rgba(0,0,0,0.06);
       text-align: center;
@@ -177,6 +178,27 @@
       font-size: 12px;
       color: var(--text-muted);
       margin-bottom: 20px;
+    }
+
+    /* ALERTS */
+    .alert-box {
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 14px;
+      text-align: left;
+      line-height: 1.4;
+    }
+    .alert-error {
+      background: #fee2e2;
+      color: #b91c1c;
+      border: 1px solid #fca5a5;
+    }
+    .alert-success {
+      background: #dcfce7;
+      color: #15803d;
+      border: 1px solid #86efac;
     }
 
     /* STATS METRICS */
@@ -249,6 +271,36 @@
       display: flex;
       align-items: center;
       gap: 6px;
+    }
+
+    /* PREVISUALIZADOR DE IMAGEN */
+    .img-preview-container {
+      width: 100%;
+      height: 140px;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #f1f5f9;
+      border: 1px dashed var(--border);
+      position: relative;
+      margin-top: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .img-preview-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .img-preview-placeholder {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 700;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
     }
 
     /* SEARCH & FILTERS */
@@ -374,7 +426,7 @@
 
     /* FORMS & INPUTS */
     .form-group {
-      margin-bottom: 10px;
+      margin-bottom: 12px;
       text-align: left;
     }
     .form-label {
@@ -411,6 +463,13 @@
       font-weight: 800;
       cursor: pointer;
       box-shadow: 0 4px 12px rgba(234, 88, 12, 0.25);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .btn-primary:active {
+      transform: scale(0.99);
     }
     .btn-secondary {
       background: #f1f5f9;
@@ -422,6 +481,17 @@
       font-weight: 700;
       cursor: pointer;
       text-decoration: none;
+      display: inline-block;
+    }
+    .btn-link-action {
+      background: transparent;
+      border: none;
+      color: var(--brand);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: underline;
+      padding: 4px;
       display: inline-block;
     }
     .grid-2 {
@@ -441,32 +511,42 @@
 </head>
 <body>
 
-  <!-- ==================== 1. PANTALLA DE LOGIN ==================== -->
+  <!-- ==================== 1. PANTALLA DE LOGIN SEGURO ==================== -->
   <section id="admin-login-section" class="login-wrapper">
     <div class="login-card">
       <div class="login-logo">🔒</div>
       <h1 class="login-title">Sazón Lau</h1>
       <p class="login-sub">Panel Administrativo de Almuerzos</p>
 
-      <div id="login-error" class="hidden" style="background:#fee2e2; color:#b91c1c; padding:8px; border-radius:8px; font-size:12px; font-weight:700; margin-bottom:12px;"></div>
+      <!-- Mensajes dinámicos de error / éxito -->
+      <div id="login-error" class="alert-box alert-error hidden"></div>
+      <div id="login-success" class="alert-box alert-success hidden"></div>
 
+      <!-- Formulario con campos inicializados completamente VACÍOS -->
       <form onsubmit="handleAdminLogin(event)">
         <div class="form-group">
           <label class="form-label">Correo Electrónico Administrador</label>
-          <input type="email" id="admin-email" value="admin@sazonlau.com" required placeholder="admin@sazonlau.com" class="input-text">
+          <input type="email" id="admin-email" value="" required placeholder="tu-correo@ejemplo.com" class="input-text" autocomplete="email">
         </div>
 
         <div class="form-group">
           <label class="form-label">Contraseña</label>
-          <input type="password" id="admin-password" value="admin123" required placeholder="••••••••" class="input-text">
+          <input type="password" id="admin-password" value="" required placeholder="••••••••" class="input-text" autocomplete="current-password">
         </div>
 
-        <button type="submit" class="btn-primary" style="margin-top: 6px;">
-          Ingresar al Panel
+        <button type="submit" id="btn-login-submit" class="btn-primary" style="margin-top: 6px;">
+          <span>Ingresar al Panel</span>
         </button>
       </form>
 
-      <div style="margin-top: 16px;">
+      <!-- Opción de Recuperación / Envío de Clave por Correo -->
+      <div style="margin-top: 14px; padding-top: 12px; border-top: 1px solid #f1f5f9;">
+        <button type="button" onclick="handleForgotPassword()" class="btn-link-action">
+          🔑 ¿Olvidaste tu contraseña? / Enviar acceso a mi correo
+        </button>
+      </div>
+
+      <div style="margin-top: 12px;">
         <a href="index.html" class="btn-secondary">← Volver al Menú de Clientes</a>
       </div>
     </div>
@@ -484,14 +564,14 @@
             <div class="brand-title">Sazón Lau - Admin</div>
             <div class="brand-status">
               <span class="status-dot"></span>
-              <span>Firebase RTDB Conectado</span>
+              <span id="header-admin-email">Firebase Conectado</span>
             </div>
           </div>
         </div>
 
         <div class="header-actions">
           <a href="index.html" target="_blank" class="btn-action-nav">👁️ Menú Cliente</a>
-          <button onclick="handleAdminLogout()" class="btn-action-nav btn-logout">Salir</button>
+          <button onclick="handleAdminLogout()" class="btn-action-nav btn-logout">Cerrar Sesión</button>
         </div>
       </div>
     </header>
@@ -518,7 +598,7 @@
         </div>
       </div>
 
-      <!-- Gestor de Menú en Vivo (Formulario Compacto) -->
+      <!-- Gestor de Menú en Vivo con Previsualización de Imagen -->
       <div class="card">
         <div class="card-header-flex">
           <h2 class="card-title">🍲 Gestor del Menú en Vivo</h2>
@@ -530,28 +610,40 @@
         <div class="grid-2">
           <div class="form-group">
             <label class="form-label">Nombre del Plato Destacado</label>
-            <input type="text" id="adm-plato-nombre" class="input-text">
+            <input type="text" id="adm-plato-nombre" class="input-text" placeholder="Ej. Pollo con Yuca y Plátano">
           </div>
           <div class="form-group">
-            <label class="form-label">Precio ($)</label>
-            <input type="number" id="adm-plato-precio" class="input-text">
+            <label class="form-label">Precio Porción ($)</label>
+            <input type="number" id="adm-plato-precio" class="input-text" placeholder="22000">
           </div>
         </div>
 
         <div class="grid-2">
           <div class="form-group">
             <label class="form-label">Costo Domicilio ($)</label>
-            <input type="number" id="adm-domicilio-precio" class="input-text">
+            <input type="number" id="adm-domicilio-precio" class="input-text" placeholder="3000">
           </div>
           <div class="form-group">
-            <label class="form-label">URL Imagen</label>
-            <input type="url" id="adm-plato-imagen" class="input-text">
+            <label class="form-label">WhatsApp para Reservas</label>
+            <input type="tel" id="adm-whatsapp" class="input-text" placeholder="573001234567">
           </div>
         </div>
 
         <div class="form-group">
-          <label class="form-label">Descripción</label>
-          <textarea id="adm-plato-desc" rows="2" class="textarea-box"></textarea>
+          <label class="form-label">URL Imagen del Plato (con Previsualización en Vivo)</label>
+          <input type="url" id="adm-plato-imagen" class="input-text" placeholder="https://..." oninput="updateImagePreview(this.value)">
+          
+          <div class="img-preview-container">
+            <img id="adm-img-preview" src="" alt="Previsualización" class="hidden" onerror="handlePreviewError()">
+            <div id="adm-img-placeholder" class="img-preview-placeholder">
+              <span>🖼️ Vista previa de la foto del menú</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Descripción del Plato</label>
+          <textarea id="adm-plato-desc" rows="2" class="textarea-box" placeholder="Ingredientes y preparación..."></textarea>
         </div>
       </div>
 

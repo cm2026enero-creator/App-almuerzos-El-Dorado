@@ -96,6 +96,7 @@ fun AppWebView(
           useWideViewPort = true
           loadWithOverviewMode = true
           mediaPlaybackRequiresUserGesture = false
+          mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
           @Suppress("DEPRECATION")
           allowFileAccessFromFileURLs = true
           @Suppress("DEPRECATION")

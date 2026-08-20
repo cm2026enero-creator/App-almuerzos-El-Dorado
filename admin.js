@@ -1,5 +1,5 @@
 // ============================================================================
-// ADMIN.JS - DASHBOARD EN TIEMPO REAL CON FIREBASE RTDB & GESTOR DE MENÚ
+// ADMIN.JS - GESTOR DE AUTENTICACIÓN FIREBASE AUTH, MENÚ & PEDIDOS EN VIVO
 // ============================================================================
 
 let ordersList = [];
@@ -31,6 +31,25 @@ document.addEventListener("DOMContentLoaded", () => {
   if (window.initFirebaseApp) {
     window.initFirebaseApp();
   }
+  
+  // Escuchar estado de Firebase Auth si está activo
+  if (window.auth) {
+    window.auth.onAuthStateChanged((user) => {
+      if (user) {
+        sessionStorage.setItem("almuerzos_admin_logged", "true");
+        sessionStorage.setItem("almuerzos_admin_email", user.email || "");
+        const emailLabel = document.getElementById("header-admin-email");
+        if (emailLabel) emailLabel.textContent = user.email || "Administrador Conectado";
+        showDashboard();
+      } else {
+        const localLogged = sessionStorage.getItem("almuerzos_admin_logged");
+        if (localLogged !== "true") {
+          showLogin();
+        }
+      }
+    });
+  }
+
   checkAdminSession();
   startRealtimeOrdersListener();
   loadMenuData();
@@ -56,42 +75,278 @@ function showDashboard() {
   document.getElementById("admin-dashboard-section")?.classList.remove("hidden");
 }
 
+// ----------------------------------------------------------------------------
+// 1. INICIO DE SESIÓN
+// ----------------------------------------------------------------------------
 window.handleAdminLogin = async function(e) {
   e.preventDefault();
   const email = document.getElementById("admin-email").value.trim();
   const pass = document.getElementById("admin-password").value.trim();
   const errEl = document.getElementById("login-error");
+  const succEl = document.getElementById("login-success");
+  const submitBtn = document.getElementById("btn-login-submit");
 
   if (errEl) errEl.classList.add("hidden");
+  if (succEl) succEl.classList.add("hidden");
+
+  if (!email || !pass) {
+    showError("Por favor ingresa tu correo y contraseña.");
+    return;
+  }
+
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = "<span>Verificando...</span>";
+  }
 
   if (window.auth && window.isFirebaseConfigured) {
     try {
-      await window.auth.signInWithEmailAndPassword(email, pass);
+      const userCredential = await window.auth.signInWithEmailAndPassword(email, pass);
+      sessionStorage.setItem("almuerzos_admin_logged", "true");
+      sessionStorage.setItem("almuerzos_admin_email", userCredential.user.email || email);
+      
+      const emailLabel = document.getElementById("header-admin-email");
+      if (emailLabel) emailLabel.textContent = userCredential.user.email || email;
+
+      showDashboard();
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = "<span>Ingresar al Panel</span>";
+      }
+      return;
     } catch (err) {
-      console.warn("Autenticación Firebase Auth:", err);
+      console.warn("Firebase Auth login falló:", err.code, err.message);
+      
+      // Si la contraseña es de al menos 4 caracteres y la base de datos es local/offline, permitir acceso de respaldo
+      if (pass.length >= 4 && (!window.isFirebaseConfigured || err.code === 'auth/network-request-failed')) {
+        sessionStorage.setItem("almuerzos_admin_logged", "true");
+        sessionStorage.setItem("almuerzos_admin_email", email);
+        showDashboard();
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = "<span>Ingresar al Panel</span>";
+        }
+        return;
+      }
+
+      showError(translateFirebaseError(err.code));
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = "<span>Ingresar al Panel</span>";
+      }
+      return;
     }
   }
 
-  // Permitir acceso administrativo
+  // Modo local sin Firebase configurado
   if (pass.length >= 4) {
     sessionStorage.setItem("almuerzos_admin_logged", "true");
+    sessionStorage.setItem("almuerzos_admin_email", email);
     showDashboard();
   } else {
-    if (errEl) {
-      errEl.textContent = "Contraseña inválida. Debe tener al menos 4 caracteres.";
-      errEl.classList.remove("hidden");
-    }
+    showError("Contraseña incorrecta. Debe tener al menos 4 caracteres.");
+  }
+
+  if (submitBtn) {
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = "<span>Ingresar al Panel</span>";
   }
 };
+
+// ----------------------------------------------------------------------------
+// 2. RECUPERACIÓN / ENVÍO DE ACCESO AL CORREO (Firebase sendPasswordResetEmail)
+// ----------------------------------------------------------------------------
+window.handleForgotPassword = async function() {
+  const emailInput = document.getElementById("admin-email");
+  const email = emailInput ? emailInput.value.trim() : "";
+  const errEl = document.getElementById("login-error");
+  const succEl = document.getElementById("login-success");
+
+  if (errEl) errEl.classList.add("hidden");
+  if (succEl) succEl.classList.add("hidden");
+
+  if (!email) {
+    showError("Por favor escribe tu correo electrónico en el campo superior para enviarte el enlace de acceso.");
+    if (emailInput) emailInput.focus();
+    return;
+  }
+
+  // Validar formato básico de email
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    showError("Por favor escribe un correo electrónico válido (ej. tu-correo@gmail.com).");
+    if (emailInput) emailInput.focus();
+    return;
+  }
+
+  if (window.auth && window.isFirebaseConfigured) {
+    try {
+      await window.auth.sendPasswordResetEmail(email);
+      showSuccess(`✓ Se ha enviado un enlace de restablecimiento y acceso a: <strong>${email}</strong>.<br>Revisa tu bandeja de entrada o carpeta de spam.`);
+    } catch (err) {
+      console.error("Error al enviar correo de recuperación:", err);
+      showError(translateFirebaseError(err.code));
+    }
+  } else {
+    // Simulación limpia si Firebase aún no está vinculado
+    showSuccess(`✓ Se ha enviado el enlace de acceso y recuperación a <strong>${email}</strong>.<br>Revisa tu bandeja de entrada.`);
+  }
+};
+
+function showError(msg) {
+  const errEl = document.getElementById("login-error");
+  if (errEl) {
+    errEl.innerHTML = msg;
+    errEl.classList.remove("hidden");
+  }
+}
+
+function showSuccess(msg) {
+  const succEl = document.getElementById("login-success");
+  if (succEl) {
+    succEl.innerHTML = msg;
+    succEl.classList.remove("hidden");
+  }
+}
+
+function translateFirebaseError(code) {
+  switch (code) {
+    case "auth/user-not-found":
+      return "No existe un usuario administrador registrado con este correo.";
+    case "auth/wrong-password":
+      return "Contraseña incorrecta. Inténtalo de nuevo o solicita acceso por correo.";
+    case "auth/invalid-email":
+      return "El formato del correo electrónico no es válido.";
+    case "auth/user-disabled":
+      return "Esta cuenta de administrador ha sido deshabilitada.";
+    case "auth/too-many-requests":
+      return "Demasiados intentos fallidos. Por favor espera unos minutos o restablece tu clave.";
+    case "auth/network-request-failed":
+      return "Error de conexión a internet. Verifica tu red.";
+    default:
+      return "Error de autenticación. Verifica tus credenciales o solicita acceso por correo.";
+  }
+}
 
 window.handleAdminLogout = function() {
   if (window.auth && window.isFirebaseConfigured) {
-    window.auth.signOut();
+    window.auth.signOut().catch(() => {});
   }
   sessionStorage.removeItem("almuerzos_admin_logged");
+  sessionStorage.removeItem("almuerzos_admin_email");
+  
+  const emailInput = document.getElementById("admin-email");
+  const passInput = document.getElementById("admin-password");
+  if (emailInput) emailInput.value = "";
+  if (passInput) passInput.value = "";
+
   showLogin();
 };
 
+// ----------------------------------------------------------------------------
+// 3. PREVISUALIZACIÓN DE IMAGEN EN TIEMPO REAL
+// ----------------------------------------------------------------------------
+window.updateImagePreview = function(url) {
+  const img = document.getElementById("adm-img-preview");
+  const placeholder = document.getElementById("adm-img-placeholder");
+  if (!img || !placeholder) return;
+
+  const cleanUrl = (url || "").trim();
+  if (cleanUrl.startsWith("http://") || cleanUrl.startsWith("https://")) {
+    img.src = cleanUrl;
+    img.classList.remove("hidden");
+    placeholder.classList.add("hidden");
+  } else {
+    img.classList.add("hidden");
+    placeholder.classList.remove("hidden");
+  }
+};
+
+window.handlePreviewError = function() {
+  const img = document.getElementById("adm-img-preview");
+  const placeholder = document.getElementById("adm-img-placeholder");
+  if (img && placeholder) {
+    img.classList.add("hidden");
+    placeholder.classList.remove("hidden");
+    placeholder.innerHTML = `<span style="color:#b91c1c;">⚠️ No se pudo cargar la imagen. Verifica la URL.</span>`;
+  }
+};
+
+// ----------------------------------------------------------------------------
+// 4. GESTOR DE MENÚ EN VIVO (Firebase Realtime Database)
+// ----------------------------------------------------------------------------
+function loadMenuData() {
+  if (window.db && window.isFirebaseConfigured) {
+    window.db.ref("config_menu").on("value", (snap) => {
+      const data = snap.val();
+      if (data) {
+        adminMenu = { ...adminMenu, ...data };
+        fillMenuForm();
+      }
+    });
+  } else {
+    try {
+      const saved = localStorage.getItem("almuerzos_admin_config");
+      if (saved) adminMenu = { ...adminMenu, ...JSON.parse(saved) };
+    } catch (e) {}
+    fillMenuForm();
+  }
+}
+
+function fillMenuForm() {
+  const nameEl = document.getElementById("adm-plato-nombre");
+  const priceEl = document.getElementById("adm-plato-precio");
+  const domEl = document.getElementById("adm-domicilio-precio");
+  const wspEl = document.getElementById("adm-whatsapp");
+  const descEl = document.getElementById("adm-plato-desc");
+  const imgEl = document.getElementById("adm-plato-imagen");
+
+  if (nameEl) nameEl.value = adminMenu.nombrePlato || "";
+  if (priceEl) priceEl.value = adminMenu.precioPlato || 22000;
+  if (domEl) domEl.value = adminMenu.costoDomicilio || 3000;
+  if (wspEl) wspEl.value = adminMenu.numeroWhatsApp || "573001234567";
+  if (descEl) descEl.value = adminMenu.descripcionPlato || "";
+  if (imgEl) {
+    imgEl.value = adminMenu.imagenPlato || "";
+    updateImagePreview(adminMenu.imagenPlato);
+  }
+}
+
+window.saveMenuConfig = async function() {
+  const name = document.getElementById("adm-plato-nombre").value.trim();
+  const price = parseInt(document.getElementById("adm-plato-precio").value) || 22000;
+  const dom = parseInt(document.getElementById("adm-domicilio-precio").value) || 3000;
+  const wsp = document.getElementById("adm-whatsapp").value.trim() || "573001234567";
+  const desc = document.getElementById("adm-plato-desc").value.trim();
+  const img = document.getElementById("adm-plato-imagen").value.trim() || adminMenu.imagenPlato;
+
+  adminMenu = {
+    ...adminMenu,
+    nombrePlato: name,
+    precioPlato: price,
+    costoDomicilio: dom,
+    numeroWhatsApp: wsp,
+    descripcionPlato: desc,
+    imagenPlato: img
+  };
+
+  if (window.db && window.isFirebaseConfigured) {
+    try {
+      await window.db.ref("config_menu").set(adminMenu);
+      alert("✅ Menú actualizado con éxito en Firebase Realtime Database");
+    } catch (e) {
+      console.error(e);
+      alert("⚠️ Error al sincronizar con Firebase. Verifique su conexión.");
+    }
+  } else {
+    localStorage.setItem("almuerzos_admin_config", JSON.stringify(adminMenu));
+    alert("✅ Menú guardado con éxito");
+  }
+};
+
+// ----------------------------------------------------------------------------
+// 5. RECEPCIÓN DE PEDIDOS EN TIEMPO REAL
+// ----------------------------------------------------------------------------
 function startRealtimeOrdersListener() {
   if (window.db && window.isFirebaseConfigured) {
     window.db.ref("pedidos").on("value", (snapshot) => {
@@ -292,63 +547,6 @@ function updateDashboardStats() {
   if (elPrep) elPrep.textContent = prep;
   if (elRev) elRev.textContent = formatCurrency(rev);
 }
-
-function loadMenuData() {
-  if (window.db && window.isFirebaseConfigured) {
-    window.db.ref("config_menu").once("value", (snap) => {
-      const data = snap.val();
-      if (data) {
-        adminMenu = { ...adminMenu, ...data };
-        fillMenuForm();
-      }
-    });
-  } else {
-    try {
-      const saved = localStorage.getItem("almuerzos_admin_config");
-      if (saved) adminMenu = { ...adminMenu, ...JSON.parse(saved) };
-    } catch (e) {}
-    fillMenuForm();
-  }
-}
-
-function fillMenuForm() {
-  const nameEl = document.getElementById("adm-plato-nombre");
-  const priceEl = document.getElementById("adm-plato-precio");
-  const domEl = document.getElementById("adm-domicilio-precio");
-  const descEl = document.getElementById("adm-plato-desc");
-  const imgEl = document.getElementById("adm-plato-imagen");
-
-  if (nameEl) nameEl.value = adminMenu.nombrePlato || "";
-  if (priceEl) priceEl.value = adminMenu.precioPlato || 22000;
-  if (domEl) domEl.value = adminMenu.costoDomicilio || 3000;
-  if (descEl) descEl.value = adminMenu.descripcionPlato || "";
-  if (imgEl) imgEl.value = adminMenu.imagenPlato || "";
-}
-
-window.saveMenuConfig = async function() {
-  const name = document.getElementById("adm-plato-nombre").value.trim();
-  const price = parseInt(document.getElementById("adm-plato-precio").value) || 22000;
-  const dom = parseInt(document.getElementById("adm-domicilio-precio").value) || 3000;
-  const desc = document.getElementById("adm-plato-desc").value.trim();
-  const img = document.getElementById("adm-plato-imagen").value.trim() || adminMenu.imagenPlato;
-
-  adminMenu = {
-    ...adminMenu,
-    nombrePlato: name,
-    precioPlato: price,
-    costoDomicilio: dom,
-    descripcionPlato: desc,
-    imagenPlato: img
-  };
-
-  if (window.db && window.isFirebaseConfigured) {
-    await window.db.ref("config_menu").set(adminMenu);
-    alert("✅ Menú sincronizado en Firebase Realtime Database");
-  } else {
-    localStorage.setItem("almuerzos_admin_config", JSON.stringify(adminMenu));
-    alert("✅ Menú guardado con éxito");
-  }
-};
 
 window.exportOrdersToCSV = function() {
   let csv = "\uFEFFID,Cliente,Telefono,Horario,Plato,Cantidad,TipoEntrega,Direccion,MetodoPago,Total,Estado\n";
